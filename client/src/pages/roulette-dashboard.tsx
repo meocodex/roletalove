@@ -8,6 +8,7 @@ import { PatternAnalysis } from '@/components/pattern-analysis';
 import { StrategyPanel } from '@/components/strategy-panel';
 import { StatsPanel } from '@/components/stats-panel';
 import { AlertsPanel } from '@/components/alerts-panel';
+import { BettingPreferences } from '@/components/betting-preferences';
 import { useWebSocket } from '@/hooks/use-websocket';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
@@ -239,6 +240,9 @@ export default function RouletteDashboard() {
 
             {/* Strategy System */}
             <StrategyPanel />
+
+            {/* Betting Preferences */}
+            <BettingPreferences />
 
             {/* Real-time Stats */}
             <StatsPanel />

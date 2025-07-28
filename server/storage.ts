@@ -1,4 +1,4 @@
-import { type RouletteResult, type InsertRouletteResult, type Pattern, type InsertPattern, type Strategy, type InsertStrategy, type Alert, type InsertAlert, type Session, type InsertSession } from "@shared/schema";
+import { type RouletteResult, type InsertRouletteResult, type Pattern, type InsertPattern, type Strategy, type InsertStrategy, type Alert, type InsertAlert, type Session, type InsertSession, type BettingPreference, type InsertBettingPreference } from "@shared/schema";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -27,6 +27,11 @@ export interface IStorage {
   createSession(session: InsertSession): Promise<Session>;
   getCurrentSession(): Promise<Session | undefined>;
   updateSession(id: string, updates: Partial<Session>): Promise<Session | undefined>;
+  
+  // Betting Preferences
+  getBettingPreferences(): Promise<BettingPreference[]>;
+  updateBettingPreference(id: string, updates: Partial<BettingPreference>): Promise<BettingPreference | undefined>;
+  saveBettingPreference(preference: InsertBettingPreference): Promise<BettingPreference>;
 }
 
 export class MemStorage implements IStorage {
@@ -35,12 +40,14 @@ export class MemStorage implements IStorage {
   private strategies: Map<string, Strategy> = new Map();
   private alerts: Map<string, Alert> = new Map();
   private sessions: Map<string, Session> = new Map();
+  private bettingPreferences: Map<string, BettingPreference> = new Map();
   private currentSessionId: string | null = null;
 
   constructor() {
-    // Initialize with default session
+    // Initialize with default session and strategies
     this.initializeDefaultSession();
     this.initializeDefaultStrategies();
+    this.initializeDefaultBettingPreferences();
   }
 
   private async initializeDefaultSession() {
@@ -89,6 +96,75 @@ export class MemStorage implements IStorage {
 
     this.strategies.set(straightUpStrategy.id, straightUpStrategy);
     this.strategies.set(neighborsStrategy.id, neighborsStrategy);
+  }
+
+  private async initializeDefaultBettingPreferences() {
+    const preferences: BettingPreference[] = [
+      {
+        id: randomUUID(),
+        name: "Números Plenos",
+        type: "straight_up",
+        enabled: true,
+        description: "Apostas em números únicos (0-36) com pagamento 35:1",
+        priority: 5,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        id: randomUUID(),
+        name: "Vizinhos",
+        type: "neighbors",
+        enabled: true,
+        description: "Apostas em grupos de números vizinhos na roda",
+        priority: 4,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        id: randomUUID(),
+        name: "Dúzias",
+        type: "dozens",
+        enabled: true,
+        description: "Apostas nas dúzias (1-12, 13-24, 25-36) com pagamento 2:1",
+        priority: 3,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        id: randomUUID(),
+        name: "Colunas",
+        type: "columns",
+        enabled: false,
+        description: "Apostas nas colunas verticais com pagamento 2:1",
+        priority: 2,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        id: randomUUID(),
+        name: "Cores",
+        type: "colors",
+        enabled: false,
+        description: "Apostas em vermelho/preto com pagamento 1:1",
+        priority: 2,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        id: randomUUID(),
+        name: "Par/Ímpar", 
+        type: "parity",
+        enabled: false,
+        description: "Apostas em números pares/ímpares com pagamento 1:1",
+        priority: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    ];
+
+    preferences.forEach(pref => {
+      this.bettingPreferences.set(pref.id, pref);
+    });
   }
 
   async addResult(insertResult: InsertRouletteResult): Promise<RouletteResult> {
@@ -235,6 +311,33 @@ export class MemStorage implements IStorage {
     const updatedSession = { ...session, ...updates };
     this.sessions.set(id, updatedSession);
     return updatedSession;
+  }
+
+  async getBettingPreferences(): Promise<BettingPreference[]> {
+    return Array.from(this.bettingPreferences.values())
+      .sort((a, b) => (b.priority || 0) - (a.priority || 0));
+  }
+
+  async updateBettingPreference(id: string, updates: Partial<BettingPreference>): Promise<BettingPreference | undefined> {
+    const preference = this.bettingPreferences.get(id);
+    if (!preference) return undefined;
+    
+    const updatedPreference = { ...preference, ...updates, updatedAt: new Date() };
+    this.bettingPreferences.set(id, updatedPreference);
+    return updatedPreference;
+  }
+
+  async saveBettingPreference(insertPreference: InsertBettingPreference): Promise<BettingPreference> {
+    const id = randomUUID();
+    const preference: BettingPreference = {
+      ...insertPreference,
+      id,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    
+    this.bettingPreferences.set(id, preference);
+    return preference;
   }
 }
 

@@ -482,5 +482,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get betting preferences
+  app.get('/api/betting-preferences', async (req, res) => {
+    try {
+      const preferences = await storage.getBettingPreferences();
+      res.json(preferences);
+    } catch (error) {
+      console.error('Error fetching betting preferences:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  // Update betting preference
+  app.put('/api/betting-preferences/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updates = req.body;
+      
+      const updatedPreference = await storage.updateBettingPreference(id, updates);
+      if (!updatedPreference) {
+        return res.status(404).json({ error: 'Preference not found' });
+      }
+      
+      // Create alert for preference change
+      await storage.addAlert({
+        type: 'system_info',
+        title: 'Preferência Atualizada',
+        message: `${updatedPreference.name} foi ${updatedPreference.enabled ? 'ativada' : 'desativada'}`,
+        severity: 'info',
+        data: { preference: updatedPreference.name, enabled: updatedPreference.enabled },
+        read: false
+      });
+      
+      res.json(updatedPreference);
+    } catch (error) {
+      console.error('Error updating betting preference:', error);
+      res.status(400).json({ error: 'Invalid data' });
+    }
+  });
+
   return httpServer;
 }

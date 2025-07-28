@@ -17,12 +17,22 @@ Preferred communication style: Portuguese, simple and everyday language.
 - WebSocket para atualizações em tempo real
 - API REST funcionando corretamente (testado)
 - Dashboard interativo com painéis de análise
+- **NOVO**: Sistema de preferências de apostas configurável pelo cliente
 
 ✅ **Estratégias Implementadas**
 - Números Plenos: exatamente 7 números obrigatoriamente por rodada, máximo 5 tentativas
 - Vizinhos: até 21 números cobertos, máximo 5 tentativas  
 - Recálculo automático da estratégia quando não acerta após 5 tentativas
 - Algoritmo inteligente para gerar novos números plenos baseado em números quentes/frios
+
+✅ **Preferências de Apostas (NOVO)**
+- Números Plenos: apostas diretas (0-36) com pagamento 35:1 - ATIVO
+- Vizinhos: grupos de números vizinhos na roda - ATIVO  
+- Dúzias: apostas nas dúzias (1-12, 13-24, 25-36) com pagamento 2:1 - ATIVO
+- Colunas: apostas nas colunas verticais com pagamento 2:1 - INATIVO
+- Cores: apostas vermelho/preto com pagamento 1:1 - INATIVO
+- Par/Ímpar: apostas em números pares/ímpares com pagamento 1:1 - INATIVO
+- Cliente pode ativar/desativar qualquer tipo de aposta pelo painel
 
 ## System Architecture
 

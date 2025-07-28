@@ -66,6 +66,17 @@ export const sessions = pgTable("sessions", {
   isActive: boolean("is_active").default(true)
 });
 
+export const bettingPreferences = pgTable("betting_preferences", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  type: text("type").notNull(), // 'straight_up', 'neighbors', 'dozens', 'columns', 'colors', 'parity'
+  enabled: boolean("enabled").default(true),
+  description: text("description"),
+  priority: integer("priority").default(1), // 1-5, higher = more priority
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull()
+});
+
 // Insert schemas
 export const insertRouletteResultSchema = createInsertSchema(rouletteResults).omit({
   id: true,
@@ -98,6 +109,12 @@ export const insertSessionSchema = createInsertSchema(sessions).omit({
   startTime: true
 });
 
+export const insertBettingPreferenceSchema = createInsertSchema(bettingPreferences).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
+
 // Types
 export type RouletteResult = typeof rouletteResults.$inferSelect;
 export type InsertRouletteResult = z.infer<typeof insertRouletteResultSchema>;
@@ -113,3 +130,6 @@ export type InsertAlert = z.infer<typeof insertAlertSchema>;
 
 export type Session = typeof sessions.$inferSelect;
 export type InsertSession = z.infer<typeof insertSessionSchema>;
+
+export type BettingPreference = typeof bettingPreferences.$inferSelect;
+export type InsertBettingPreference = z.infer<typeof insertBettingPreferenceSchema>;
