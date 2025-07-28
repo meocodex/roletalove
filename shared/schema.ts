@@ -1,0 +1,110 @@
+import { sql } from "drizzle-orm";
+import { pgTable, text, varchar, integer, timestamp, boolean, real, json } from "drizzle-orm/pg-core";
+import { createInsertSchema } from "drizzle-zod";
+import { z } from "zod";
+
+export const rouletteResults = pgTable("roulette_results", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  number: integer("number").notNull(),
+  color: text("color").notNull(), // 'red', 'black', 'green'
+  dozen: integer("dozen"), // 1, 2, 3
+  column: integer("column"), // 1, 2, 3
+  half: text("half"), // 'low' (1-18), 'high' (19-36)
+  parity: text("parity"), // 'even', 'odd', null (for 0)
+  timestamp: timestamp("timestamp").defaultNow().notNull(),
+  sessionId: varchar("session_id").notNull(),
+  source: text("source").notNull().default("manual") // 'manual', 'api', 'websocket'
+});
+
+export const patterns = pgTable("patterns", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  sequence: json("sequence").notNull(), // Array of numbers or pattern identifiers
+  type: text("type").notNull(), // 'exact', 'color', 'dozen', 'mixed', 'positional'
+  outcomes: json("outcomes").notNull(), // Map of results to frequency
+  probability: real("probability").notNull(),
+  confidence: real("confidence").notNull(),
+  totalOccurrences: integer("total_occurrences").notNull(),
+  successCount: integer("success_count").notNull(),
+  lastTriggered: timestamp("last_triggered"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull()
+});
+
+export const strategies = pgTable("strategies", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  type: text("type").notNull(), // 'neighbors', 'straight_up'
+  numbers: json("numbers").notNull(), // Array of numbers to bet on
+  maxAttempts: integer("max_attempts").default(5),
+  currentAttempts: integer("current_attempts").default(0),
+  isActive: boolean("is_active").default(true),
+  lastUsed: timestamp("last_used"),
+  successRate: real("success_rate").default(0),
+  createdAt: timestamp("created_at").defaultNow().notNull()
+});
+
+export const alerts = pgTable("alerts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  type: text("type").notNull(), // 'pattern_detected', 'strategy_hit', 'system_info'
+  title: text("title").notNull(),
+  message: text("message").notNull(),
+  severity: text("severity").notNull(), // 'info', 'warning', 'success', 'error'
+  data: json("data"), // Additional context data
+  read: boolean("read").default(false),
+  timestamp: timestamp("timestamp").defaultNow().notNull()
+});
+
+export const sessions = pgTable("sessions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name"),
+  startTime: timestamp("start_time").defaultNow().notNull(),
+  endTime: timestamp("end_time"),
+  totalSpins: integer("total_spins").default(0),
+  patternsDetected: integer("patterns_detected").default(0),
+  successRate: real("success_rate").default(0),
+  isActive: boolean("is_active").default(true)
+});
+
+// Insert schemas
+export const insertRouletteResultSchema = createInsertSchema(rouletteResults).omit({
+  id: true,
+  timestamp: true
+});
+
+export const insertPatternSchema = createInsertSchema(patterns).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
+
+export const insertStrategySchema = createInsertSchema(strategies).omit({
+  id: true,
+  createdAt: true
+});
+
+export const insertAlertSchema = createInsertSchema(alerts).omit({
+  id: true,
+  timestamp: true
+});
+
+export const insertSessionSchema = createInsertSchema(sessions).omit({
+  id: true,
+  startTime: true
+});
+
+// Types
+export type RouletteResult = typeof rouletteResults.$inferSelect;
+export type InsertRouletteResult = z.infer<typeof insertRouletteResultSchema>;
+
+export type Pattern = typeof patterns.$inferSelect;
+export type InsertPattern = z.infer<typeof insertPatternSchema>;
+
+export type Strategy = typeof strategies.$inferSelect;
+export type InsertStrategy = z.infer<typeof insertStrategySchema>;
+
+export type Alert = typeof alerts.$inferSelect;
+export type InsertAlert = z.infer<typeof insertAlertSchema>;
+
+export type Session = typeof sessions.$inferSelect;
+export type InsertSession = z.infer<typeof insertSessionSchema>;
