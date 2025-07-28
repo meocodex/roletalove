@@ -1,0 +1,1043 @@
+# Prompt para Desenvolvimento de Sistema de Análise de Padrões de Roleta com IA
+
+## CONTEXTO E OBJETIVO DO PROJETO
+
+Você deve desenvolver um sistema completo de análise de padrões em roleta utilizando Node.js e Express. O sistema deve identificar sequências de resultados (gatilhos) que historicamente apresentam probabilidade ≥75% de um determinado resultado no próximo giro. O sistema operará em tempo real, analisando continuamente os resultados e sinalizando oportunidades de aposta quando detectar padrões promissores.
+
+## ARQUITETURA E ESTRUTURA DO PROJETO
+
+### Estrutura de Diretórios Obrigatória:
+```
+roulette-ai-system/
+├── src/
+│   ├── modules/
+│   │   ├── data-collector/
+│   │   │   ├── index.js
+│   │   │   ├── collectors/
+│   │   │   ├── validators/
+│   │   │   └── transformers/
+│   │   ├── pattern-analyzer/
+│   │   │   ├── index.js
+│   │   │   ├── algorithms/
+│   │   │   ├── statistics/
+│   │   │   └── validators/
+│   │   ├── real-time-monitor/
+│   │   │   ├── index.js
+│   │   │   ├── triggers/
+│   │   │   ├── alerts/
+│   │   │   └── websocket/
+│   │   ├── database/
+│   │   │   ├── index.js
+│   │   │   ├── models/
+│   │   │   ├── migrations/
+│   │   │   └── seeds/
+│   │   └── api/
+│   │       ├── index.js
+│   │       ├── routes/
+│   │       ├── middlewares/
+│   │       └── controllers/
+│   ├── config/
+│   │   ├── database.js
+│   │   ├── server.js
+│   │   └── patterns.js
+│   ├── utils/
+│   │   ├── logger.js
+│   │   ├── validators.js
+│   │   └── helpers.js
+│   ├── tests/
+│   │   ├── unit/
+│   │   ├── integration/
+│   │   └── e2e/
+│   └── app.js
+├── public/
+│   ├── css/
+│   ├── js/
+│   └── assets/
+├── views/
+│   ├── layouts/
+│   ├── components/
+│   └── pages/
+├── docs/
+│   ├── api/
+│   ├── algorithms/
+│   └── deployment/
+├── scripts/
+├── .env.example
+├── .gitignore
+├── package.json
+├── README.md
+└── docker-compose.yml
+```
+
+## REGRAS RIGOROSAS CONTRA ALUCINAÇÃO DA IA
+
+### 1. PROIBIÇÕES ABSOLUTAS:
+- **NUNCA** inventar funcionalidades que não foram explicitamente solicitadas
+- **NUNCA** criar métodos ou funções sem implementação completa
+- **NUNCA** usar bibliotecas ou frameworks não especificados sem justificativa
+- **NUNCA** assumir comportamentos ou lógicas não documentadas
+- **NUNCA** criar propriedades ou métodos que não tenham uso real no sistema
+
+### 2. VALIDAÇÃO DE CÓDIGO:
+- TODO código deve ser testável e incluir testes unitários
+- TODO método deve ter documentação JSDoc completa
+- TODA função deve validar seus parâmetros de entrada
+- TODO erro deve ser tratado explicitamente
+- TODA operação assíncrona deve ter timeout configurado
+
+### 3. PRECISÃO MATEMÁTICA:
+- TODOS os cálculos estatísticos devem usar fórmulas matematicamente corretas
+- TODAS as probabilidades devem somar 100% quando aplicável
+- TODOS os percentuais devem ser validados (0-100%)
+- NUNCA arredondar valores antes do cálculo final
+- SEMPRE usar BigDecimal ou similar para cálculos monetários
+
+## ESPECIFICAÇÕES TÉCNICAS DETALHADAS
+
+### 1. MÓDULO: Data Collector
+
+```javascript
+// Estrutura de dados para resultado de roleta
+const RouletteResult = {
+  id: String,           // UUID
+  number: Number,       // 0-36
+  color: String,        // 'red', 'black', 'green'
+  dozen: Number,        // 1, 2, 3
+  column: Number,       // 1, 2, 3
+  half: String,         // 'low' (1-18), 'high' (19-36)
+  parity: String,       // 'even', 'odd', null (for 0)
+  timestamp: Date,
+  sessionId: String,
+  source: String        // 'manual', 'api', 'websocket'
+}
+```
+
+**Funcionalidades obrigatórias:**
+- Importação de CSV/JSON com histórico
+- Validação rigorosa de cada entrada
+- Detecção e remoção de duplicatas
+- Normalização de dados de diferentes fontes
+- API para entrada manual de resultados
+- WebSocket para dados em tempo real
+
+### 2. MÓDULO: Pattern Analyzer
+
+**Algoritmos obrigatórios:**
+```javascript
+// Tipos de padrões a analisar
+const PatternTypes = {
+  EXACT_SEQUENCE: 'exact',      // Ex: [32, 15] → 17
+  COLOR_SEQUENCE: 'color',      // Ex: [R, R, R] → B
+  DOZEN_PATTERN: 'dozen',       // Ex: [D1, D1, D2] → D2
+  MIXED_PATTERN: 'mixed',       // Combinações de propriedades
+  POSITIONAL: 'positional'      // Padrões baseados em posição na roleta
+}
+
+// Configurações de análise
+const AnalysisConfig = {
+  minPatternLength: 1,
+  maxPatternLength: 4,
+  minOccurrences: 10,          // Mínimo de ocorrências para validar
+  minProbability: 0.75,        // 75% mínimo
+  confidenceLevel: 0.95,       // Para testes estatísticos
+  lookbackPeriod: 1000         // Últimos N giros a analisar
+}
+```
+
+**Métodos obrigatórios:**
+- `findAllPatterns()`: Varre todo histórico identificando padrões
+- `calculateConditionalProbability()`: Calcula P(resultado|padrão)
+- `chiSquareTest()`: Valida significância estatística
+- `validatePattern()`: Confirma se padrão atende critérios
+- `rankPatterns()`: Ordena padrões por eficácia
+- `backtest()`: Simula uso histórico do padrão
+
+### 3. MÓDULO: Real-Time Monitor
+
+**Sistema de gatilhos:**
+```javascript
+const Trigger = {
+  id: String,
+  pattern: Array,              // Sequência que ativa o gatilho
+  patternType: String,
+  targetOutcome: Object,       // Resultado esperado
+  probability: Number,         // Probabilidade histórica
+  confidence: Number,          // Intervalo de confiança
+  totalOccurrences: Number,
+  successCount: Number,
+  lastTriggered: Date,
+  isActive: Boolean
+}
+```
+
+**Funcionalidades em tempo real:**
+- WebSocket server para clientes
+- Verificação instantânea após cada giro
+- Sistema de filas para processar múltiplos gatilhos
+- Alertas diferenciados por probabilidade
+- Dashboard em tempo real
+- Histórico de gatilhos acionados
+
+### 4. MÓDULO: Database
+
+**Modelos obrigatórios:**
+```javascript
+// Schemas MongoDB/PostgreSQL
+const schemas = {
+  Result: {
+    // Campos do RouletteResult
+    indexes: ['timestamp', 'sessionId', 'number']
+  },
+  Pattern: {
+    sequence: Array,
+    type: String,
+    outcomes: Map,           // Mapa de resultados → frequência
+    statistics: Object,
+    createdAt: Date,
+    updatedAt: Date
+  },
+  Trigger: {
+    // Campos do Trigger
+    performance: Object      // Métricas de desempenho
+  },
+  Alert: {
+    triggerId: String,
+    timestamp: Date,
+    outcome: Object,
+    wasSuccessful: Boolean,
+    userId: String
+  }
+}
+```
+
+### 5. MÓDULO: API
+
+**Endpoints obrigatórios:**
+```javascript
+// Rotas REST
+const routes = {
+  // Resultados
+  'POST /api/results': 'Adicionar novo resultado',
+  'GET /api/results': 'Listar resultados (paginado)',
+  'POST /api/results/import': 'Importar CSV/JSON',
+  
+  // Padrões
+  'GET /api/patterns': 'Listar padrões identificados',
+  'POST /api/patterns/analyze': 'Executar análise',
+  'GET /api/patterns/:id/stats': 'Estatísticas do padrão',
+  
+  // Gatilhos
+  'GET /api/triggers': 'Listar gatilhos ativos',
+  'PUT /api/triggers/:id': 'Ativar/desativar gatilho',
+  'GET /api/triggers/current': 'Verificar gatilhos atuais',
+  
+  // Monitoramento
+  'WS /ws/monitor': 'WebSocket para monitoramento',
+  'GET /api/alerts': 'Histórico de alertas',
+  'GET /api/stats/performance': 'Métricas de desempenho'
+}
+```
+
+## INTERFACE DO USUÁRIO
+
+### Design Requirements:
+- **Framework**: React.js ou Vue.js 3
+- **UI Library**: Tailwind CSS + Shadcn/ui ou Material-UI
+- **Gráficos**: Chart.js ou Recharts
+- **Real-time**: Socket.io-client
+
+### Telas obrigatórias:
+
+1. **Dashboard Principal**
+   - Visualização em tempo real dos últimos resultados
+   - Gatilhos ativos com probabilidades
+   - Alertas instantâneos
+   - Mini-gráficos de tendências
+
+2. **Análise de Padrões**
+   - Tabela interativa de padrões descobertos
+   - Filtros por tipo, probabilidade, ocorrências
+   - Gráficos de desempenho histórico
+   - Simulador de backtest
+
+3. **Monitor em Tempo Real**
+   - Representação visual da roleta
+   - Histórico rolante dos últimos 50 giros
+   - Painel de gatilhos prontos para disparar
+   - Sistema de notificações visuais e sonoras
+
+4. **Gestão de Dados**
+   - Importação/exportação de históricos
+   - Limpeza e validação de dados
+   - Configurações de análise
+
+## ALGORITMOS ESPECÍFICOS
+
+### 1. Detecção de Padrões Sequenciais:
+```javascript
+class SequentialPatternDetector {
+  constructor(config) {
+    this.minLength = config.minLength || 1;
+    this.maxLength = config.maxLength || 4;
+    this.minSupport = config.minSupport || 10;
+  }
+
+  findPatterns(history) {
+    // Implementar algoritmo de mineração sequencial
+    // Similar ao PrefixSpan ou GSP
+    // Deve retornar padrões ordenados por suporte
+  }
+
+  calculateSupport(pattern, history) {
+    // Contar ocorrências do padrão no histórico
+  }
+
+  calculateConfidence(pattern, outcome, history) {
+    // P(outcome|pattern) = count(pattern→outcome) / count(pattern)
+  }
+}
+```
+
+### 2. Validação Estatística:
+```javascript
+class StatisticalValidator {
+  chiSquareTest(observed, expected, degreesOfFreedom) {
+    // Implementar teste qui-quadrado completo
+    // Retornar p-value e decisão de rejeição
+  }
+
+  confidenceInterval(probability, sampleSize, confidenceLevel = 0.95) {
+    // Calcular intervalo de confiança para proporção
+    // Usar método Wilson Score
+  }
+
+  validateSampleSize(occurrences, desiredPower = 0.8) {
+    // Verificar se amostra é suficiente
+  }
+}
+```
+
+### 3. Sistema de Pontuação:
+```javascript
+class PatternScorer {
+  score(pattern) {
+    // Fatores de pontuação:
+    // - Probabilidade (peso: 40%)
+    // - Número de ocorrências (peso: 20%)
+    // - Recência (peso: 20%)
+    // - Consistência temporal (peso: 20%)
+    return weightedScore;
+  }
+}
+```
+
+## IMPLEMENTAÇÃO DA INTELIGÊNCIA ARTIFICIAL
+
+### 1. MÓDULO: AI Engine
+
+**Estrutura do módulo IA:**
+```
+src/modules/ai-engine/
+├── index.js
+├── models/
+│   ├── pattern-recognition/
+│   │   ├── MarkovChain.js
+│   │   ├── NeuralNetwork.js
+│   │   └── DecisionTree.js
+│   ├── prediction/
+│   │   ├── BayesianPredictor.js
+│   │   ├── EnsembleModel.js
+│   │   └── TimeSeriesAnalyzer.js
+│   └── optimization/
+│       ├── GeneticAlgorithm.js
+│       └── ReinforcementLearning.js
+├── training/
+│   ├── DataPreprocessor.js
+│   ├── FeatureExtractor.js
+│   ├── ModelTrainer.js
+│   └── CrossValidator.js
+└── inference/
+    ├── RealTimePredictor.js
+    ├── ConfidenceCalculator.js
+    └── DecisionMaker.js
+```
+
+### 2. Algoritmos de IA Obrigatórios:
+
+#### A. Cadeia de Markov (Pattern Recognition)
+```javascript
+class MarkovChainAnalyzer {
+  constructor(order = 3) {
+    this.order = order; // Tamanho máximo do padrão
+    this.transitionMatrix = new Map();
+    this.stateFrequencies = new Map();
+  }
+
+  train(historicalData) {
+    // Construir matriz de transição
+    for (let i = this.order; i < historicalData.length; i++) {
+      const state = this.extractState(historicalData, i);
+      const nextOutcome = historicalData[i];
+      
+      this.updateTransitionMatrix(state, nextOutcome);
+    }
+    
+    // Calcular probabilidades
+    this.calculateProbabilities();
+  }
+
+  predict(currentState) {
+    const transitions = this.transitionMatrix.get(currentState);
+    if (!transitions) return null;
+    
+    // Retornar predições com probabilidades
+    return {
+      predictions: this.rankPredictions(transitions),
+      confidence: this.calculateConfidence(transitions)
+    };
+  }
+}
+```
+
+#### B. Rede Neural para Detecção de Padrões
+```javascript
+import * as tf from '@tensorflow/tfjs-node';
+
+class RouletteNeuralNetwork {
+  constructor(config) {
+    this.inputSize = config.inputSize || 10; // Últimos N resultados
+    this.hiddenLayers = config.hiddenLayers || [128, 64, 32];
+    this.outputSize = 37; // 0-36
+    this.model = this.buildModel();
+  }
+
+  buildModel() {
+    const model = tf.sequential();
+    
+    // Input layer
+    model.add(tf.layers.dense({
+      inputShape: [this.inputSize * 5], // número + cor + dúzia + coluna + paridade
+      units: this.hiddenLayers[0],
+      activation: 'relu'
+    }));
+    
+    // Hidden layers com dropout
+    this.hiddenLayers.slice(1).forEach(units => {
+      model.add(tf.layers.dense({ units, activation: 'relu' }));
+      model.add(tf.layers.dropout({ rate: 0.2 }));
+    });
+    
+    // Output layer
+    model.add(tf.layers.dense({
+      units: this.outputSize,
+      activation: 'softmax'
+    }));
+    
+    model.compile({
+      optimizer: tf.train.adam(0.001),
+      loss: 'categoricalCrossentropy',
+      metrics: ['accuracy']
+    });
+    
+    return model;
+  }
+
+  async train(trainingData, epochs = 100) {
+    const { inputs, outputs } = this.preprocessData(trainingData);
+    
+    return await this.model.fit(inputs, outputs, {
+      epochs,
+      batchSize: 32,
+      validationSplit: 0.2,
+      callbacks: {
+        onEpochEnd: (epoch, logs) => {
+          console.log(`Epoch ${epoch}: loss = ${logs.loss}, accuracy = ${logs.acc}`);
+        }
+      }
+    });
+  }
+
+  async predict(recentResults) {
+    const input = this.encodeInput(recentResults);
+    const prediction = await this.model.predict(input).data();
+    
+    return this.decodePrediction(prediction);
+  }
+}
+```
+
+#### C. Algoritmo Bayesiano para Cálculo de Probabilidades
+```javascript
+class BayesianPatternAnalyzer {
+  constructor() {
+    this.priorProbabilities = new Map();
+    this.likelihoods = new Map();
+  }
+
+  updateBelief(pattern, outcome) {
+    // Atualizar probabilidades usando Teorema de Bayes
+    // P(outcome|pattern) = P(pattern|outcome) * P(outcome) / P(pattern)
+    
+    const prior = this.getPrior(outcome);
+    const likelihood = this.calculateLikelihood(pattern, outcome);
+    const evidence = this.calculateEvidence(pattern);
+    
+    const posterior = (likelihood * prior) / evidence;
+    
+    this.updateProbabilities(pattern, outcome, posterior);
+  }
+
+  predictWithUncertainty(pattern) {
+    const predictions = [];
+    
+    for (const outcome of this.possibleOutcomes) {
+      const probability = this.calculatePosterior(pattern, outcome);
+      const uncertainty = this.calculateUncertainty(pattern, outcome);
+      
+      predictions.push({
+        outcome,
+        probability,
+        uncertainty,
+        confidenceInterval: this.calculateCredibleInterval(probability, uncertainty)
+      });
+    }
+    
+    return predictions.sort((a, b) => b.probability - a.probability);
+  }
+}
+```
+
+#### D. Ensemble Model (Combinação de Modelos)
+```javascript
+class EnsemblePredictor {
+  constructor() {
+    this.models = {
+      markov: new MarkovChainAnalyzer(),
+      neural: new RouletteNeuralNetwork(),
+      bayesian: new BayesianPatternAnalyzer(),
+      timeSeries: new TimeSeriesPredictor()
+    };
+    
+    this.weights = {
+      markov: 0.3,
+      neural: 0.3,
+      bayesian: 0.2,
+      timeSeries: 0.2
+    };
+  }
+
+  async trainAll(historicalData) {
+    const trainingPromises = Object.entries(this.models).map(([name, model]) => {
+      console.log(`Training ${name} model...`);
+      return model.train(historicalData);
+    });
+    
+    await Promise.all(trainingPromises);
+    
+    // Otimizar pesos baseado em performance
+    await this.optimizeWeights(historicalData);
+  }
+
+  async predict(currentState) {
+    const predictions = {};
+    
+    // Obter predições de cada modelo
+    for (const [name, model] of Object.entries(this.models)) {
+      predictions[name] = await model.predict(currentState);
+    }
+    
+    // Combinar predições usando weighted voting
+    return this.combineePredictions(predictions);
+  }
+
+  combinePredictions(predictions) {
+    const combined = new Map();
+    
+    for (const [modelName, modelPredictions] of Object.entries(predictions)) {
+      const weight = this.weights[modelName];
+      
+      for (const pred of modelPredictions) {
+        const current = combined.get(pred.outcome) || 0;
+        combined.set(pred.outcome, current + (pred.probability * weight));
+      }
+    }
+    
+    // Normalizar e retornar top predições
+    return this.normalizeAndRank(combined);
+  }
+}
+```
+
+### 3. Feature Engineering para IA:
+
+```javascript
+class FeatureExtractor {
+  extractFeatures(historicalData, windowSize = 10) {
+    const features = {
+      // Características numéricas básicas
+      lastNumbers: this.getLastN(historicalData, windowSize),
+      
+      // Características estatísticas
+      colorDistribution: this.calculateColorDistribution(historicalData, windowSize),
+      dozenDistribution: this.calculateDozenDistribution(historicalData, windowSize),
+      numberFrequency: this.calculateNumberFrequency(historicalData, windowSize),
+      
+      // Características de sequência
+      colorStreaks: this.detectColorStreaks(historicalData),
+      numberGaps: this.calculateNumberGaps(historicalData),
+      hotNumbers: this.identifyHotNumbers(historicalData, windowSize),
+      coldNumbers: this.identifyColdNumbers(historicalData, windowSize),
+      
+      // Características cíclicas
+      wheelSectors: this.analyzeWheelSectors(historicalData),
+      neighboringNumbers: this.analyzeNeighbors(historicalData),
+      
+      // Características temporais
+      timeSinceLastAppearance: this.calculateTimeSince(historicalData),
+      periodicityScore: this.detectPeriodicity(historicalData),
+      
+      // Características avançadas
+      entropy: this.calculateEntropy(historicalData, windowSize),
+      autocorrelation: this.calculateAutocorrelation(historicalData),
+      fourierComponents: this.extractFourierComponents(historicalData)
+    };
+    
+    return this.normalizeFeatures(features);
+  }
+}
+```
+
+### 4. Sistema de Aprendizado Contínuo:
+
+```javascript
+class ContinuousLearningSystem {
+  constructor(aiEngine) {
+    this.aiEngine = aiEngine;
+    this.performanceTracker = new PerformanceTracker();
+    this.retrainingThreshold = 0.7; // Retreinar se accuracy < 70%
+  }
+
+  async processNewResult(result, prediction) {
+    // 1. Registrar performance
+    const wasCorrect = this.evaluatePrediction(prediction, result);
+    this.performanceTracker.record(wasCorrect);
+    
+    // 2. Atualizar modelo online (se suportado)
+    if (this.aiEngine.supportsOnlineLearning) {
+      await this.aiEngine.updateOnline(result);
+    }
+    
+    // 3. Verificar necessidade de retreinamento
+    const currentAccuracy = this.performanceTracker.getRecentAccuracy();
+    if (currentAccuracy < this.retrainingThreshold) {
+      await this.scheduleRetraining();
+    }
+    
+    // 4. Ajustar parâmetros dinamicamente
+    this.adjustModelParameters(currentAccuracy);
+  }
+
+  async scheduleRetraining() {
+    console.log('Scheduling model retraining due to performance degradation');
+    
+    // Coletar dados recentes
+    const recentData = await this.collectRecentData();
+    
+    // Retreinar em background
+    this.retrainInBackground(recentData);
+  }
+}
+```
+
+### 5. Otimização com Algoritmos Genéticos:
+
+```javascript
+class GeneticOptimizer {
+  constructor(populationSize = 50) {
+    this.populationSize = populationSize;
+    this.mutationRate = 0.1;
+    this.crossoverRate = 0.7;
+    this.eliteSize = 5;
+  }
+
+  async optimizePatternDetection(historicalData) {
+    // Criar população inicial de estratégias
+    let population = this.createInitialPopulation();
+    
+    for (let generation = 0; generation < 100; generation++) {
+      // Avaliar fitness de cada indivíduo
+      const fitness = await this.evaluatePopulation(population, historicalData);
+      
+      // Selecionar melhores indivíduos
+      const selected = this.selection(population, fitness);
+      
+      // Criar nova geração
+      population = this.createNewGeneration(selected);
+      
+      // Log progresso
+      console.log(`Generation ${generation}: Best fitness = ${Math.max(...fitness)}`);
+    }
+    
+    return this.getBestIndividual(population);
+  }
+
+  createIndividual() {
+    return {
+      patternLength: Math.floor(Math.random() * 4) + 1,
+      lookbackWindow: Math.floor(Math.random() * 50) + 10,
+      minOccurrences: Math.floor(Math.random() * 20) + 5,
+      confidenceThreshold: Math.random() * 0.3 + 0.7, // 0.7 - 1.0
+      features: this.randomFeatureSelection()
+    };
+  }
+}
+```
+
+### 6. Métricas de Performance da IA:
+
+```javascript
+class AIPerformanceMonitor {
+  constructor() {
+    this.metrics = {
+      accuracy: new RollingAverage(100),
+      precision: new RollingAverage(100),
+      recall: new RollingAverage(100),
+      f1Score: new RollingAverage(100),
+      predictionLatency: new RollingAverage(100),
+      confidenceCalibration: new ConfidenceCalibrator()
+    };
+  }
+
+  evaluatePrediction(prediction, actual) {
+    const startTime = Date.now();
+    
+    // Calcular métricas
+    const isCorrect = prediction.topPrediction === actual;
+    const confidence = prediction.confidence;
+    
+    // Atualizar métricas
+    this.metrics.accuracy.add(isCorrect ? 1 : 0);
+    this.metrics.predictionLatency.add(Date.now() - startTime);
+    this.metrics.confidenceCalibration.add(confidence, isCorrect);
+    
+    // Calcular precisão para predições de alta confiança
+    if (confidence >= 0.75) {
+      this.updateHighConfidenceMetrics(isCorrect);
+    }
+    
+    return {
+      accuracy: this.metrics.accuracy.getAverage(),
+      calibrationError: this.metrics.confidenceCalibration.getCalibrationError(),
+      latency: this.metrics.predictionLatency.getAverage()
+    };
+  }
+}
+```
+
+## REGRAS DE DESENVOLVIMENTO
+
+### 1. Código Limpo:
+- Máximo 50 linhas por função
+- Máximo 200 linhas por arquivo
+- Complexidade ciclomática máxima: 10
+- Nomes descritivos e em inglês
+- Comentários apenas quando necessário
+
+### 2. Padrões de Código:
+```javascript
+// Exemplo de padrão obrigatório
+class PatternAnalyzer {
+  constructor(dependencies) {
+    // Injeção de dependências
+    this.logger = dependencies.logger;
+    this.validator = dependencies.validator;
+    this.database = dependencies.database;
+  }
+
+  async analyzePattern(data) {
+    // 1. Validação de entrada
+    const validationResult = this.validator.validate(data);
+    if (!validationResult.isValid) {
+      throw new ValidationError(validationResult.errors);
+    }
+
+    // 2. Processamento com tratamento de erro
+    try {
+      const result = await this._processData(data);
+      
+      // 3. Log de sucesso
+      this.logger.info('Pattern analyzed successfully', { 
+        patternId: result.id 
+      });
+      
+      return result;
+    } catch (error) {
+      // 4. Tratamento específico de erro
+      this.logger.error('Pattern analysis failed', { 
+        error: error.message,
+        stack: error.stack,
+        data 
+      });
+      throw new AnalysisError('Failed to analyze pattern', { cause: error });
+    }
+  }
+}
+```
+
+### 3. Testes Obrigatórios:
+```javascript
+// Estrutura de teste padrão
+describe('PatternAnalyzer', () => {
+  let analyzer;
+  let mockDependencies;
+
+  beforeEach(() => {
+    mockDependencies = {
+      logger: createMockLogger(),
+      validator: createMockValidator(),
+      database: createMockDatabase()
+    };
+    analyzer = new PatternAnalyzer(mockDependencies);
+  });
+
+  describe('analyzePattern', () => {
+    it('should successfully analyze valid pattern', async () => {
+      // Arrange
+      const validData = createValidPatternData();
+      const expectedResult = createExpectedResult();
+      
+      // Act
+      const result = await analyzer.analyzePattern(validData);
+      
+      // Assert
+      expect(result).toEqual(expectedResult);
+      expect(mockDependencies.logger.info).toHaveBeenCalledWith(
+        'Pattern analyzed successfully',
+        expect.any(Object)
+      );
+    });
+
+    it('should throw ValidationError for invalid data', async () => {
+      // Teste de validação
+    });
+
+    it('should handle database errors gracefully', async () => {
+      // Teste de erro
+    });
+  });
+});
+```
+
+### 4. Documentação:
+```javascript
+/**
+ * Analyzes roulette patterns to identify high-probability triggers
+ * @class PatternAnalyzer
+ * @param {Object} dependencies - Required dependencies
+ * @param {Logger} dependencies.logger - Logger instance
+ * @param {Validator} dependencies.validator - Data validator
+ * @param {Database} dependencies.database - Database connection
+ * @example
+ * const analyzer = new PatternAnalyzer({ logger, validator, database });
+ * const patterns = await analyzer.findPatterns(historicalData);
+ */
+```
+
+### 5. Configuração de Ambiente:
+```env
+# .env.example
+NODE_ENV=development
+PORT=3000
+
+# Database
+DB_TYPE=postgresql
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=roulette_ai
+DB_USER=roulette_user
+DB_PASSWORD=secure_password
+
+# Redis (para cache e filas)
+REDIS_URL=redis://localhost:6379
+
+# Análise
+MIN_PATTERN_LENGTH=1
+MAX_PATTERN_LENGTH=4
+MIN_PROBABILITY=0.75
+MIN_OCCURRENCES=10
+CONFIDENCE_LEVEL=0.95
+
+# Segurança
+JWT_SECRET=your-secret-key
+API_RATE_LIMIT=100
+CORS_ORIGINS=http://localhost:3001
+
+# Monitoring
+LOG_LEVEL=info
+SENTRY_DSN=your-sentry-dsn
+```
+
+## FLUXO DE IMPLEMENTAÇÃO
+
+### Fase 1: Infraestrutura Base (Semana 1)
+1. Setup do projeto com estrutura de diretórios
+2. Configuração de TypeScript, ESLint, Prettier
+3. Setup de banco de dados e migrações
+4. Sistema de logging e tratamento de erros
+5. Testes unitários básicos
+
+### Fase 2: Módulos Core (Semana 2-3)
+1. Implementar Data Collector completo
+2. Desenvolver Pattern Analyzer com algoritmos
+3. Criar sistema de validação estatística
+4. Testes de integração
+
+### Fase 3: Real-Time e API (Semana 4)
+1. Implementar WebSocket server
+2. Desenvolver sistema de gatilhos
+3. Criar API REST completa
+4. Documentação da API
+
+### Fase 4: Interface (Semana 5-6)
+1. Setup do frontend
+2. Implementar dashboard
+3. Criar visualizações em tempo real
+4. Sistema de notificações
+
+### Fase 5: Otimização e Deploy (Semana 7)
+1. Otimização de performance
+2. Testes de carga
+3. Documentação completa
+4. Deploy com Docker
+
+## MÉTRICAS DE QUALIDADE
+
+### Código:
+- Cobertura de testes: mínimo 80%
+- Complexidade ciclomática: máximo 10
+- Duplicação de código: máximo 3%
+- Tempo de resposta API: < 100ms
+- Uptime: 99.9%
+
+### Funcional:
+- Precisão na detecção de padrões: > 95%
+- Taxa de falsos positivos: < 5%
+- Latência de detecção de gatilhos: < 50ms
+- Capacidade: 1000 requisições/segundo
+
+## SEGURANÇA
+
+### Implementações obrigatórias:
+1. Autenticação JWT com refresh tokens
+2. Rate limiting por IP e por usuário
+3. Validação e sanitização de todas as entradas
+4. Criptografia de dados sensíveis
+5. Logs de auditoria para todas as ações
+6. HTTPS obrigatório
+7. Headers de segurança (Helmet.js)
+8. Proteção contra CSRF
+9. Validação de CORS
+10. Backups automáticos
+
+## EXEMPLO DE IMPLEMENTAÇÃO INICIAL
+
+```javascript
+// src/app.js
+import express from 'express';
+import helmet from 'helmet';
+import cors from 'cors';
+import compression from 'compression';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
+import { config } from './config/server.js';
+import { logger } from './utils/logger.js';
+import { errorHandler } from './middlewares/errorHandler.js';
+import { rateLimiter } from './middlewares/rateLimiter.js';
+import { apiRouter } from './modules/api/index.js';
+import { initializeDatabase } from './modules/database/index.js';
+import { PatternAnalyzer } from './modules/pattern-analyzer/index.js';
+import { RealTimeMonitor } from './modules/real-time-monitor/index.js';
+
+class RouletteAISystem {
+  constructor() {
+    this.app = express();
+    this.server = createServer(this.app);
+    this.io = new Server(this.server, {
+      cors: { origin: config.cors.origins }
+    });
+  }
+
+  async initialize() {
+    try {
+      // Database connection
+      await initializeDatabase();
+      logger.info('Database connected successfully');
+
+      // Middleware setup
+      this.setupMiddleware();
+
+      // Routes setup
+      this.setupRoutes();
+
+      // WebSocket setup
+      this.setupWebSocket();
+
+      // Error handling
+      this.app.use(errorHandler);
+
+      // Start server
+      await this.start();
+    } catch (error) {
+      logger.error('Failed to initialize system', error);
+      process.exit(1);
+    }
+  }
+
+  setupMiddleware() {
+    this.app.use(helmet());
+    this.app.use(cors(config.cors));
+    this.app.use(compression());
+    this.app.use(express.json({ limit: '10mb' }));
+    this.app.use(express.urlencoded({ extended: true }));
+    this.app.use(rateLimiter);
+  }
+
+  setupRoutes() {
+    this.app.use('/api', apiRouter);
+    this.app.get('/health', (req, res) => {
+      res.json({ status: 'healthy', timestamp: new Date() });
+    });
+  }
+
+  setupWebSocket() {
+    const monitor = new RealTimeMonitor(this.io);
+    monitor.initialize();
+  }
+
+  async start() {
+    const port = config.port || 3000;
+    this.server.listen(port, () => {
+      logger.info(`Roulette AI System running on port ${port}`);
+    });
+  }
+}
+
+// Initialize and start the system
+const system = new RouletteAISystem();
+system.initialize();
+
+export default system;
+```
+
+## NOTAS FINAIS
+
+1. **SEMPRE** seguir o princípio DRY (Don't Repeat Yourself)
+2. **SEMPRE** implementar logging detalhado
+3. **SEMPRE** validar dados de entrada
+4. **SEMPRE** usar async/await para operações assíncronas
+5. **NUNCA** hardcode valores - use configurações
+6. **NUNCA** ignorar erros - sempre trate ou propague
+7. **NUNCA** confiar em dados externos sem validação
+8. **SEMPRE** documentar decisões arquiteturais importantes
+
+Este sistema deve ser construído com a mentalidade de produção desde o início, considerando escalabilidade, manutenibilidade e confiabilidade em cada decisão de design.
