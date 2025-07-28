@@ -19,9 +19,10 @@ Preferred communication style: Portuguese, simple and everyday language.
 - Dashboard interativo com painéis de análise
 
 ✅ **Estratégias Implementadas**
-- Números Plenos: até 7 números por rodada, máximo 5 tentativas
+- Números Plenos: exatamente 7 números obrigatoriamente por rodada, máximo 5 tentativas
 - Vizinhos: até 21 números cobertos, máximo 5 tentativas  
-- Recálculo automático da estratégia quando não acerta
+- Recálculo automático da estratégia quando não acerta após 5 tentativas
+- Algoritmo inteligente para gerar novos números plenos baseado em números quentes/frios
 
 ## System Architecture
 

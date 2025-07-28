@@ -5,6 +5,59 @@ import { storage } from "./storage";
 import { insertRouletteResultSchema, insertAlertSchema, type RouletteResult } from "@shared/schema";
 import { z } from "zod";
 
+// Generate exactly 7 numbers for straight-up strategy based on pattern analysis
+function generateStraightUpNumbers(results: RouletteResult[]): number[] {
+  const numbers = new Set<number>();
+  
+  // Strategy 1: Hot numbers (numbers that appeared more frequently)
+  const numberCounts = new Map<number, number>();
+  const recentResults = results.slice(0, 50); // Last 50 spins
+  
+  recentResults.forEach(result => {
+    numberCounts.set(result.number, (numberCounts.get(result.number) || 0) + 1);
+  });
+  
+  // Get top hot numbers
+  const hotNumbers = Array.from(numberCounts.entries())
+    .filter(([num]) => num !== 0) // Exclude zero
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 4)
+    .map(([num]) => num);
+  
+  hotNumbers.forEach(num => numbers.add(num));
+  
+  // Strategy 2: Cold numbers (numbers that haven't appeared recently)
+  const allNumbers = Array.from({length: 36}, (_, i) => i + 1);
+  const recentNumbers = new Set(recentResults.slice(0, 20).map(r => r.number));
+  const coldNumbers = allNumbers.filter(num => !recentNumbers.has(num));
+  
+  // Add 2 cold numbers randomly
+  for (let i = 0; i < 2 && coldNumbers.length > 0; i++) {
+    const index = Math.floor(Math.random() * coldNumbers.length);
+    numbers.add(coldNumbers.splice(index, 1)[0]);
+  }
+  
+  // Strategy 3: Fill remaining with balanced selection
+  const remainingNumbers = allNumbers.filter(num => !numbers.has(num));
+  while (numbers.size < 7 && remainingNumbers.length > 0) {
+    const index = Math.floor(Math.random() * remainingNumbers.length);
+    numbers.add(remainingNumbers.splice(index, 1)[0]);
+  }
+  
+  // Ensure exactly 7 numbers
+  const result = Array.from(numbers).slice(0, 7);
+  
+  // If we have less than 7, fill with random numbers
+  while (result.length < 7) {
+    const randomNum = Math.floor(Math.random() * 36) + 1;
+    if (!result.includes(randomNum)) {
+      result.push(randomNum);
+    }
+  }
+  
+  return result;
+}
+
 // Pattern analysis algorithms
 class PatternAnalyzer {
   private static getNumberColor(number: number): string {
@@ -280,10 +333,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Increment attempts
           const newAttempts = (strategy.currentAttempts || 0) + 1;
           if (newAttempts >= (strategy.maxAttempts || 5)) {
-            // Reset strategy
+            // Max attempts reached - recalculate strategy
+            let newNumbers = strategyNumbers;
+            
+            // For straight_up strategy, regenerate exactly 7 numbers
+            if (strategy.type === 'straight_up') {
+              newNumbers = generateStraightUpNumbers(recentResults);
+            }
+            
             await storage.updateStrategy(strategy.id, {
               currentAttempts: 0,
+              numbers: newNumbers,
               lastUsed: new Date()
+            });
+            
+            await storage.addAlert({
+              type: 'system_info',
+              title: 'Estratégia Recalculada',
+              message: `${strategy.name} - Novos números gerados após ${strategy.maxAttempts} tentativas`,
+              severity: 'warning',
+              data: { strategy: strategy.name, newNumbers },
+              read: false
             });
           } else {
             await storage.updateStrategy(strategy.id, {
