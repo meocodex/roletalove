@@ -309,11 +309,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Check strategy hits
-      const activeStrategies = await storage.getActiveStrategies();
-      for (const strategy of activeStrategies) {
-        const strategyNumbers = Array.isArray(strategy.numbers) ? strategy.numbers as number[] : [];
-        if (strategyNumbers.includes(result.number)) {
+      // Check strategy hits (only if we have at least 10 results)
+      if (recentResults.length >= 10) {
+        const activeStrategies = await storage.getActiveStrategies();
+        for (const strategy of activeStrategies) {
+          const strategyNumbers = Array.isArray(strategy.numbers) ? strategy.numbers as number[] : [];
+          if (strategyNumbers.includes(result.number)) {
           // Strategy hit!
           await storage.updateStrategy(strategy.id, {
             currentAttempts: 0,
@@ -360,6 +361,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
               currentAttempts: newAttempts
             });
           }
+        }
+      }
+      } else {
+        // Not enough results yet - add info alert if needed
+        if (recentResults.length === 9) {
+          await storage.addAlert({
+            type: 'system_info',
+            title: 'Estratégias Quase Prontas',
+            message: 'Falta apenas 1 resultado para ativar as estratégias automáticas',
+            severity: 'info',
+            data: { currentResults: recentResults.length, required: 10 },
+            read: false
+          });
         }
       }
       

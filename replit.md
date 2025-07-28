@@ -24,6 +24,8 @@ Preferred communication style: Portuguese, simple and everyday language.
 - Vizinhos: até 21 números cobertos, máximo 5 tentativas  
 - Recálculo automático da estratégia quando não acerta após 5 tentativas
 - Algoritmo inteligente para gerar novos números plenos baseado em números quentes/frios
+- **REQUISITO CRÍTICO**: Estratégias só funcionam após carregar pelo menos 10 resultados
+- Sistema avisa quando está próximo de ativar as estratégias (aos 9 resultados)
 
 ✅ **Preferências de Apostas (NOVO)**
 - Números Plenos: apostas diretas (0-36) com pagamento 35:1 - ATIVO

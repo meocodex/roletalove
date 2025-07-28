@@ -17,6 +17,10 @@ export function StrategyPanel({ className }: StrategyPanelProps) {
     queryKey: ['/api/strategies'],
   });
 
+  const { data: results = [] } = useQuery({
+    queryKey: ['/api/results'],
+  });
+
   const updateStrategyMutation = useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<Strategy> }) => {
       const response = await apiRequest('PUT', `/api/strategies/${id}`, updates);
@@ -34,13 +38,17 @@ export function StrategyPanel({ className }: StrategyPanelProps) {
     });
   };
 
+  const hasEnoughData = results.length >= 10;
+
   const getStrategyStatusColor = (strategy: Strategy) => {
+    if (!hasEnoughData) return 'text-yellow-400';
     if (!strategy.isActive) return 'text-gray-400';
     if (strategy.currentAttempts >= strategy.maxAttempts - 1) return 'text-red-400';
     return strategy.type === 'straight_up' ? 'text-blue-400' : 'text-purple-400';
   };
 
   const getStrategyStatusBg = (strategy: Strategy) => {
+    if (!hasEnoughData) return 'bg-yellow-900/20 border-yellow-600/50';
     if (!strategy.isActive) return 'bg-gray-900/30 border-gray-600';
     if (strategy.currentAttempts >= strategy.maxAttempts - 1) return 'bg-red-900/30 border-red-600';
     return strategy.type === 'straight_up' ? 'bg-blue-900/30 border-blue-600' : 'bg-purple-900/30 border-purple-600';
@@ -76,21 +84,32 @@ export function StrategyPanel({ className }: StrategyPanelProps) {
           <Settings className="text-casino-gold mr-2" size={20} />
           Estratégias Ativas
         </CardTitle>
+        {!hasEnoughData && (
+          <div className="text-xs text-yellow-400 mt-1 bg-yellow-900/20 border border-yellow-600/30 rounded p-2">
+            <i className="fas fa-clock mr-1"></i>
+            Aguardando dados: {results.length}/10 resultados necessários
+          </div>
+        )}
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
           {strategies.map((strategy) => (
             <div
               key={strategy.id}
-              className={`border rounded p-3 cursor-pointer transition-all hover:opacity-80 ${getStrategyStatusBg(strategy)}`}
-              onClick={() => toggleStrategy(strategy)}
+              className={`border rounded p-3 transition-all ${
+                hasEnoughData ? 'cursor-pointer hover:opacity-80' : 'cursor-not-allowed opacity-60'
+              } ${getStrategyStatusBg(strategy)}`}
+              onClick={() => hasEnoughData && toggleStrategy(strategy)}
             >
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium">{strategy.name}</span>
                 <div className="flex items-center space-x-1">
-                  <div className={`w-2 h-2 rounded-full ${strategy.isActive ? 'bg-green-500 animate-pulse' : 'bg-gray-500'}`}></div>
+                  <div className={`w-2 h-2 rounded-full ${
+                    !hasEnoughData ? 'bg-yellow-500' : 
+                    strategy.isActive ? 'bg-green-500 animate-pulse' : 'bg-gray-500'
+                  }`}></div>
                   <span className={`text-xs ${getStrategyStatusColor(strategy)}`}>
-                    {strategy.isActive ? 'Ativa' : 'Standby'}
+                    {!hasEnoughData ? 'Aguardando' : strategy.isActive ? 'Ativa' : 'Standby'}
                   </span>
                 </div>
               </div>
@@ -104,7 +123,9 @@ export function StrategyPanel({ className }: StrategyPanelProps) {
               </div>
               
               <div className={`text-xs ${getStrategyStatusColor(strategy)}`}>
-                {strategy.isActive ? (
+                {!hasEnoughData ? (
+                  `Precisa de ${10 - results.length} resultados para ativar`
+                ) : strategy.isActive ? (
                   <>Tentativa {strategy.currentAttempts + 1}/{strategy.maxAttempts}</>
                 ) : (
                   'Aguardando ativação'
