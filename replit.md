@@ -2,11 +2,26 @@
 
 ## Overview
 
-This is a full-stack roulette analysis application built with a modern TypeScript stack. The application analyzes roulette patterns in real-time, provides AI-powered insights, and helps users identify betting opportunities through pattern recognition and statistical analysis.
+Sistema completo de análise de padrões de roleta com IA desenvolvido em TypeScript. O sistema analisa padrões de roleta em tempo real, fornece insights gerados por IA e identifica oportunidades de apostas através de reconhecimento de padrões e análise estatística. Incluí mesa de roleta europeia idêntica ao original com estratégias de vizinhos (até 21 números) e números plenos (até 7 números).
 
 ## User Preferences
 
-Preferred communication style: Simple, everyday language.
+Preferred communication style: Portuguese, simple and everyday language.
+
+## Estado Atual (28 de Julho 2025)
+
+✅ **Sistema Funcionando Completamente**
+- Mesa de roleta europeia com layout original (0-36)
+- Sistema de análise de padrões IA funcionando
+- Estratégias de vizinhos e números plenos implementadas
+- WebSocket para atualizações em tempo real
+- API REST funcionando corretamente (testado)
+- Dashboard interativo com painéis de análise
+
+✅ **Estratégias Implementadas**
+- Números Plenos: até 7 números por rodada, máximo 5 tentativas
+- Vizinhos: até 21 números cobertos, máximo 5 tentativas  
+- Recálculo automático da estratégia quando não acerta
 
 ## System Architecture
 

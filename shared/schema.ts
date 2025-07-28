@@ -69,7 +69,12 @@ export const sessions = pgTable("sessions", {
 // Insert schemas
 export const insertRouletteResultSchema = createInsertSchema(rouletteResults).omit({
   id: true,
-  timestamp: true
+  timestamp: true,
+  color: true,
+  dozen: true,
+  column: true,
+  half: true,
+  parity: true
 });
 
 export const insertPatternSchema = createInsertSchema(patterns).omit({

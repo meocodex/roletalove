@@ -24,8 +24,8 @@ class PatternAnalyzer {
     };
   }
 
-  static async analyzePatterns(results: RouletteResult[]) {
-    const patterns = [];
+  static async analyzePatterns(results: RouletteResult[]): Promise<any[]> {
+    const patterns: any[] = [];
     
     // Color sequence patterns
     const colorSequences = this.findColorSequences(results);
@@ -42,9 +42,9 @@ class PatternAnalyzer {
     return patterns.filter(p => p.probability >= 0.75);
   }
 
-  private static findColorSequences(results: RouletteResult[]) {
-    const patterns = [];
-    const sequences = [];
+  private static findColorSequences(results: RouletteResult[]): any[] {
+    const patterns: any[] = [];
+    const sequences: any[] = [];
     
     // Look for patterns like [R,R,R] -> B
     for (let i = 0; i < results.length - 3; i++) {
@@ -58,14 +58,14 @@ class PatternAnalyzer {
     }
     
     // Find recurring patterns
-    const sequenceMap = new Map();
+    const sequenceMap = new Map<string, { total: number; outcomes: Map<string, number> }>();
     sequences.forEach(seq => {
       const key = seq.sequence.join(',');
       if (!sequenceMap.has(key)) {
         sequenceMap.set(key, { total: 0, outcomes: new Map() });
       }
       
-      const data = sequenceMap.get(key);
+      const data = sequenceMap.get(key)!;
       data.total++;
       const outcome = seq.nextColor;
       data.outcomes.set(outcome, (data.outcomes.get(outcome) || 0) + 1);
@@ -74,7 +74,7 @@ class PatternAnalyzer {
     // Calculate probabilities
     sequenceMap.forEach((data, sequence) => {
       if (data.total >= 10) { // Minimum occurrences
-        data.outcomes.forEach((count, outcome) => {
+        data.outcomes.forEach((count: number, outcome: string) => {
           const probability = count / data.total;
           if (probability >= 0.75) {
             patterns.push({
@@ -94,9 +94,9 @@ class PatternAnalyzer {
     return patterns;
   }
 
-  private static findDozenPatterns(results: RouletteResult[]) {
-    const patterns = [];
-    const dozenCounts = new Map();
+  private static findDozenPatterns(results: RouletteResult[]): any[] {
+    const patterns: any[] = [];
+    const dozenCounts = new Map<number, number>();
     
     // Count dozen occurrences in recent results
     const recentResults = results.slice(0, 20);
@@ -107,7 +107,7 @@ class PatternAnalyzer {
     });
     
     // Find hot dozens
-    dozenCounts.forEach((count, dozen) => {
+    dozenCounts.forEach((count: number, dozen: number) => {
       const probability = count / recentResults.length;
       if (probability >= 0.35) { // 35% or higher in recent spins
         patterns.push({
@@ -125,9 +125,9 @@ class PatternAnalyzer {
     return patterns;
   }
 
-  private static findHotNumbers(results: RouletteResult[]) {
-    const patterns = [];
-    const numberCounts = new Map();
+  private static findHotNumbers(results: RouletteResult[]): any[] {
+    const patterns: any[] = [];
+    const numberCounts = new Map<number, number>();
     
     // Count number occurrences in recent results
     const recentResults = results.slice(0, 50);
@@ -138,7 +138,7 @@ class PatternAnalyzer {
     // Find hot numbers (appearing more than expected)
     const expectedFrequency = recentResults.length / 37; // European roulette has 37 numbers
     
-    numberCounts.forEach((count, number) => {
+    numberCounts.forEach((count: number, number: number) => {
       if (count > expectedFrequency * 1.5) { // 50% above expected
         const probability = Math.min(count / recentResults.length * 5, 0.80); // Boost and cap
         patterns.push({
@@ -259,11 +259,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check strategy hits
       const activeStrategies = await storage.getActiveStrategies();
       for (const strategy of activeStrategies) {
-        if (strategy.numbers.includes(result.number)) {
+        const strategyNumbers = Array.isArray(strategy.numbers) ? strategy.numbers as number[] : [];
+        if (strategyNumbers.includes(result.number)) {
           // Strategy hit!
           await storage.updateStrategy(strategy.id, {
             currentAttempts: 0,
-            successRate: (strategy.successRate + 1) / 2, // Simple average
+            successRate: ((strategy.successRate || 0) + 1) / 2, // Simple average
             lastUsed: new Date()
           });
           
@@ -277,8 +278,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
         } else {
           // Increment attempts
-          const newAttempts = strategy.currentAttempts + 1;
-          if (newAttempts >= strategy.maxAttempts) {
+          const newAttempts = (strategy.currentAttempts || 0) + 1;
+          if (newAttempts >= (strategy.maxAttempts || 5)) {
             // Reset strategy
             await storage.updateStrategy(strategy.id, {
               currentAttempts: 0,

@@ -59,12 +59,12 @@ export class MemStorage implements IStorage {
   }
 
   private async initializeDefaultStrategies() {
-    // Straight-up numbers strategy
+    // Straight-up numbers strategy (max 7 numbers as requested)
     const straightUpStrategy: Strategy = {
       id: randomUUID(),
       name: "Números Plenos",
       type: "straight_up",
-      numbers: [17, 32, 19, 4, 21],
+      numbers: [17, 32, 19, 4, 21, 7, 14], // Max 7 numbers
       maxAttempts: 5,
       currentAttempts: 0,
       isActive: true,
@@ -73,13 +73,13 @@ export class MemStorage implements IStorage {
       createdAt: new Date()
     };
 
-    // Neighbors strategy (neighbors of 17)
+    // Neighbors strategy (up to 21 numbers as requested)
     const neighborsStrategy: Strategy = {
       id: randomUUID(),
       name: "Vizinhos do 17",
       type: "neighbors",
-      numbers: [2, 25, 4, 21, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20],
-      maxAttempts: 3,
+      numbers: [2, 25, 4, 21, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20], // 21 numbers
+      maxAttempts: 5, // Max 5 attempts as requested
       currentAttempts: 0,
       isActive: false,
       lastUsed: null,
