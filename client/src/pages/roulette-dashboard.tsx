@@ -9,6 +9,8 @@ import { StrategyPanel } from '@/components/strategy-panel';
 import { StatsPanel } from '@/components/stats-panel';
 import { AlertsPanel } from '@/components/alerts-panel';
 import { BettingPreferences } from '@/components/betting-preferences';
+import MLAnalysisPanel from '@/components/ml-analysis-panel';
+import CombinedStrategiesPanel from '@/components/combined-strategies-panel';
 import { useWebSocket } from '@/hooks/use-websocket';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
@@ -235,6 +237,12 @@ export default function RouletteDashboard() {
           {/* Right Sidebar - Analysis Dashboard */}
           <div className="xl:col-span-1 space-y-6">
             
+            {/* ML Analysis Panel - New Advanced Feature */}
+            <MLAnalysisPanel />
+
+            {/* Combined Strategies Panel - Phase 2 Implementation */}
+            <CombinedStrategiesPanel />
+
             {/* Pattern Analysis */}
             <PatternAnalysis />
 
