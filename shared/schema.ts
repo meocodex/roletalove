@@ -1,7 +1,38 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer, timestamp, boolean, real, json } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, integer, timestamp, boolean, real, json, pgEnum } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+
+// Sistema de Planos SaaS
+export const planTypeEnum = pgEnum('plan_type', ['basico', 'intermediario', 'completo']);
+
+export const users = pgTable("users", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  email: varchar("email").unique().notNull(),
+  name: varchar("name").notNull(),
+  planType: planTypeEnum("plan_type").default('basico').notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Controle de Features por Plano
+export const features = pgTable("features", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name").notNull(),
+  displayName: varchar("display_name").notNull(),
+  description: text("description"),
+  planType: planTypeEnum("plan_type").notNull(),
+  isActive: boolean("is_active").default(true),
+});
+
+// Sessões de análise por usuário
+export const userSessions = pgTable("user_sessions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  sessionName: varchar("session_name"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
 
 export const rouletteResults = pgTable("roulette_results", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -133,3 +164,53 @@ export type InsertSession = z.infer<typeof insertSessionSchema>;
 
 export type BettingPreference = typeof bettingPreferences.$inferSelect;
 export type InsertBettingPreference = z.infer<typeof insertBettingPreferenceSchema>;
+
+// Novos tipos para sistema SaaS
+export type User = typeof users.$inferSelect;
+export type InsertUser = typeof users.$inferInsert;
+
+export type Feature = typeof features.$inferSelect;
+export type InsertFeature = typeof features.$inferInsert;
+
+export type UserSession = typeof userSessions.$inferSelect;
+export type InsertUserSession = typeof userSessions.$inferInsert;
+
+// Tipos de planos
+export type PlanType = 'basico' | 'intermediario' | 'completo';
+
+// Configuração de features por plano
+export const PLAN_FEATURES = {
+  basico: [
+    'mesa_roleta',
+    'entrada_manual',
+    'resultados_recentes',
+    'estatisticas_basicas'
+  ],
+  intermediario: [
+    'mesa_roleta',
+    'entrada_manual', 
+    'resultados_recentes',
+    'estatisticas_basicas',
+    'analise_padroes',
+    'estrategias_tradicionais',
+    'ml_analyzer',
+    'graficos_basicos'
+  ],
+  completo: [
+    'mesa_roleta',
+    'entrada_manual',
+    'resultados_recentes', 
+    'estatisticas_basicas',
+    'analise_padroes',
+    'estrategias_tradicionais',
+    'ml_analyzer',
+    'graficos_basicos',
+    'ia_externa_chatgpt',
+    'ia_externa_claude',
+    'estrategias_combinadas',
+    'graficos_avancados',
+    'dashboard_customizavel',
+    'exportacao_dados',
+    'historico_sessoes'
+  ]
+} as const;

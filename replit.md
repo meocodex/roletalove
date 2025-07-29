@@ -12,6 +12,42 @@ Sistema completo e avançado de análise de padrões de roleta com inteligência
 
 ## Estado Atual (29 de Julho 2025)
 
+### 🚀 NOVA ARQUITETURA: Sistema SaaS com 3 Planos - ✅ IMPLEMENTADA
+
+**Sistema de Controle de Acesso Implementado:**
+- **Autenticação**: Sistema completo de usuários com planos
+- **3 Planos Disponíveis**: Básico, Intermediário e Completo
+- **Controle Granular**: Cada funcionalidade restrita por plano específico
+- **Interface de Planos**: Página dedicada para seleção e upgrade
+- **FeatureGuard**: Componente que bloqueia funcionalidades baseado no plano
+- **Header Informativo**: Mostra usuário atual e plano ativo
+
+**Estrutura dos Planos:**
+
+**📦 Plano Básico (R$ 29/mês)**
+- Mesa de roleta visual
+- Entrada manual de números  
+- Histórico de resultados
+- Estatísticas básicas
+
+**📦 Plano Intermediário (R$ 59/mês)**
+- Tudo do Plano Básico +
+- Análise de padrões avançada
+- Estratégias tradicionais  
+- Machine Learning básico
+- Gráficos interativos
+- Sistema de alertas
+
+**📦 Plano Completo (R$ 99/mês)**
+- Tudo do Plano Intermediário +
+- **IA Externa (ChatGPT + Claude)**
+- **Estratégias combinadas** 
+- **Gráficos avançados**
+- **Dashboard customizável**
+- Exportação de dados
+- Histórico completo
+- Suporte prioritário
+
 ### ✅ Funcionalidades Principais Implementadas
 
 **Mesa de Roleta e Interface**
@@ -83,6 +119,35 @@ Sistema completo e avançado de análise de padrões de roleta com inteligência
 | **Par/Ímpar** | ❌ INATIVO | 1:1 | Números pares vs ímpares |
 
 ## Arquitetura Completa do Sistema
+
+### 🔐 Sistema de Autenticação e Controle de Acesso
+
+**Componentes Principais:**
+- **AuthProvider**: Contexto global de autenticação
+- **useAuth**: Hook para verificar usuário e permissões
+- **FeatureGuard**: Componente que controla acesso a funcionalidades
+- **PlanSelector**: Interface para seleção e upgrade de planos
+- **Badge**: Componente para exibir status dos planos
+
+**Fluxo de Controle:**
+```typescript
+// Verificação de feature
+const { hasFeature } = useAuth();
+if (hasFeature('ia_externa_chatgpt')) {
+  // Exibir funcionalidade
+} else {
+  // Mostrar prompt de upgrade
+}
+```
+
+**Configuração de Features por Plano:**
+```typescript
+export const PLAN_FEATURES = {
+  basico: ['mesa_roleta', 'entrada_manual', 'resultados_recentes'],
+  intermediario: [...basico, 'analise_padroes', 'ml_analyzer'],
+  completo: [...intermediario, 'ia_externa_chatgpt', 'dashboard_customizavel']
+};
+```
 
 ### 🎯 Arquitetura Frontend
 

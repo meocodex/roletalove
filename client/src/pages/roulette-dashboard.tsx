@@ -18,6 +18,8 @@ import CustomizableDashboard from '@/components/customizable-dashboard';
 import AdvancedCharts from '@/components/advanced-charts';
 import { useWebSocket } from '@/hooks/use-websocket';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
+import { FeatureGuard } from '@/components/auth/FeatureGuard';
 import { apiRequest } from '@/lib/queryClient';
 import { getNumberColor, getColorClass } from '@/lib/roulette-utils';
 import { ClientPatternAnalyzer } from '@/lib/pattern-analyzer';
@@ -36,6 +38,7 @@ export default function RouletteDashboard() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { isConnected, lastMessage } = useWebSocket();
+  const { user, hasFeature } = useAuth();
 
   // Queries
   const { data: results = [] } = useQuery<RouletteResult[]>({
@@ -185,25 +188,49 @@ export default function RouletteDashboard() {
             </div>
           </div>
           <div className="flex items-center space-x-4">
-            {/* Dashboard Mode Toggle */}
+            {/* User Info */}
+            {user && (
+              <div className="text-right">
+                <div className="text-sm text-gray-400">Usuário: {user.name}</div>
+                <div className="text-xs text-roulette-green font-medium">
+                  {user.planType === 'basico' ? 'Plano Básico' : 
+                   user.planType === 'intermediario' ? 'Plano Intermediário' : 
+                   'Plano Completo'}
+                </div>
+              </div>
+            )}
+
+            {/* Plans Link */}
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setDashboardMode(dashboardMode === 'standard' ? 'custom' : 'standard')}
+              onClick={() => window.location.href = '/plans'}
               className="bg-gray-800 border-gray-600 hover:bg-gray-700"
             >
-              {dashboardMode === 'standard' ? (
-                <>
-                  <Grid className="w-4 h-4 mr-2" />
-                  Dashboard Customizável
-                </>
-              ) : (
-                <>
-                  <Layout className="w-4 h-4 mr-2" />
-                  Dashboard Padrão
-                </>
-              )}
+              Planos
             </Button>
+
+            {/* Dashboard Mode Toggle - Only for Complete Plan */}
+            <FeatureGuard feature="dashboard_customizavel" showUpgrade={false}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setDashboardMode(dashboardMode === 'standard' ? 'custom' : 'standard')}
+                className="bg-gray-800 border-gray-600 hover:bg-gray-700"
+              >
+                {dashboardMode === 'standard' ? (
+                  <>
+                    <Grid className="w-4 h-4 mr-2" />
+                    Dashboard Customizável
+                  </>
+                ) : (
+                  <>
+                    <Layout className="w-4 h-4 mr-2" />
+                    Dashboard Padrão
+                  </>
+                )}
+              </Button>
+            </FeatureGuard>
             
             <div className="text-right">
               <div className="text-sm text-gray-400">Status do Sistema</div>
@@ -388,27 +415,39 @@ export default function RouletteDashboard() {
               {/* Betting Recommendations - DESTAQUE PRINCIPAL */}
               <BettingRecommendations />
               
-              {/* External AI Analysis Panel - ChatGPT & Claude */}
-              <ExternalAIPanel 
-                insights={aiInsights}
-                isLoading={aiLoading}
-                onRefresh={fetchAIAnalysis}
-              />
+              {/* External AI Analysis Panel - Only Complete Plan */}
+              <FeatureGuard feature="ia_externa_chatgpt">
+                <ExternalAIPanel 
+                  insights={aiInsights}
+                  isLoading={aiLoading}
+                  onRefresh={fetchAIAnalysis}
+                />
+              </FeatureGuard>
               
-              {/* ML Analysis Panel - New Advanced Feature */}
-              <MLAnalysisPanel />
+              {/* ML Analysis Panel - Intermediate+ Plan */}
+              <FeatureGuard feature="ml_analyzer">
+                <MLAnalysisPanel />
+              </FeatureGuard>
 
-              {/* Combined Strategies Panel - Phase 2 Implementation */}
-              <CombinedStrategiesPanel />
+              {/* Combined Strategies Panel - Complete Plan Only */}
+              <FeatureGuard feature="estrategias_combinadas">
+                <CombinedStrategiesPanel />
+              </FeatureGuard>
 
-              {/* Advanced Charts - Phase 3 */}
-              <AdvancedCharts />
+              {/* Advanced Charts - Complete Plan */}
+              <FeatureGuard feature="graficos_avancados">
+                <AdvancedCharts />
+              </FeatureGuard>
 
-              {/* Pattern Analysis */}
-              <PatternAnalysis />
+              {/* Pattern Analysis - Intermediate+ Plan */}
+              <FeatureGuard feature="analise_padroes">
+                <PatternAnalysis />
+              </FeatureGuard>
 
-              {/* Strategy System */}
-              <StrategyPanel />
+              {/* Strategy System - Intermediate+ Plan */}
+              <FeatureGuard feature="estrategias_tradicionais">
+                <StrategyPanel />
+              </FeatureGuard>
 
               {/* Betting Preferences */}
               <BettingPreferences />
