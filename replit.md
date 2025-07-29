@@ -2,7 +2,7 @@
 
 ## Overview
 
-Sistema completo e avançado de análise de padrões de roleta com inteligência artificial desenvolvido em TypeScript. O sistema oferece análise em tempo real de resultados da roleta europeia, geração automática de estratégias de apostas baseadas em IA, reconhecimento de padrões estatísticos e sistema configurável de preferências de apostas. A interface inclui mesa visual idêntica à roleta europeia original com funcionalidades interativas completas.
+Sistema completo e avançado de análise de padrões de roleta com inteligência artificial desenvolvido em TypeScript. O sistema oferece análise em tempo real de resultados da roleta europeia, geração automática de estratégias de apostas baseadas em IA, reconhecimento de padrões estatísticos e sistema configurável de preferências de apostas. A interface inclui mesa visual idêntica à roleta europeia original com interface simplificada focada apenas em cliques diretos.
 
 ## User Preferences
 
@@ -10,7 +10,21 @@ Sistema completo e avançado de análise de padrões de roleta com inteligência
 - **Interface**: Dashboard profissional com tema escuro tipo casino
 - **Funcionalidades**: Foco em estratégias automáticas e análise de padrões
 
-## Estado Atual (29 de Julho 2025)
+## Estado Atual (29 de Julho 2025) - SEÇÃO ENTRADA MANUAL REMOVIDA
+
+### 🎯 ÚLTIMA ALTERAÇÃO: Interface Simplificada (29 Jul 2025)
+
+**Mudança Implementada:**
+- ✅ **Seção "Entrada Manual" REMOVIDA** por completo do dashboard
+- ✅ **Campo de números 0-36 ELIMINADO** - sem input manual
+- ✅ **Interface SIMPLIFICADA** - apenas cliques diretos na mesa
+- ✅ **Código limpo** - variáveis e funções desnecessárias removidas
+- ✅ **Experiência otimizada** - foco total na mesa de roleta visual
+
+**Como funciona agora:**
+- **Única entrada**: Cliques diretos nos números da mesa de roleta
+- **Visual minimalista**: Sem campos de entrada ocupando espaço
+- **Experiência profissional**: Interface limpa tipo casino
 
 ### 🚀 NOVA ARQUITETURA: Sistema SaaS com 3 Planos - ✅ IMPLEMENTADA
 
@@ -25,10 +39,10 @@ Sistema completo e avançado de análise de padrões de roleta com inteligência
 **Estrutura dos Planos:**
 
 **📦 Plano Básico (R$ 29/mês)**
-- Mesa de roleta visual
-- Entrada manual de números  
+- Mesa de roleta visual interativa (cliques diretos)
 - Histórico de resultados
 - Estatísticas básicas
+- Sistema de sessões
 
 **📦 Plano Intermediário (R$ 59/mês)**
 - Tudo do Plano Básico +
@@ -50,16 +64,15 @@ Sistema completo e avançado de análise de padrões de roleta com inteligência
 
 ### ✅ Funcionalidades Principais Implementadas
 
-**Mesa de Roleta e Interface**
+**Mesa de Roleta e Interface - FINALIZADA**
 - **Mesa de roleta europeia OTIMIZADA**: Layout minimalista sem bordas e fundos desnecessários
 - **Zero preenchendo 3 linhas**: Posicionado corretamente entre números 3, 2, 1 como na roleta original
 - **Layout compacto**: Botões menores (w-8 h-10) com gaps mínimos (gap-0.5) para maximizar espaço
 - **Visual limpo**: Fundo cinza escuro sem bordas douradas, apenas os números essenciais
-- Interface interativa para clique direto nos números
-- Entrada manual de números com validação
-- Display de últimos resultados com destaque visual
-- Sistema de sessões ativo/inativo
-- Dashboard customizável com alternância entre modo padrão e avançado
+- **Interface simplificada**: APENAS cliques diretos nos números (entrada manual removida)
+- **Display otimizado**: Últimos resultados com destaque visual
+- **Sistema de sessões**: Controle ativo/inativo funcional
+- **Dashboard responsivo**: Customizável com alternância entre modo padrão e avançado
 
 **🚀 NOVA: Análise com IA Externa - ✅ IMPLEMENTADA**
 - **Integração ChatGPT**: Análise avançada via OpenAI GPT-4o
@@ -542,17 +555,17 @@ npm run build:server
 
 ## 📋 Casos de Uso e Workflows Operacionais
 
-### 🎯 Workflow do Usuário Final
+### 🎯 Workflow do Usuário Final - SIMPLIFICADO
 
 1. **Início de Sessão**
    - Usuário acessa dashboard
    - Clica "Iniciar Sessão"
    - Sistema ativa captura de dados
 
-2. **Entrada de Resultados**
-   - Clique direto nos números da mesa OU
-   - Entrada manual no campo específico
-   - Validação automática (0-36)
+2. **Entrada de Resultados - APENAS CLIQUES**
+   - **ÚNICA FORMA**: Clique direto nos números da mesa de roleta
+   - **Validação automática**: Números 0-36 aceitos
+   - **Interface limpa**: Sem campos de entrada manual
 
 3. **Análise Progressiva**
    - **1-9 resultados**: Sistema coleta dados
@@ -712,7 +725,7 @@ npm run build:server
 - Visualizações avançadas com análise de setores da roda e sequências
 - Dashboard responsivo com reorganização flexível
 
-## 📖 Guia de Uso do Sistema
+## 📖 Guia de Uso do Sistema - INTERFACE SIMPLIFICADA
 
 ### 🎯 Como Usar as Previsões de IA
 
@@ -721,10 +734,10 @@ npm run build:server
 2. Clique em "Iniciar Sessão" na mesa
 3. Sistema estará pronto para receber números
 
-**Passo 2: Inserir Resultados**
-- **Método 1**: Clique diretamente nos números da mesa visual
-- **Método 2**: Digite no campo "Número manual" e pressione Enter
-- Cada número é validado automaticamente (0-36)
+**Passo 2: Inserir Resultados - APENAS CLIQUES**
+- **ÚNICA FORMA**: Clique diretamente nos números da mesa visual
+- **Validação automática**: Números 0-36 aceitos instantaneamente
+- **Interface limpa**: Sem campos de entrada manual
 
 **Passo 3: Aguardar Ativação das Previsões ML**
 - **10+ números**: Estratégias tradicionais ativam (seção azul)
