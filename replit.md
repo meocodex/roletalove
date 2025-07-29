@@ -89,6 +89,13 @@ Sistema completo e avançado de análise de padrões de roleta com inteligência
 - **Padrões Detectados**: Lista de tendências identificadas pela IA
 - **Próximos Prováveis**: Previsões com probabilidades específicas
 
+**🎯 NOVA: Previsões ML Simplificadas - ✅ OTIMIZADA**
+- **Números Plenos ML**: Top 7 números com número principal destacado
+- **Vizinhos ML**: 5 números da roda física com principal no centro
+- **Interface Limpa**: Apenas números jogáveis, sem porcentagens desnecessárias
+- **Visual Intuitivo**: Anel roxo destaca números principais
+- **Análise Rápida**: Métricas essenciais em formato compacto
+
 **Sistema de Análise com IA - Fase 1 ✅**
 - Engine de análise de padrões em tempo real
 - Detecção automática de números quentes/frios

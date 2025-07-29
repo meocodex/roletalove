@@ -49,157 +49,108 @@ export default function MLAnalysisPanel({ className }: MLAnalysisPanelProps) {
     );
   }
 
+  // Criar estratégias de vizinhos baseadas em ML
+  const getNeighborsStrategy = () => {
+    if (topPredictions.length === 0) return [];
+    
+    const mainNumber = topPredictions[0].number;
+    
+    // Mapeamento da roda física da roleta europeia
+    const wheelOrder = [0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
+    
+    const mainIndex = wheelOrder.indexOf(mainNumber);
+    if (mainIndex === -1) return [];
+    
+    // Pegar 2 vizinhos de cada lado (5 números total)
+    const neighbors = [];
+    for (let i = -2; i <= 2; i++) {
+      const index = (mainIndex + i + wheelOrder.length) % wheelOrder.length;
+      neighbors.push(wheelOrder[index]);
+    }
+    
+    return neighbors;
+  };
+
+  const neighbors = getNeighborsStrategy();
+
   return (
     <div className={`space-y-3 ${className}`}>
-      {/* Painel Principal - Compacto */}
+      {/* Números Plenos ML */}
       <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-purple-400 text-base">
-            <Brain className="h-4 w-4" />
-            Previsões ML - Top {topPredictions.length}
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-purple-400 text-sm">
+            <Target className="h-4 w-4" />
+            Números Plenos ML
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-2">
-            {topPredictions.map((prediction, index) => (
-              <div
+          <div className="flex flex-wrap gap-1">
+            {topPredictions.slice(0, 7).map((prediction, index) => (
+              <span
                 key={prediction.number}
-                className="flex items-center justify-between p-2 rounded-lg border bg-card/30 hover:bg-card/50 transition-colors"
+                className={`w-8 h-8 rounded-md flex items-center justify-center text-white font-bold text-sm ${
+                  prediction.number === 0 
+                    ? 'bg-green-600'
+                    : [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36].includes(prediction.number)
+                    ? 'bg-red-600'
+                    : 'bg-gray-700'
+                } ${index === 0 ? 'ring-2 ring-purple-400' : ''}`}
+                title={index === 0 ? 'Número principal ML' : `Número ${index + 1} ML`}
               >
-                <div className="flex items-center gap-3">
-                  <span className="text-xs font-medium text-muted-foreground w-6">
-                    #{index + 1}
-                  </span>
-                  <span
-                    className={`w-7 h-7 rounded-md flex items-center justify-center text-white font-bold text-xs ${
-                      prediction.number === 0 
-                        ? 'bg-green-600'
-                        : [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36].includes(prediction.number)
-                        ? 'bg-red-600'
-                        : 'bg-gray-700'
-                    }`}
-                  >
-                    {prediction.number}
-                  </span>
-                  <div className="flex flex-col min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-sm">
-                        {(prediction.probability * 100).toFixed(1)}%
-                      </span>
-                      <Badge 
-                        variant={
-                          prediction.category === 'hot' ? 'destructive' :
-                          prediction.category === 'cold' ? 'secondary' : 'outline'
-                        }
-                        className="text-xs px-1.5 py-0"
-                      >
-                        {prediction.category === 'hot' ? 'Quente' :
-                         prediction.category === 'cold' ? 'Frio' : 'Neutro'}
-                      </Badge>
-                    </div>
-                    <p className="text-xs text-muted-foreground truncate">
-                      {prediction.reasoning[0]}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Progress 
-                    value={prediction.confidence * 100} 
-                    className="w-12 h-2"
-                  />
-                  <span className="text-xs text-muted-foreground w-8 text-right">
-                    {(prediction.confidence * 100).toFixed(0)}%
-                  </span>
-                </div>
-              </div>
+                {prediction.number}
+              </span>
             ))}
           </div>
         </CardContent>
       </Card>
 
-      {/* Análise por Categorias - Grid Responsivo */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {/* Números Quentes */}
+      {/* Vizinhos ML */}
+      {neighbors.length > 0 && (
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-red-400 text-sm">
-              <TrendingUp className="h-4 w-4" />
-              Quentes ({hotNumbers.length})
+            <CardTitle className="flex items-center gap-2 text-purple-400 text-sm">
+              <Brain className="h-4 w-4" />
+              Vizinhos ML
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-2">
-              {hotNumbers.slice(0, 4).map((prediction) => (
-                <div key={prediction.number} className="text-center">
+            <div className="flex flex-wrap gap-1">
+              {neighbors.map((number, index) => {
+                const isMain = index === 2; // Número central
+                return (
                   <span
-                    className={`w-8 h-8 rounded-md flex items-center justify-center text-white font-bold text-sm mx-auto mb-1 ${
-                      prediction.number === 0 
+                    key={number}
+                    className={`w-8 h-8 rounded-md flex items-center justify-center text-white font-bold text-sm ${
+                      number === 0 
                         ? 'bg-green-600'
-                        : [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36].includes(prediction.number)
+                        : [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36].includes(number)
                         ? 'bg-red-600'
                         : 'bg-gray-700'
-                    }`}
+                    } ${isMain ? 'ring-2 ring-purple-400' : ''}`}
+                    title={isMain ? 'Número principal' : 'Vizinho'}
                   >
-                    {prediction.number}
+                    {number}
                   </span>
-                  <p className="text-xs text-red-400 font-medium">
-                    {(prediction.probability * 100).toFixed(0)}%
-                  </p>
-                </div>
-              ))}
+                );
+              })}
             </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              Número principal destacado com anel roxo
+            </p>
           </CardContent>
         </Card>
+      )}
 
-        {/* Números Frios */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-blue-400 text-sm">
-              <Activity className="h-4 w-4" />
-              Frios ({coldNumbers.length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-2">
-              {coldNumbers.slice(0, 4).map((prediction) => (
-                <div key={prediction.number} className="text-center">
-                  <span
-                    className={`w-8 h-8 rounded-md flex items-center justify-center text-white font-bold text-sm mx-auto mb-1 ${
-                      prediction.number === 0 
-                        ? 'bg-green-600'
-                        : [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36].includes(prediction.number)
-                        ? 'bg-red-600'
-                        : 'bg-gray-700'
-                    }`}
-                  >
-                    {prediction.number}
-                  </span>
-                  <p className="text-xs text-blue-400 font-medium">
-                    {(prediction.probability * 100).toFixed(0)}%
-                  </p>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Métricas Resumidas */}
+      {/* Análise Rápida */}
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 text-yellow-400 text-sm">
-            <Target className="h-4 w-4" />
-            Métricas ML
+            <Zap className="h-4 w-4" />
+            Análise Rápida
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
-            <div>
-              <p className="text-lg font-bold text-green-400">
-                {mlPredictions.length}
-              </p>
-              <p className="text-xs text-muted-foreground">Previsões</p>
-            </div>
+          <div className="grid grid-cols-3 gap-2 text-center">
             <div>
               <p className="text-lg font-bold text-red-400">
                 {hotNumbers.length}
@@ -214,9 +165,9 @@ export default function MLAnalysisPanel({ className }: MLAnalysisPanelProps) {
             </div>
             <div>
               <p className="text-lg font-bold text-purple-400">
-                {topPredictions.length > 0 ? (topPredictions[0].confidence * 100).toFixed(0) : 0}%
+                {topPredictions.length}
               </p>
-              <p className="text-xs text-muted-foreground">Confiança</p>
+              <p className="text-xs text-muted-foreground">Previsões</p>
             </div>
           </div>
         </CardContent>
