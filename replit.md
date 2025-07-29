@@ -15,12 +15,12 @@ Sistema completo e avançado de análise de padrões de roleta com inteligência
 ### ✅ Funcionalidades Principais Implementadas
 
 **Mesa de Roleta e Interface**
-- Mesa de roleta europeia visual com layout idêntico ao original (0-36)
+- Mesa de roleta europeia visual com layout idêntica ao original (0-36)
 - Interface interativa para clique direto nos números
 - Entrada manual de números com validação
 - Display de últimos resultados com destaque visual
 - Sistema de sessões ativo/inativo
-- **NOVO**: Dashboard customizável com alternância entre modo padrão e avançado
+- Dashboard customizável com alternância entre modo padrão e avançado
 
 **Sistema de Análise com IA - Fase 1 ✅**
 - Engine de análise de padrões em tempo real
@@ -28,9 +28,11 @@ Sistema completo e avançado de análise de padrões de roleta com inteligência
 - Análise de sequências de dúzias, cores e paridades
 - Cálculos de probabilidade e confiança estatística
 - Análise client-side complementar para performance
-- **NOVO**: Machine Learning Analyzer com confidence scoring avançado
-- **NOVO**: Previsões ML baseadas em padrões temporais e frequência
-- **NOVO**: Classificação automática de números em categorias hot/cold/neutral
+- **Machine Learning Analyzer** com confidence scoring avançado
+- **Previsões ML** baseadas em padrões temporais e frequência
+- **Classificação automática** de números em categorias hot/cold/neutral
+- **Painel dedicado** "🎯 RECOMENDAÇÕES DE APOSTAS" no topo da barra lateral
+- **Seção roxa** "Previsões de IA (Lógica ML Avançada)" com Top 10 números
 
 **Estratégias Automatizadas - Fase 2 ✅**
 - **Números Plenos**: Geração de exatamente 7 números por rodada
@@ -44,11 +46,13 @@ Sistema completo e avançado de análise de padrões de roleta com inteligência
 - **NOVO**: Estratégias que adaptam baseado em performance ML
 
 **Interface e Experiência - Fase 3 ✅**
-- **NOVO**: Gráficos interativos avançados com 4 visualizações (Frequência, Tendências, Setores, Sequências)
-- **NOVO**: Dashboard totalmente customizável com layouts predefinidos
-- **NOVO**: Sistema de alternância entre dashboard padrão e customizável
-- **NOVO**: Painéis reorganizáveis por categoria (Análise, Estratégias, Estatísticas, Visualização)
-- **NOVO**: Layouts prontos: Iniciante, Avançado, Analista, Estrategista
+- Gráficos interativos avançados com 4 visualizações (Frequência, Tendências, Setores, Sequências)
+- Dashboard totalmente customizável com layouts predefinidos
+- Sistema de alternância entre dashboard padrão e customizável
+- Painéis reorganizáveis por categoria (Análise, Estratégias, Estatísticas, Visualização)
+- Layouts prontos: Iniciante, Avançado, Analista, Estrategista
+- **Painel de Recomendações de Apostas** centralizado no topo da barra lateral
+- **Estrutura em 3 seções**: Estratégias Tradicionais, Previsões ML, Estratégias Combinadas
 
 **Sistema de Preferências Configuráveis**
 - 6 tipos de apostas configuráveis pelo usuário
@@ -549,19 +553,30 @@ npm run build:server
 
 ## 📋 Funcionalidades Implementadas Detalhadas
 
+### 🎯 Sistema Atual Funcionando (29 Julho 2025)
+
+**Status de Desenvolvimento**:
+- ✅ Sistema base totalmente funcional
+- ✅ Todas as 3 fases do roadmap implementadas
+- ✅ 25 números de teste populados para demonstração
+- ✅ Previsões ML ativadas e funcionando
+- ✅ Painel de recomendações no topo da barra lateral
+
 ### 🎯 Fase 1: Machine Learning Integration - ✅ COMPLETA
 
 **Funcionalidades Implementadas**:
-- **ML Analyzer Engine**: Sistema de classificação baseado em frequência temporal e padrões
-- **Confidence Scoring**: Algoritmo de confiança baseado em múltiplos fatores (frequência, recência, tendência)
-- **Previsões Inteligentes**: Top 10 números com probabilidades calculadas dinamicamente
-- **Categorização Automática**: Classificação em hot/cold/neutral com thresholds adaptativos
-- **Análise Temporal**: Considera janelas móveis e decaimento temporal nas previsões
+- **ML Analyzer Engine**: Sistema avançado com algoritmos Ensemble, Markov e Bayesian
+- **Confidence Scoring**: Múltiplos fatores (frequência, recência, tendência, entropy)
+- **Previsões Top 10**: Números mais prováveis com percentuais ML
+- **Categorização Automática**: hot/cold/neutral com thresholds adaptativos
+- **Análise Temporal**: Janelas móveis e decaimento temporal
+- **Painel Visual**: Seção roxa dedicada "Previsões de IA (Lógica ML Avançada)"
 
-**Resultados Alcançados**:
-- Precisão média de 65-75% nas previsões de números quentes
-- Detecção de padrões não-lineares em sequências temporais
-- Interface ML integrada ao dashboard principal com métricas em tempo real
+**Localização das Previsões ML**:
+- Dashboard → Barra lateral direita → Topo
+- Painel "🎯 RECOMENDAÇÕES DE APOSTAS"
+- Seção 2 (roxa): "Previsões de IA (Lógica ML Avançada)"
+- Ativa após 20+ resultados (atualmente: 25 resultados)
 
 ### 🎯 Fase 2: Estratégias Combinadas - ✅ COMPLETA  
 
@@ -591,6 +606,53 @@ npm run build:server
 - Experiência adaptada para diferentes perfis de usuário
 - Visualizações avançadas com análise de setores da roda e sequências
 - Dashboard responsivo com reorganização flexível
+
+## 📖 Guia de Uso do Sistema
+
+### 🎯 Como Usar as Previsões de IA
+
+**Passo 1: Iniciar Sessão**
+1. Acesse o dashboard da roleta
+2. Clique em "Iniciar Sessão" na mesa
+3. Sistema estará pronto para receber números
+
+**Passo 2: Inserir Resultados**
+- **Método 1**: Clique diretamente nos números da mesa visual
+- **Método 2**: Digite no campo "Número manual" e pressione Enter
+- Cada número é validado automaticamente (0-36)
+
+**Passo 3: Aguardar Ativação das Previsões ML**
+- **10+ números**: Estratégias tradicionais ativam (seção azul)
+- **20+ números**: Previsões ML ativam (seção roxa)
+- **25+ números**: Estratégias combinadas ativam (seção verde)
+
+**Passo 4: Localizar as Previsões ML**
+- Vá para a **barra lateral direita**
+- Procure o painel **"🎯 RECOMENDAÇÕES DE APOSTAS"** no topo
+- Na seção **roxa** "2. Previsões de IA (Lógica ML Avançada)"
+- Verá os **Top 10 números** com percentuais de probabilidade
+
+**Passo 5: Usar as Recomendações**
+- Números são mostrados com cores da roleta real
+- Percentuais indicam probabilidade ML calculada
+- Botão "Copiar Top 10" para usar em outras plataformas
+- Debug mostra quantas previsões foram geradas
+
+### 🎯 Estrutura do Painel de Recomendações
+
+**Seção 1 (Azul)**: Estratégias Tradicionais (10+ números)
+- Números Plenos: 7 números diretos
+- Vizinhos: Grupos da roda física
+
+**Seção 2 (Roxa)**: Previsões de IA (20+ números) ⭐
+- Top 10 números mais prováveis via ML
+- Algoritmos Ensemble, Markov, Bayesian
+- Percentuais de confiança
+
+**Seção 3 (Verde)**: Estratégias Combinadas (25+ números)
+- Portfolio otimizado de apostas
+- Distribuição percentual automática
+- Métricas de risco/retorno
 
 ## 🚀 Próximos Passos de Evolução (Futuras Implementações)
 
