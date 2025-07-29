@@ -22,6 +22,17 @@ Sistema completo e avançado de análise de padrões de roleta com inteligência
 - Sistema de sessões ativo/inativo
 - Dashboard customizável com alternância entre modo padrão e avançado
 
+**🚀 NOVA: Análise com IA Externa - ✅ IMPLEMENTADA**
+- **Integração ChatGPT**: Análise avançada via OpenAI GPT-4o
+- **Integração Claude**: Análise avançada via Anthropic Claude-4
+- **Interface Visual**: Painel dedicado "🚀 Análise com IA Externa"
+- **Análise Paralela**: Consulta simultânea a ambos os sistemas de IA
+- **Insights Únicos**: Detecção de padrões que algoritmos locais podem perder
+- **Recomendações Personalizadas**: Top 7 números com raciocínio detalhado
+- **Confiança Medida**: Percentual de certeza de cada análise (0-100%)
+- **Padrões Detectados**: Lista de tendências identificadas pela IA
+- **Próximos Prováveis**: Previsões com probabilidades específicas
+
 **Sistema de Análise com IA - Fase 1 ✅**
 - Engine de análise de padrões em tempo real
 - Detecção automática de números quentes/frios
@@ -187,6 +198,30 @@ Sistema completo e avançado de análise de padrões de roleta com inteligência
 - **Recálculo**: Nova estratégia após falha completa
 - **Validação**: Mínimo 10 resultados para ativação
 - **Persistência**: Estado salvo no banco de dados
+
+### 🔄 Fluxo de Análise com IA Externa
+
+```mermaid
+graph TD
+    A[Usuário clica "Analisar com IA"] --> B{15+ números?}
+    B -->|Não| C[Erro: dados insuficientes]
+    B -->|Sim| D[Preparar sequência]
+    D --> E[Chamar OpenAI GPT-4o]
+    D --> F[Chamar Claude-4]
+    E --> G[Processar resposta JSON]
+    F --> H[Processar resposta JSON]
+    G --> I[Combinar insights]
+    H --> I
+    I --> J[Exibir análises no painel]
+    J --> K[Permitir cópia de números]
+```
+
+**Vantagens da IA Externa:**
+- **Análise de linguagem natural** mais sofisticada
+- **Reconhecimento de padrões complexos** que humanos não veem
+- **Insights únicos** baseados em "intuição" da IA
+- **Explicações detalhadas** do raciocínio por trás de cada recomendação
+- **Consenso entre múltiplas IAs** para maior confiabilidade
 
 ## 🔄 Workflows e Fluxos de Dados Completos
 

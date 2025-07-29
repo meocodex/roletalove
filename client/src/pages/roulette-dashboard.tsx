@@ -12,6 +12,8 @@ import { BettingPreferences } from '@/components/betting-preferences';
 import { BettingRecommendations } from '@/components/betting-recommendations';
 import MLAnalysisPanel from '@/components/ml-analysis-panel';
 import CombinedStrategiesPanel from '@/components/combined-strategies-panel';
+import { ExternalAIPanel } from '@/components/external-ai-panel';
+import { ExternalAIAnalyzer, type ExternalAIInsight } from '@/lib/external-ai-analyzer';
 import CustomizableDashboard from '@/components/customizable-dashboard';
 import AdvancedCharts from '@/components/advanced-charts';
 import { useWebSocket } from '@/hooks/use-websocket';
@@ -28,6 +30,8 @@ export default function RouletteDashboard() {
   const [lastResult, setLastResult] = useState<number | null>(null);
   const [clientPatterns, setClientPatterns] = useState<any[]>([]);
   const [dashboardMode, setDashboardMode] = useState<'standard' | 'custom'>('standard');
+  const [aiInsights, setAiInsights] = useState<ExternalAIInsight[]>([]);
+  const [aiLoading, setAiLoading] = useState(false);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -124,6 +128,46 @@ export default function RouletteDashboard() {
       title: sessionActive ? "Sessão Pausada" : "Sessão Iniciada",
       description: sessionActive ? "Entrada de dados pausada" : "Sistema pronto para receber resultados",
     });
+  };
+
+  // Função para buscar análises de IA externa 
+  const fetchAIAnalysis = async () => {
+    if (results.length < 15) {
+      toast({
+        title: "Dados insuficientes",
+        description: "Análise com IA externa requer 15+ números",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setAiLoading(true);
+    try {
+      const insights = await ExternalAIAnalyzer.analyzeWithExternalAI(results);
+      setAiInsights(insights);
+      
+      if (insights.length > 0) {
+        toast({
+          title: "Análise IA concluída!",
+          description: `${insights.length} análise(s) de IA externa recebida(s)`,
+        });
+      } else {
+        toast({
+          title: "Erro na análise",
+          description: "Não foi possível obter análises de IA externa",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error('AI Analysis Error:', error);
+      toast({
+        title: "Erro na análise IA",
+        description: "Falha ao consultar IA externa",
+        variant: "destructive"
+      });
+    } finally {
+      setAiLoading(false);
+    }
   };
 
   return (
@@ -343,6 +387,13 @@ export default function RouletteDashboard() {
               
               {/* Betting Recommendations - DESTAQUE PRINCIPAL */}
               <BettingRecommendations />
+              
+              {/* External AI Analysis Panel - ChatGPT & Claude */}
+              <ExternalAIPanel 
+                insights={aiInsights}
+                isLoading={aiLoading}
+                onRefresh={fetchAIAnalysis}
+              />
               
               {/* ML Analysis Panel - New Advanced Feature */}
               <MLAnalysisPanel />

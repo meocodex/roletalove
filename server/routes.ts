@@ -4,6 +4,7 @@ import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
 import { insertRouletteResultSchema, insertAlertSchema, type RouletteResult } from "@shared/schema";
 import { z } from "zod";
+import { AIServices } from "./ai-services";
 
 // Generate exactly 7 numbers for straight-up strategy based on pattern analysis
 function generateStraightUpNumbers(results: RouletteResult[]): number[] {
@@ -532,6 +533,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error updating betting preference:', error);
       res.status(400).json({ error: 'Invalid data' });
+    }
+  });
+
+  // AI Analysis endpoints
+  app.post('/api/ai-analysis/openai', async (req, res) => {
+    try {
+      const { sequence, results } = req.body;
+      
+      if (!sequence || !Array.isArray(results)) {
+        return res.status(400).json({ error: 'Sequência e resultados são obrigatórios' });
+      }
+
+      const analysis = await AIServices.analyzeWithOpenAI(sequence, results);
+      res.json(analysis);
+    } catch (error) {
+      console.error('OpenAI API Error:', error);
+      res.status(500).json({ 
+        error: 'Erro na análise OpenAI',
+        details: error instanceof Error ? error.message : 'Erro desconhecido'
+      });
+    }
+  });
+
+  app.post('/api/ai-analysis/claude', async (req, res) => {
+    try {
+      const { sequence, results } = req.body;
+      
+      if (!sequence || !Array.isArray(results)) {
+        return res.status(400).json({ error: 'Sequência e resultados são obrigatórios' });
+      }
+
+      const analysis = await AIServices.analyzeWithClaude(sequence, results);
+      res.json(analysis);
+    } catch (error) {
+      console.error('Claude API Error:', error);
+      res.status(500).json({ 
+        error: 'Erro na análise Claude',
+        details: error instanceof Error ? error.message : 'Erro desconhecido'
+      });
     }
   });
 
