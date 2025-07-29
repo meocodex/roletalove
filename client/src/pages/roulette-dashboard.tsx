@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RouletteTable } from '@/components/roulette-table';
 import { PatternAnalysis } from '@/components/pattern-analysis';
@@ -24,11 +23,11 @@ import { apiRequest } from '@/lib/queryClient';
 import { getNumberColor, getColorClass } from '@/lib/roulette-utils';
 import { ClientPatternAnalyzer } from '@/lib/pattern-analyzer';
 import { type RouletteResult } from '@shared/schema';
-import { Play, Plus, Wifi, WifiOff, Layout, Grid } from 'lucide-react';
+import { Play, Wifi, WifiOff, Layout, Grid } from 'lucide-react';
 
 export default function RouletteDashboard() {
   const [sessionActive, setSessionActive] = useState(false);
-  const [manualInput, setManualInput] = useState('');
+
   const [lastResult, setLastResult] = useState<number | null>(null);
   const [clientPatterns, setClientPatterns] = useState<any[]>([]);
   const [dashboardMode, setDashboardMode] = useState<'standard' | 'custom'>('standard');
@@ -117,13 +116,7 @@ export default function RouletteDashboard() {
     }
   };
 
-  const handleManualAdd = () => {
-    const number = parseInt(manualInput);
-    if (number >= 0 && number <= 36 && sessionActive) {
-      addResultMutation.mutate(number);
-      setManualInput('');
-    }
-  };
+
 
   const toggleSession = () => {
     setSessionActive(!sessionActive);
@@ -455,52 +448,7 @@ export default function RouletteDashboard() {
               {/* Real-time Stats */}
               <StatsPanel />
 
-              {/* Manual Input */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center text-lg">
-                    <i className="fas fa-keyboard text-blue-500 mr-2"></i>
-                    Entrada Manual
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
-                        Número Sorteado
-                      </label>
-                      <div className="flex space-x-2">
-                        <Input
-                          type="number"
-                          min="0"
-                          max="36"
-                          value={manualInput}
-                          onChange={(e) => setManualInput(e.target.value)}
-                          className="flex-1 bg-gray-700 border-gray-600 text-white focus:border-roulette-green"
-                          placeholder="0-36"
-                          onKeyPress={(e) => {
-                            if (e.key === 'Enter') {
-                              handleManualAdd();
-                            }
-                          }}
-                        />
-                        <Button
-                          onClick={handleManualAdd}
-                          disabled={!sessionActive || addResultMutation.isPending}
-                          className="bg-roulette-green hover:bg-green-600 text-white transition-colors"
-                        >
-                          <Plus size={16} />
-                        </Button>
-                      </div>
-                    </div>
-                    
-                    <div className="text-xs text-gray-400">
-                      <i className="fas fa-info-circle mr-1"></i>
-                      {sessionActive ? 'Clique nos números da mesa ou digite manualmente' : 'Inicie uma sessão para adicionar resultados'}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+
 
               {/* Alerts Panel */}
               <AlertsPanel />
