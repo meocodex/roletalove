@@ -139,8 +139,8 @@ export function BettingRecommendations({ className }: BettingRecommendationsProp
           </div>
         )}
 
-        {/* 2. Recomendações ML */}
-        {results.length >= 20 && mlPredictions.length > 0 && (
+        {/* 2. Recomendações ML - DEBUG */}
+        {results.length >= 20 && (
           <div className="space-y-3">
             <h3 className="font-semibold flex items-center gap-2 text-purple-400">
               <Brain className="h-4 w-4" />
@@ -149,10 +149,14 @@ export function BettingRecommendations({ className }: BettingRecommendationsProp
             <div className="p-4 bg-purple-900/20 border border-purple-600/30 rounded-lg">
               <p className="text-sm text-gray-300 mb-3">
                 Top 10 números mais prováveis baseados em Machine Learning:
+                <span className="text-xs text-yellow-400 ml-2">
+                  ({mlPredictions.length} previsões geradas)
+                </span>
               </p>
               
-              <div className="flex flex-wrap gap-2 mb-3">
-                {mlPredictions.slice(0, 10).map((pred, index) => (
+              {mlPredictions.length > 0 ? (
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {mlPredictions.slice(0, 10).map((pred, index) => (
                   <div key={pred.number} className="flex flex-col items-center">
                     <span
                       className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm ${
@@ -169,10 +173,18 @@ export function BettingRecommendations({ className }: BettingRecommendationsProp
                       {(pred.probability * 100).toFixed(0)}%
                     </span>
                   </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-4 text-yellow-400">
+                  <Brain className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  <p className="text-sm">Gerando previsões ML...</p>
+                  <p className="text-xs text-gray-400">Análise em processamento</p>
+                </div>
+              )}
 
-              <div className="flex items-center justify-between">
+              {mlPredictions.length > 0 && (
+                <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-400">
                   Baseado em análise ML de {results.length} resultados
                 </span>
@@ -185,7 +197,8 @@ export function BettingRecommendations({ className }: BettingRecommendationsProp
                   <Copy className="h-3 w-3 mr-1" />
                   Copiar Top 10
                 </Button>
-              </div>
+                </div>
+              )}
             </div>
           </div>
         )}
