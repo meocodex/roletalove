@@ -1,13 +1,13 @@
 /**
- * Painel de Análise com Machine Learning
- * Integra algoritmos avançados de ML na interface
+ * Painel de Análise ML - Versão Compacta e Harmônica
+ * Interface responsiva e adaptativa para qualquer tipo de tela
  */
 
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Brain, TrendingUp, Target, Activity } from "lucide-react";
+import { Brain, TrendingUp, Target, Activity, Zap } from "lucide-react";
 import { MLAnalyzer, type MLPrediction } from "@/lib/ml-analyzer";
 import type { RouletteResult } from "../../../shared/schema";
 
@@ -23,25 +23,25 @@ export default function MLAnalysisPanel({ className }: MLAnalysisPanelProps) {
 
   // Análise ML em tempo real
   const mlPredictions = MLAnalyzer.analyzePredictions(results);
-  const topPredictions = mlPredictions.slice(0, 10);
-  const hotNumbers = mlPredictions.filter(p => p.category === 'hot');
-  const coldNumbers = mlPredictions.filter(p => p.category === 'cold');
+  const topPredictions = mlPredictions.slice(0, 6);
+  const hotNumbers = mlPredictions.filter(p => p.category === 'hot').slice(0, 4);
+  const coldNumbers = mlPredictions.filter(p => p.category === 'cold').slice(0, 4);
 
   if (results.length < 20) {
     return (
       <Card className={className}>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Brain className="h-5 w-5" />
-            Análise ML Avançada
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-purple-400 text-base">
+            <Brain className="h-4 w-4" />
+            Análise ML
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-8 text-muted-foreground">
-            <Brain className="h-12 w-12 mx-auto mb-4 opacity-50" />
-            <p>Aguardando dados para análise ML</p>
-            <p className="text-sm">Mínimo 20 resultados necessários</p>
-            <Progress value={(results.length / 20) * 100} className="mt-4" />
+          <div className="text-center py-4 text-muted-foreground">
+            <Brain className="h-8 w-8 mx-auto mb-3 opacity-50" />
+            <p className="text-sm">Aguardando dados para ML</p>
+            <p className="text-xs">Mínimo 20 resultados necessários</p>
+            <Progress value={(results.length / 20) * 100} className="mt-3 h-2" />
             <p className="text-xs mt-2">{results.length}/20 resultados</p>
           </div>
         </CardContent>
@@ -50,42 +50,40 @@ export default function MLAnalysisPanel({ className }: MLAnalysisPanelProps) {
   }
 
   return (
-    <div className={`space-y-4 ${className}`}>
-      {/* Painel Principal de Previsões */}
+    <div className={`space-y-3 ${className}`}>
+      {/* Painel Principal - Compacto */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Brain className="h-5 w-5" />
-            Previsões ML - Top 10 Números
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-purple-400 text-base">
+            <Brain className="h-4 w-4" />
+            Previsões ML - Top {topPredictions.length}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-3">
+          <div className="grid gap-2">
             {topPredictions.map((prediction, index) => (
               <div
                 key={prediction.number}
-                className="flex items-center justify-between p-3 rounded-lg border bg-card/50"
+                className="flex items-center justify-between p-2 rounded-lg border bg-card/30 hover:bg-card/50 transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-muted-foreground">
-                      #{index + 1}
-                    </span>
-                    <span
-                      className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm ${
-                        prediction.number === 0 
-                          ? 'bg-green-600'
-                          : [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36].includes(prediction.number)
-                          ? 'bg-red-600'
-                          : 'bg-gray-800'
-                      }`}
-                    >
-                      {prediction.number}
-                    </span>
-                  </div>
-                  <div className="flex flex-col">
+                  <span className="text-xs font-medium text-muted-foreground w-6">
+                    #{index + 1}
+                  </span>
+                  <span
+                    className={`w-7 h-7 rounded-md flex items-center justify-center text-white font-bold text-xs ${
+                      prediction.number === 0 
+                        ? 'bg-green-600'
+                        : [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36].includes(prediction.number)
+                        ? 'bg-red-600'
+                        : 'bg-gray-700'
+                    }`}
+                  >
+                    {prediction.number}
+                  </span>
+                  <div className="flex flex-col min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-medium">
+                      <span className="font-medium text-sm">
                         {(prediction.probability * 100).toFixed(1)}%
                       </span>
                       <Badge 
@@ -93,21 +91,21 @@ export default function MLAnalysisPanel({ className }: MLAnalysisPanelProps) {
                           prediction.category === 'hot' ? 'destructive' :
                           prediction.category === 'cold' ? 'secondary' : 'outline'
                         }
-                        className="text-xs"
+                        className="text-xs px-1.5 py-0"
                       >
                         {prediction.category === 'hot' ? 'Quente' :
                          prediction.category === 'cold' ? 'Frio' : 'Neutro'}
                       </Badge>
                     </div>
-                    <div className="text-xs text-muted-foreground">
+                    <p className="text-xs text-muted-foreground truncate">
                       {prediction.reasoning[0]}
-                    </div>
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <Progress 
                     value={prediction.confidence * 100} 
-                    className="w-16"
+                    className="w-12 h-2"
                   />
                   <span className="text-xs text-muted-foreground w-8 text-right">
                     {(prediction.confidence * 100).toFixed(0)}%
@@ -119,37 +117,34 @@ export default function MLAnalysisPanel({ className }: MLAnalysisPanelProps) {
         </CardContent>
       </Card>
 
-      {/* Análise por Categorias */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* Análise por Categorias - Grid Responsivo */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {/* Números Quentes */}
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-sm">
-              <TrendingUp className="h-4 w-4 text-red-500" />
-              Números Quentes ({hotNumbers.length})
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-red-400 text-sm">
+              <TrendingUp className="h-4 w-4" />
+              Quentes ({hotNumbers.length})
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-wrap gap-2">
-              {hotNumbers.slice(0, 8).map((prediction) => (
-                <div
-                  key={prediction.number}
-                  className="flex items-center gap-1 px-2 py-1 rounded bg-red-100 dark:bg-red-900/20"
-                >
+            <div className="grid grid-cols-2 gap-2">
+              {hotNumbers.slice(0, 4).map((prediction) => (
+                <div key={prediction.number} className="text-center">
                   <span
-                    className={`w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold ${
+                    className={`w-8 h-8 rounded-md flex items-center justify-center text-white font-bold text-sm mx-auto mb-1 ${
                       prediction.number === 0 
                         ? 'bg-green-600'
                         : [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36].includes(prediction.number)
                         ? 'bg-red-600'
-                        : 'bg-gray-800'
+                        : 'bg-gray-700'
                     }`}
                   >
                     {prediction.number}
                   </span>
-                  <span className="text-xs font-medium">
-                    {(prediction.probability * 100).toFixed(1)}%
-                  </span>
+                  <p className="text-xs text-red-400 font-medium">
+                    {(prediction.probability * 100).toFixed(0)}%
+                  </p>
                 </div>
               ))}
             </div>
@@ -158,33 +153,30 @@ export default function MLAnalysisPanel({ className }: MLAnalysisPanelProps) {
 
         {/* Números Frios */}
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-sm">
-              <Activity className="h-4 w-4 text-blue-500" />
-              Números Frios ({coldNumbers.length})
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-blue-400 text-sm">
+              <Activity className="h-4 w-4" />
+              Frios ({coldNumbers.length})
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-wrap gap-2">
-              {coldNumbers.slice(0, 8).map((prediction) => (
-                <div
-                  key={prediction.number}
-                  className="flex items-center gap-1 px-2 py-1 rounded bg-blue-100 dark:bg-blue-900/20"
-                >
+            <div className="grid grid-cols-2 gap-2">
+              {coldNumbers.slice(0, 4).map((prediction) => (
+                <div key={prediction.number} className="text-center">
                   <span
-                    className={`w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold ${
+                    className={`w-8 h-8 rounded-md flex items-center justify-center text-white font-bold text-sm mx-auto mb-1 ${
                       prediction.number === 0 
                         ? 'bg-green-600'
                         : [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36].includes(prediction.number)
                         ? 'bg-red-600'
-                        : 'bg-gray-800'
+                        : 'bg-gray-700'
                     }`}
                   >
                     {prediction.number}
                   </span>
-                  <span className="text-xs font-medium text-muted-foreground">
-                    {(prediction.probability * 100).toFixed(1)}%
-                  </span>
+                  <p className="text-xs text-blue-400 font-medium">
+                    {(prediction.probability * 100).toFixed(0)}%
+                  </p>
                 </div>
               ))}
             </div>
@@ -192,73 +184,43 @@ export default function MLAnalysisPanel({ className }: MLAnalysisPanelProps) {
         </Card>
       </div>
 
-      {/* Métricas Avançadas */}
+      {/* Métricas Resumidas */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-sm">
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-yellow-400 text-sm">
             <Target className="h-4 w-4" />
-            Métricas do Sistema ML
+            Métricas ML
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold">
-                {topPredictions.length > 0 ? (topPredictions[0].probability * 100).toFixed(1) : '0'}%
-              </div>
-              <div className="text-xs text-muted-foreground">Melhor Previsão</div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+            <div>
+              <p className="text-lg font-bold text-green-400">
+                {mlPredictions.length}
+              </p>
+              <p className="text-xs text-muted-foreground">Previsões</p>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold">
-                {topPredictions.length > 0 ? (topPredictions.slice(0, 3).reduce((sum, p) => sum + p.confidence, 0) / 3 * 100).toFixed(0) : '0'}%
-              </div>
-              <div className="text-xs text-muted-foreground">Confiança Média</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-red-500">
+            <div>
+              <p className="text-lg font-bold text-red-400">
                 {hotNumbers.length}
-              </div>
-              <div className="text-xs text-muted-foreground">Números Quentes</div>
+              </p>
+              <p className="text-xs text-muted-foreground">Quentes</p>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-blue-500">
+            <div>
+              <p className="text-lg font-bold text-blue-400">
                 {coldNumbers.length}
-              </div>
-              <div className="text-xs text-muted-foreground">Números Frios</div>
+              </p>
+              <p className="text-xs text-muted-foreground">Frios</p>
+            </div>
+            <div>
+              <p className="text-lg font-bold text-purple-400">
+                {topPredictions.length > 0 ? (topPredictions[0].confidence * 100).toFixed(0) : 0}%
+              </p>
+              <p className="text-xs text-muted-foreground">Confiança</p>
             </div>
           </div>
         </CardContent>
       </Card>
-
-      {/* Explicações Detalhadas */}
-      {topPredictions.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm">
-              Análise Detalhada - Número {topPredictions[0].number}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {topPredictions[0].reasoning.map((reason, index) => (
-                <div key={index} className="flex items-center gap-2 text-sm">
-                  <div className="w-2 h-2 rounded-full bg-primary" />
-                  <span>{reason}</span>
-                </div>
-              ))}
-            </div>
-            <div className="mt-4 p-3 bg-muted rounded-lg">
-              <div className="text-xs font-medium mb-2">Algoritmos Utilizados:</div>
-              <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
-                <div>• Cadeias de Markov (Ordem 3)</div>
-                <div>• Probabilidades Bayesianas</div>
-                <div>• Análise de Vizinhança Física</div>
-                <div>• Ensemble Learning</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 }

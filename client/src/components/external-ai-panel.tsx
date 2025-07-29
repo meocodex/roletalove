@@ -41,15 +41,15 @@ export function ExternalAIPanel({ insights, isLoading, onRefresh }: ExternalAIPa
     return (
       <Card className="bg-gradient-to-br from-violet-950/50 to-purple-900/30 border-violet-600/30">
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg font-bold text-violet-300 flex items-center gap-2">
-            <Brain className="h-5 w-5" />
-            🚀 Análise com IA Externa
+          <CardTitle className="text-base font-medium text-violet-300 flex items-center gap-2">
+            <Brain className="h-4 w-4" />
+            🚀 IA Externa
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-center py-8">
-            <Loader className="h-6 w-6 animate-spin text-violet-400" />
-            <span className="ml-2 text-gray-300">Consultando ChatGPT e Claude...</span>
+          <div className="flex items-center justify-center py-4">
+            <Loader className="h-5 w-5 animate-spin text-violet-400" />
+            <span className="ml-2 text-gray-300 text-sm">Consultando ChatGPT e Claude...</span>
           </div>
         </CardContent>
       </Card>
@@ -60,15 +60,15 @@ export function ExternalAIPanel({ insights, isLoading, onRefresh }: ExternalAIPa
     return (
       <Card className="bg-gradient-to-br from-violet-950/50 to-purple-900/30 border-violet-600/30">
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg font-bold text-violet-300 flex items-center gap-2">
-            <Brain className="h-5 w-5" />
-            🚀 Análise com IA Externa
+          <CardTitle className="text-base font-medium text-violet-300 flex items-center gap-2">
+            <Brain className="h-4 w-4" />
+            🚀 IA Externa
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-4">
-            <p className="text-gray-400 mb-3">
-              Análise com IA externa disponível após 15+ números
+            <p className="text-gray-400 mb-3 text-sm">
+              Análise disponível após 15+ números
             </p>
             <Button 
               onClick={onRefresh}
@@ -89,9 +89,9 @@ export function ExternalAIPanel({ insights, isLoading, onRefresh }: ExternalAIPa
     <Card className="bg-gradient-to-br from-violet-950/50 to-purple-900/30 border-violet-600/30">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg font-bold text-violet-300 flex items-center gap-2">
-            <Brain className="h-5 w-5" />
-            🚀 Análise com IA Externa
+          <CardTitle className="text-base font-medium text-violet-300 flex items-center gap-2">
+            <Brain className="h-4 w-4" />
+            🚀 IA Externa
           </CardTitle>
           <Button 
             onClick={onRefresh}

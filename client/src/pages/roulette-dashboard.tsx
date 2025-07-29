@@ -168,103 +168,87 @@ export default function RouletteDashboard() {
 
   return (
     <div className="min-h-screen bg-dashboard-dark text-white font-casino">
-      {/* Header */}
-      <header className="bg-gray-900 border-b border-gray-700 px-6 py-4">
+      {/* Header Compacto */}
+      <header className="bg-gray-900 border-b border-gray-700 px-4 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="w-10 h-10 bg-roulette-green rounded-full flex items-center justify-center">
-              <i className="fas fa-chart-line text-white text-lg"></i>
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-roulette-green rounded-full flex items-center justify-center">
+              <Play className="w-4 h-4 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-white">Sistema de Análise de Roleta IA</h1>
-              <p className="text-sm text-gray-400">Análise de padrões em tempo real</p>
+              <h1 className="text-lg font-bold text-white">Sistema Roleta IA</h1>
+              <p className="text-xs text-gray-400">Análise em tempo real</p>
             </div>
           </div>
-          <div className="flex items-center space-x-4">
-            {/* User Info */}
+          
+          <div className="flex items-center space-x-3">
+            {/* User Info Compacto */}
             {user && (
               <div className="text-right">
-                <div className="text-sm text-gray-400">Usuário: {user.name}</div>
+                <div className="text-xs text-gray-400">{user.name || 'Usuário'}</div>
                 <div className="text-xs text-roulette-green font-medium">
-                  {user.planType === 'basico' ? 'Plano Básico' : 
-                   user.planType === 'intermediario' ? 'Plano Intermediário' : 
-                   'Plano Completo'}
+                  {user.planType === 'basico' ? 'Básico' : 
+                   user.planType === 'intermediario' ? 'Intermediário' : 
+                   'Completo'}
                 </div>
               </div>
             )}
 
-            {/* Plans Link */}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => window.location.href = '/plans'}
-              className="bg-gray-800 border-gray-600 hover:bg-gray-700"
-            >
-              Planos
-            </Button>
-
-            {/* Dashboard Mode Toggle - Only for Complete Plan */}
+            {/* Dashboard Mode Toggle - Compacto */}
             <FeatureGuard feature="dashboard_customizavel" showUpgrade={false}>
               <Button
-                variant="outline"
+                variant="ghost"
                 size="sm"
                 onClick={() => setDashboardMode(dashboardMode === 'standard' ? 'custom' : 'standard')}
-                className="bg-gray-800 border-gray-600 hover:bg-gray-700"
+                className="text-xs hover:bg-gray-800"
               >
                 {dashboardMode === 'standard' ? (
                   <>
-                    <Grid className="w-4 h-4 mr-2" />
-                    Dashboard Customizável
+                    <Grid className="w-3 h-3 mr-1" />
+                    Custom
                   </>
                 ) : (
                   <>
-                    <Layout className="w-4 h-4 mr-2" />
-                    Dashboard Padrão
+                    <Layout className="w-3 h-3 mr-1" />
+                    Padrão
                   </>
                 )}
               </Button>
             </FeatureGuard>
             
-            <div className="text-right">
-              <div className="text-sm text-gray-400">Status do Sistema</div>
-              <div className="flex items-center space-x-2">
-                {isConnected ? (
-                  <>
-                    <Wifi className="w-4 h-4 text-green-500" />
-                    <span className="text-green-500 font-medium">Online</span>
-                  </>
-                ) : (
-                  <>
-                    <WifiOff className="w-4 h-4 text-red-500" />
-                    <span className="text-red-500 font-medium">Offline</span>
-                  </>
-                )}
-              </div>
+            {/* Status Compacto */}
+            <div className="flex items-center space-x-1">
+              {isConnected ? (
+                <Wifi className="w-4 h-4 text-green-500" />
+              ) : (
+                <WifiOff className="w-4 h-4 text-red-500" />
+              )}
             </div>
           </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto p-6">
+      <div className="max-w-7xl mx-auto p-4">
         {dashboardMode === 'custom' ? (
           /* Dashboard Customizável */
-          <div className="space-y-6">
+          <div className="space-y-4">
             {/* Mesa de Roleta sempre no topo no modo customizável */}
             <Card>
-              <CardHeader>
+              <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-xl">Mesa de Roleta Europeia</CardTitle>
-                  <div className="flex items-center space-x-4">
+                  <CardTitle className="text-lg font-medium">Mesa de Roleta Europeia</CardTitle>
+                  <div className="flex items-center space-x-3">
                     <Button 
                       onClick={toggleSession}
-                      className={`${sessionActive ? 'bg-red-600 hover:bg-red-700' : 'bg-roulette-green hover:bg-green-600'} font-medium transition-colors`}
+                      size="sm"
+                      className={`${sessionActive ? 'bg-red-600 hover:bg-red-700' : 'bg-roulette-green hover:bg-green-600'} font-medium transition-colors text-xs`}
                     >
-                      <Play className="mr-2" size={16} />
-                      {sessionActive ? 'Pausar Sessão' : 'Iniciar Sessão'}
+                      <Play className="mr-1" size={14} />
+                      {sessionActive ? 'Pausar' : 'Iniciar'}
                     </Button>
                     {lastResult !== null && (
-                      <div className="text-sm text-gray-400">
-                        Último resultado: <span className={`font-bold text-lg ${
+                      <div className="text-xs text-gray-400">
+                        Último: <span className={`font-bold text-sm ${
                           getNumberColor(lastResult) === 'red' ? 'text-roulette-red' :
                           getNumberColor(lastResult) === 'black' ? 'text-white' :
                           'text-roulette-green'
@@ -280,18 +264,18 @@ export default function RouletteDashboard() {
                   lastResult={lastResult}
                 />
 
-                {/* Recent Results */}
-                <div className="mt-6">
-                  <h3 className="text-lg font-semibold mb-3">Últimos Resultados</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {results.slice(0, 15).map((result, index) => {
+                {/* Recent Results - Compacto */}
+                <div className="mt-4">
+                  <h3 className="text-sm font-medium mb-2">Últimos Resultados</h3>
+                  <div className="flex flex-wrap gap-1">
+                    {results.slice(0, 12).map((result, index) => {
                       const color = getNumberColor(result.number);
                       const isHighlighted = index === 0;
                       
                       return (
                         <div
                           key={result.id}
-                          className={`w-10 h-10 ${getColorClass(color).split(' ')[0]} rounded-full flex items-center justify-center text-white font-bold text-sm border-2 ${
+                          className={`w-8 h-8 ${getColorClass(color).split(' ')[0]} rounded-md flex items-center justify-center text-white font-bold text-xs border ${
                             isHighlighted ? 'border-casino-gold' : 'border-transparent'
                           } transition-all duration-300`}
                           title={`${result.number} - ${new Date(result.timestamp).toLocaleTimeString()}`}
@@ -301,20 +285,17 @@ export default function RouletteDashboard() {
                       );
                     })}
                     {results.length === 0 && (
-                      <div className="text-gray-400 text-sm">Nenhum resultado ainda...</div>
+                      <div className="text-gray-400 text-xs">Nenhum resultado ainda...</div>
                     )}
                   </div>
                 </div>
 
-                {/* Client-side pattern preview */}
+                {/* Client-side pattern preview - Compacto */}
                 {clientPatterns.length > 0 && (
-                  <div className="mt-4 p-3 bg-blue-900/20 border border-blue-600/30 rounded-lg">
-                    <h4 className="text-sm font-medium text-blue-400 mb-2">Análise em Tempo Real:</h4>
+                  <div className="mt-3 p-2 bg-blue-900/20 border border-blue-600/30 rounded-md">
+                    <h4 className="text-xs font-medium text-blue-400 mb-1">Análise Instantânea:</h4>
                     <div className="text-xs text-blue-300">
                       {clientPatterns[0].description} - {Math.round(clientPatterns[0].probability * 100)}%
-                    </div>
-                    <div className="text-xs text-blue-200 mt-1">
-                      {clientPatterns[0].suggestion}
                     </div>
                   </div>
                 )}
@@ -326,7 +307,7 @@ export default function RouletteDashboard() {
           </div>
         ) : (
           /* Dashboard Padrão */
-          <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 xl:grid-cols-4 gap-4">
             
             {/* Main Roulette Table */}
             <div className="xl:col-span-3">
