@@ -51,7 +51,10 @@ Sistema completo e avançado de análise de padrões de roleta com inteligência
 ### ✅ Funcionalidades Principais Implementadas
 
 **Mesa de Roleta e Interface**
-- Mesa de roleta europeia visual com layout idêntica ao original (0-36)
+- **Mesa de roleta europeia OTIMIZADA**: Layout minimalista sem bordas e fundos desnecessários
+- **Zero preenchendo 3 linhas**: Posicionado corretamente entre números 3, 2, 1 como na roleta original
+- **Layout compacto**: Botões menores (w-8 h-10) com gaps mínimos (gap-0.5) para maximizar espaço
+- **Visual limpo**: Fundo cinza escuro sem bordas douradas, apenas os números essenciais
 - Interface interativa para clique direto nos números
 - Entrada manual de números com validação
 - Display de últimos resultados com destaque visual
