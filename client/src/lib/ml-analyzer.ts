@@ -66,6 +66,55 @@ export class MLAnalyzer {
   }
 
   /**
+   * Análise de vizinhos baseada em ML
+   */
+  static analyzeMLNeighbors(results: RouletteResult[]): { number: number; neighbors: number[]; totalProbability: number; reasoning: string }[] {
+    if (results.length < this.MIN_SAMPLES) {
+      return [];
+    }
+
+    const predictions = this.analyzePredictions(results);
+    const wheelOrder = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26];
+    
+    const neighborGroups: { number: number; neighbors: number[]; totalProbability: number; reasoning: string }[] = [];
+
+    // Análise dos top números para vizinhança
+    const topNumbers = predictions.slice(0, 10);
+    
+    for (const pred of topNumbers) {
+      const centerIndex = wheelOrder.indexOf(pred.number);
+      const neighbors: number[] = [];
+      let totalProb = pred.probability;
+      
+      // Pegar 2 números de cada lado (5 números total)
+      for (let i = -2; i <= 2; i++) {
+        const neighborIndex = (centerIndex + i + wheelOrder.length) % wheelOrder.length;
+        const neighborNumber = wheelOrder[neighborIndex];
+        neighbors.push(neighborNumber);
+        
+        if (i !== 0) { // Não contar o número central duas vezes
+          const neighborPred = predictions.find(p => p.number === neighborNumber);
+          if (neighborPred) {
+            totalProb += neighborPred.probability * 0.3; // Peso menor para vizinhos
+          }
+        }
+      }
+
+      // Só incluir se a probabilidade total for significativa
+      if (totalProb > 0.08) {
+        neighborGroups.push({
+          number: pred.number,
+          neighbors: neighbors.sort((a, b) => a - b),
+          totalProbability: totalProb,
+          reasoning: `Centro: ${pred.number} (${(pred.probability * 100).toFixed(1)}%) + vizinhos físicos`
+        });
+      }
+    }
+
+    return neighborGroups.sort((a, b) => b.totalProbability - a.totalProbability).slice(0, 3);
+  }
+
+  /**
    * Extração de features para ML
    */
   private static extractFeatures(number: number, results: RouletteResult[]): FeatureVector {

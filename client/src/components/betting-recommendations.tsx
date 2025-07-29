@@ -32,6 +32,7 @@ export function BettingRecommendations({ className }: BettingRecommendationsProp
 
   // Análises das duas lógicas
   const mlPredictions = MLAnalyzer.analyzePredictions(results);
+  const mlNeighbors = MLAnalyzer.analyzeMLNeighbors(results);
   const combinedStrategy = CombinedStrategiesEngine.generateOptimalStrategy(results);
   
   // Estratégias tradicionais ativas
@@ -183,10 +184,57 @@ export function BettingRecommendations({ className }: BettingRecommendationsProp
                 </div>
               )}
 
+              {/* Vizinhos ML */}
+              {mlNeighbors.length > 0 && (
+                <div className="mt-4 pt-4 border-t border-purple-600/30">
+                  <p className="text-sm text-gray-300 mb-3 font-medium">
+                    🎯 Vizinhos ML (Top 3 setores da roda física):
+                  </p>
+                  
+                  {mlNeighbors.map((group, index) => (
+                    <div key={group.number} className="mb-3 p-2 bg-purple-800/20 rounded border border-purple-600/20">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-medium text-purple-300">
+                          Setor #{index + 1} - Centro: {group.number} ({(group.totalProbability * 100).toFixed(1)}%)
+                        </span>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => copyNumbers(group.neighbors, `Vizinhos ML #${index + 1}`)}
+                          className="text-xs h-6 px-2"
+                        >
+                          <Copy className="h-3 w-3 mr-1" />
+                          Copiar
+                        </Button>
+                      </div>
+                      
+                      <div className="flex flex-wrap gap-1 mb-1">
+                        {group.neighbors.map((number) => (
+                          <span
+                            key={number}
+                            className={`w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold ${
+                              number === 0 
+                                ? 'bg-green-600'
+                                : [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36].includes(number)
+                                ? 'bg-red-600'
+                                : 'bg-gray-800'
+                            } ${number === group.number ? 'ring-2 ring-purple-400' : ''}`}
+                          >
+                            {number}
+                          </span>
+                        ))}
+                      </div>
+                      
+                      <p className="text-xs text-gray-400">{group.reasoning}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+
               {mlPredictions.length > 0 && (
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between mt-4 pt-4 border-t border-purple-600/30">
                 <span className="text-sm text-gray-400">
-                  Baseado em análise ML de {results.length} resultados
+                  Análise ML completa de {results.length} resultados
                 </span>
                 <Button
                   size="sm"

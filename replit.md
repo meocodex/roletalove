@@ -576,6 +576,8 @@ npm run build:server
 - Dashboard → Barra lateral direita → Topo
 - Painel "🎯 RECOMENDAÇÕES DE APOSTAS"
 - Seção 2 (roxa): "Previsões de IA (Lógica ML Avançada)"
+- **Números Plenos**: Top 10 com percentuais
+- **Vizinhos ML**: 3 setores da roda física (5 números cada)
 - Ativa após 20+ resultados (atualmente: 25 resultados)
 
 ### 🎯 Fase 2: Estratégias Combinadas - ✅ COMPLETA  
@@ -645,9 +647,11 @@ npm run build:server
 - Vizinhos: Grupos da roda física
 
 **Seção 2 (Roxa)**: Previsões de IA (20+ números) ⭐
-- Top 10 números mais prováveis via ML
-- Algoritmos Ensemble, Markov, Bayesian
-- Percentuais de confiança
+- **Top 10 números** mais prováveis via ML
+- **Vizinhos ML**: Top 3 setores da roda física baseados em IA
+- **Algoritmos**: Ensemble, Markov, Bayesian
+- **Percentuais** de confiança para cada número/setor
+- **Visualização**: Números centrais destacados com anel roxo
 
 **Seção 3 (Verde)**: Estratégias Combinadas (25+ números)
 - Portfolio otimizado de apostas
