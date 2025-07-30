@@ -106,119 +106,85 @@ export function ExternalAIPanel({ insights, isLoading, onRefresh }: ExternalAIPa
       </CardHeader>
       <CardContent className="space-y-4">
         {insights.map((insight, index) => (
-          <div key={index} className="p-3 bg-violet-800/20 rounded-lg border border-violet-600/20">
+          <div key={index} className="space-y-3">
             {/* Header da IA */}
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <span className="text-lg">{getProviderIcon(insight.provider)}</span>
-                <span className="text-sm font-semibold text-violet-300">
-                  {getProviderName(insight.provider)}
-                </span>
-                <Badge 
-                  className={`${getConfidenceColor(insight.confidence)} text-white text-xs`}
-                >
-                  {(insight.confidence * 100).toFixed(0)}% confiança
-                </Badge>
-              </div>
+            <div className="flex items-center gap-2">
+              <span className="text-lg">{getProviderIcon(insight.provider)}</span>
+              <span className="text-sm font-semibold text-violet-300">
+                {getProviderName(insight.provider)}
+              </span>
             </div>
 
-            {/* Recomendações de números */}
-            <div className="mb-3">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-sm font-medium text-gray-300">
-                  <Target className="h-4 w-4 inline mr-1" />
-                  Top Recomendações:
-                </p>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => copyNumbers(insight.recommendations, getProviderName(insight.provider))}
-                  className="text-xs h-6 px-2"
-                >
-                  <Copy className="h-3 w-3 mr-1" />
-                  Copiar
-                </Button>
-              </div>
-              
-              <div className="flex flex-wrap gap-1 mb-2">
-                {insight.recommendations.map((number) => (
+            {/* Números Plenos - sempre 7 números (limite: 5 tentativas) */}
+            <div>
+              <p className="text-xs text-gray-400 mb-2">Números Plenos (Limite: 5 tentativas):</p>
+              <div className="flex flex-wrap gap-1">
+                {insight.recommendations.slice(0, 7).map((num) => (
                   <span
-                    key={number}
-                    className={`w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold ${
-                      number === 0 
+                    key={num}
+                    className={`w-8 h-8 rounded-md flex items-center justify-center text-white font-bold text-sm ${
+                      num === 0 
                         ? 'bg-green-600'
-                        : [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36].includes(number)
+                        : [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36].includes(num)
                         ? 'bg-red-600'
-                        : 'bg-gray-800'
-                    } ring-2 ring-violet-400/50`}
+                        : 'bg-gray-700'
+                    }`}
                   >
-                    {number}
+                    {num}
                   </span>
                 ))}
               </div>
             </div>
 
-            {/* Padrões detectados */}
-            {insight.patterns_detected.length > 0 && (
-              <div className="mb-3">
-                <p className="text-sm font-medium text-gray-300 mb-1">
-                  🔍 Padrões Detectados:
-                </p>
-                <div className="flex flex-wrap gap-1">
-                  {insight.patterns_detected.map((pattern, idx) => (
-                    <Badge key={idx} variant="secondary" className="text-xs">
-                      {pattern}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Próximos números prováveis */}
-            {insight.next_probable_numbers.length > 0 && (
-              <div className="mb-3">
-                <p className="text-sm font-medium text-gray-300 mb-2">
-                  📈 Próximos Mais Prováveis:
-                </p>
-                <div className="space-y-1">
-                  {insight.next_probable_numbers.slice(0, 5).map((prediction, idx) => (
-                    <div key={idx} className="flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-2">
-                        <span
-                          className={`w-5 h-5 rounded-full flex items-center justify-center text-white font-bold ${
-                            prediction.number === 0 
-                              ? 'bg-green-600'
-                              : [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36].includes(prediction.number)
-                              ? 'bg-red-600'
-                              : 'bg-gray-800'
-                          }`}
-                        >
-                          {prediction.number}
-                        </span>
-                        <span className="text-gray-300 truncate max-w-[120px]">
-                          {prediction.reasoning}
-                        </span>
+            {/* Vizinhos - 6 números principais (limite: 2 tentativas) */}
+            <div>
+              <p className="text-xs text-gray-400 mb-2">Vizinhos (Limite: 2 tentativas):</p>
+              <div className="space-y-2">
+                {insight.recommendations.slice(0, 6).map((mainNumber, idx) => {
+                  // Mapeamento da roda física da roleta europeia
+                  const wheelOrder = [0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
+                  const mainIndex = wheelOrder.indexOf(mainNumber);
+                  
+                  if (mainIndex === -1) return null;
+                  
+                  // Pegar 2 vizinhos de cada lado (5 números total)
+                  const neighbors = [];
+                  for (let i = -2; i <= 2; i++) {
+                    const index = (mainIndex + i + wheelOrder.length) % wheelOrder.length;
+                    neighbors.push(wheelOrder[index]);
+                  }
+                  
+                  return (
+                    <div key={mainNumber} className="text-xs">
+                      <span className="text-muted-foreground">#{idx + 1}: </span>
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {neighbors.map((number, neighborIdx) => {
+                          const isMain = neighborIdx === 2; // Número central
+                          return (
+                            <span
+                              key={number}
+                              className={`w-6 h-6 rounded-md flex items-center justify-center text-white font-bold text-xs ${
+                                number === 0 
+                                  ? 'bg-green-600'
+                                  : [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36].includes(number)
+                                  ? 'bg-red-600'
+                                  : 'bg-gray-700'
+                              } ${isMain ? 'ring-1 ring-violet-400' : ''}`}
+                            >
+                              {number}
+                            </span>
+                          );
+                        })}
                       </div>
-                      <span className="text-violet-300 font-mono">
-                        {(prediction.probability * 100).toFixed(1)}%
-                      </span>
                     </div>
-                  ))}
-                </div>
+                  );
+                })}
               </div>
-            )}
+            </div>
 
-            {/* Análise detalhada */}
-            <Separator className="my-2 bg-violet-600/20" />
-            <details className="group">
-              <summary className="text-sm font-medium text-gray-300 cursor-pointer hover:text-violet-300 transition-colors">
-                💡 Análise Detalhada {getProviderIcon(insight.provider)}
-              </summary>
-              <div className="mt-2 p-2 bg-violet-900/20 rounded text-xs text-gray-300 leading-relaxed">
-                <p className="mb-2"><strong>Análise:</strong> {insight.analysis}</p>
-                <p><strong>Raciocínio:</strong> {insight.reasoning}</p>
-              </div>
-            </details>
+            {index < insights.length - 1 && (
+              <Separator className="bg-violet-600/20" />
+            )}
           </div>
         ))}
 

@@ -49,29 +49,40 @@ export default function MLAnalysisPanel({ className }: MLAnalysisPanelProps) {
     );
   }
 
-  // Criar estratégias de vizinhos baseadas em ML
-  const getNeighborsStrategy = () => {
-    if (topPredictions.length === 0) return [];
-    
-    const mainNumber = topPredictions[0].number;
+  // Criar estratégias de vizinhos baseadas em ML - 3 números principais
+  const getNeighborsStrategies = () => {
+    if (topPredictions.length < 3) return [];
     
     // Mapeamento da roda física da roleta europeia
     const wheelOrder = [0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
     
-    const mainIndex = wheelOrder.indexOf(mainNumber);
-    if (mainIndex === -1) return [];
+    const strategies = [];
     
-    // Pegar 2 vizinhos de cada lado (5 números total)
-    const neighbors = [];
-    for (let i = -2; i <= 2; i++) {
-      const index = (mainIndex + i + wheelOrder.length) % wheelOrder.length;
-      neighbors.push(wheelOrder[index]);
+    // Pegar os top 3 números como principais
+    for (let i = 0; i < 3; i++) {
+      const mainNumber = topPredictions[i].number;
+      const mainIndex = wheelOrder.indexOf(mainNumber);
+      
+      if (mainIndex !== -1) {
+        // Pegar 2 vizinhos de cada lado (5 números total)
+        const neighbors = [];
+        for (let j = -2; j <= 2; j++) {
+          const index = (mainIndex + j + wheelOrder.length) % wheelOrder.length;
+          neighbors.push(wheelOrder[index]);
+        }
+        
+        strategies.push({
+          mainNumber,
+          neighbors,
+          index: i + 1
+        });
+      }
     }
     
-    return neighbors;
+    return strategies;
   };
 
-  const neighbors = getNeighborsStrategy();
+  const neighborsStrategies = getNeighborsStrategies();
 
   return (
     <div className={`space-y-3 ${className}`}>
@@ -104,8 +115,8 @@ export default function MLAnalysisPanel({ className }: MLAnalysisPanelProps) {
         </CardContent>
       </Card>
 
-      {/* Vizinhos ML */}
-      {neighbors.length > 0 && (
+      {/* Vizinhos ML - 3 Principais */}
+      {neighborsStrategies.length > 0 && (
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-purple-400 text-sm">
@@ -113,30 +124,34 @@ export default function MLAnalysisPanel({ className }: MLAnalysisPanelProps) {
               Vizinhos ML
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-1">
-              {neighbors.map((number, index) => {
-                const isMain = index === 2; // Número central
-                return (
-                  <span
-                    key={number}
-                    className={`w-8 h-8 rounded-md flex items-center justify-center text-white font-bold text-sm ${
-                      number === 0 
-                        ? 'bg-green-600'
-                        : [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36].includes(number)
-                        ? 'bg-red-600'
-                        : 'bg-gray-700'
-                    } ${isMain ? 'ring-2 ring-purple-400' : ''}`}
-                    title={isMain ? 'Número principal' : 'Vizinho'}
-                  >
-                    {number}
-                  </span>
-                );
-              })}
-            </div>
-            <p className="text-xs text-muted-foreground mt-2">
-              Número principal destacado com anel roxo
-            </p>
+          <CardContent className="space-y-3">
+            {neighborsStrategies.map((strategy) => (
+              <div key={strategy.mainNumber}>
+                <p className="text-xs text-muted-foreground mb-1">
+                  Principal #{strategy.index}: {strategy.mainNumber}
+                </p>
+                <div className="flex flex-wrap gap-1">
+                  {strategy.neighbors.map((number, index) => {
+                    const isMain = index === 2; // Número central
+                    return (
+                      <span
+                        key={number}
+                        className={`w-8 h-8 rounded-md flex items-center justify-center text-white font-bold text-sm ${
+                          number === 0 
+                            ? 'bg-green-600'
+                            : [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36].includes(number)
+                            ? 'bg-red-600'
+                            : 'bg-gray-700'
+                        } ${isMain ? 'ring-2 ring-purple-400' : ''}`}
+                        title={isMain ? 'Número principal' : 'Vizinho'}
+                      >
+                        {number}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </CardContent>
         </Card>
       )}

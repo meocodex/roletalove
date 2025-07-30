@@ -403,10 +403,10 @@ export default function RouletteDashboard() {
                 <MLAnalysisPanel />
               </FeatureGuard>
 
-              {/* Combined Strategies Panel - Complete Plan Only */}
-              <FeatureGuard feature="estrategias_combinadas">
+              {/* Combined Strategies Panel - Complete Plan Only - TEMPORARIAMENTE DESATIVADO */}
+              {/* <FeatureGuard feature="estrategias_combinadas">
                 <CombinedStrategiesPanel />
-              </FeatureGuard>
+              </FeatureGuard> */}
 
               {/* Advanced Charts - Complete Plan */}
               <FeatureGuard feature="graficos_avancados">
