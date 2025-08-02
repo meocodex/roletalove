@@ -47,16 +47,9 @@ app.use((req, res, next) => {
     throw err;
   });
 
-  // DESABILITADO temporariamente devido a conflitos críticos com hooks React
-  // Vite está causando tela preta com erros de hooks inválidos
-  // Interface funcional implementada via Express routes
-  /*
-  if (app.get("env") === "development") {
-    await setupVite(app, server);
-  } else {
-    serveStatic(app);
-  }
-  */
+  // Sistema funcional usando Express puro - sem React/Vite
+  // Servir arquivos estáticos básicos se necessário
+  app.use('/assets', express.static('client/public'));
 
   // ALWAYS serve the app on the port specified in the environment variable PORT
   // Other ports are firewalled. Default to 5000 if not specified.
