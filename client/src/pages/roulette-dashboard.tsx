@@ -267,7 +267,7 @@ export default function RouletteDashboard() {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="p-1">
+              <CardContent className="p-3">
                 <RouletteTable 
                   onNumberClick={handleNumberClick}
                   lastResult={lastResult}
@@ -354,7 +354,7 @@ export default function RouletteDashboard() {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="p-2">
+              <CardContent className="p-4">
                 <RouletteTable 
                   onNumberClick={handleNumberClick}
                   lastResult={lastResult}
@@ -437,7 +437,7 @@ export default function RouletteDashboard() {
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent className="p-2">
+                <CardContent className="p-4">
                   <RouletteTable 
                     onNumberClick={handleNumberClick}
                     lastResult={lastResult}
