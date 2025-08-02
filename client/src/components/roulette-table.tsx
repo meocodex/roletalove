@@ -41,17 +41,17 @@ export function RouletteTable({ onNumberClick, lastResult, className }: Roulette
   const mobileCol3 = [25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36];
 
   if (isMobile) {
-    // Layout Mobile - Mesa harmonizada
+    // Layout Mobile - Vertical com 3 colunas
     return (
-      <div className={cn("bg-gray-900 p-2 rounded-lg w-full", className)}>
-        {/* Zero - Retângulo harmonizado */}
-        <div className="mb-2 flex justify-center">
+      <div className={cn("bg-gray-900 p-2 rounded-lg w-full max-w-sm mx-auto", className)}>
+        {/* Zero - Retângulo preenchendo as 3 colunas */}
+        <div className="mb-2">
           <Button
             onClick={() => handleNumberClick(0)}
             className={cn(
-              "w-12 h-[calc(3*2.75rem+1rem)] bg-roulette-green text-white font-bold text-lg flex items-center justify-center transition-all duration-200 rounded-lg",
+              "w-full h-12 bg-roulette-green text-white font-bold text-xl flex items-center justify-center transition-all duration-200 rounded-lg",
               "hover:bg-green-600 active:scale-95 touch-manipulation shadow-lg",
-              isHighlighted(0) && "ring-2 ring-yellow-400"
+              isHighlighted(0) && "ring-2 ring-yellow-400 ring-offset-1"
             )}
             data-number="0"
           >
@@ -59,80 +59,74 @@ export function RouletteTable({ onNumberClick, lastResult, className }: Roulette
           </Button>
         </div>
 
-        {/* Mesa harmonizada - 3 linhas x 12 colunas */}
-        <div className="grid grid-rows-3 gap-2 w-full">
+        {/* Mesa Vertical - 3 colunas x 12 linhas */}
+        <div className="grid grid-cols-3 gap-2 w-full">
           
-          {/* Linha Superior: 3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36 */}
-          <div className="grid grid-cols-12 gap-1 w-full">
-            {[3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36].map((number) => {
-              const color = getNumberColor(number);
-              const colorClass = getColorClass(color);
-              
-              return (
-                <Button
-                  key={number}
-                  onClick={() => handleNumberClick(number)}
-                  className={cn(
-                    "aspect-square w-full h-11 text-white font-bold text-sm transition-all duration-200 rounded-lg shadow-sm",
-                    "active:scale-95 touch-manipulation flex items-center justify-center",
-                    colorClass,
-                    isHighlighted(number) && "ring-2 ring-yellow-400 ring-offset-1"
-                  )}
-                  data-number={number}
-                >
-                  {number}
-                </Button>
-              );
-            })}
-          </div>
+          {/* Coluna 1: 1-12 */}
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((number) => {
+            const color = getNumberColor(number);
+            const colorClass = getColorClass(color);
+            
+            return (
+              <Button
+                key={number}
+                onClick={() => handleNumberClick(number)}
+                className={cn(
+                  "aspect-square w-full text-white font-bold text-sm transition-all duration-200 rounded-lg shadow-sm",
+                  "active:scale-95 touch-manipulation flex items-center justify-center",
+                  colorClass,
+                  isHighlighted(number) && "ring-2 ring-yellow-400 ring-offset-1"
+                )}
+                data-number={number}
+              >
+                {number}
+              </Button>
+            );
+          })}
 
-          {/* Linha Média: 2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35 */}
-          <div className="grid grid-cols-12 gap-1 w-full">
-            {[2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35].map((number) => {
-              const color = getNumberColor(number);
-              const colorClass = getColorClass(color);
-              
-              return (
-                <Button
-                  key={number}
-                  onClick={() => handleNumberClick(number)}
-                  className={cn(
-                    "aspect-square w-full h-11 text-white font-bold text-sm transition-all duration-200 rounded-lg shadow-sm",
-                    "active:scale-95 touch-manipulation flex items-center justify-center",
-                    colorClass,
-                    isHighlighted(number) && "ring-2 ring-yellow-400 ring-offset-1"
-                  )}
-                  data-number={number}
-                >
-                  {number}
-                </Button>
-              );
-            })}
-          </div>
+          {/* Coluna 2: 13-24 */}
+          {[13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24].map((number) => {
+            const color = getNumberColor(number);
+            const colorClass = getColorClass(color);
+            
+            return (
+              <Button
+                key={number}
+                onClick={() => handleNumberClick(number)}
+                className={cn(
+                  "aspect-square w-full text-white font-bold text-sm transition-all duration-200 rounded-lg shadow-sm",
+                  "active:scale-95 touch-manipulation flex items-center justify-center",
+                  colorClass,
+                  isHighlighted(number) && "ring-2 ring-yellow-400 ring-offset-1"
+                )}
+                data-number={number}
+              >
+                {number}
+              </Button>
+            );
+          })}
 
-          {/* Linha Inferior: 1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34 */}
-          <div className="grid grid-cols-12 gap-1 w-full">
-            {[1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34].map((number) => {
-              const color = getNumberColor(number);
-              const colorClass = getColorClass(color);
-              
-              return (
-                <Button
-                  key={number}
-                  onClick={() => handleNumberClick(number)}
-                  className={cn(
-                    "aspect-square w-full h-11 text-white font-bold text-sm transition-all duration-200 rounded-lg shadow-sm",
-                    "active:scale-95 touch-manipulation flex items-center justify-center",
-                    colorClass,
-                    isHighlighted(number) && "ring-2 ring-yellow-400 ring-offset-1"
-                  )}
-                  data-number={number}
-                >
-                  {number}
-                </Button>
-              );
-            })}
-          </div>
+          {/* Coluna 3: 25-36 */}
+          {[25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36].map((number) => {
+            const color = getNumberColor(number);
+            const colorClass = getColorClass(color);
+            
+            return (
+              <Button
+                key={number}
+                onClick={() => handleNumberClick(number)}
+                className={cn(
+                  "aspect-square w-full text-white font-bold text-sm transition-all duration-200 rounded-lg shadow-sm",
+                  "active:scale-95 touch-manipulation flex items-center justify-center",
+                  colorClass,
+                  isHighlighted(number) && "ring-2 ring-yellow-400 ring-offset-1"
+                )}
+                data-number={number}
+              >
+                {number}
+              </Button>
+            );
+          })}
 
         </div>
       </div>
