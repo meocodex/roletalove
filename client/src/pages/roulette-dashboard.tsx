@@ -267,14 +267,14 @@ export default function RouletteDashboard() {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="pb-2">
+              <CardContent className="p-1">
                 <RouletteTable 
                   onNumberClick={handleNumberClick}
                   lastResult={lastResult}
                 />
 
                 {/* Recent Results - Mobile ultra compacto */}
-                <div className="mt-2">
+                <div className="mt-1">
                   <h3 className="text-xs font-medium mb-1">Últimos</h3>
                   <div className="flex flex-wrap gap-1">
                     {results.slice(0, 10).map((result, index) => {
@@ -354,14 +354,14 @@ export default function RouletteDashboard() {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-2">
                 <RouletteTable 
                   onNumberClick={handleNumberClick}
                   lastResult={lastResult}
                 />
 
                 {/* Recent Results - Compacto */}
-                <div className="mt-4">
+                <div className="mt-2">
                   <h3 className="text-sm font-medium mb-2">Últimos Resultados</h3>
                   <div className="flex flex-wrap gap-1">
                     {results.slice(0, 12).map((result, index) => {
@@ -437,15 +437,15 @@ export default function RouletteDashboard() {
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-2">
                   <RouletteTable 
                     onNumberClick={handleNumberClick}
                     lastResult={lastResult}
                   />
 
                   {/* Recent Results */}
-                  <div className="mt-6">
-                    <h3 className="text-lg font-semibold mb-3">Últimos Resultados</h3>
+                  <div className="mt-3">
+                    <h3 className="text-sm font-medium mb-2">Últimos Resultados</h3>
                     <div className="flex flex-wrap gap-2">
                       {results.slice(0, 15).map((result, index) => {
                         const color = getNumberColor(result.number);

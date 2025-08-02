@@ -41,15 +41,15 @@ export function RouletteTable({ onNumberClick, lastResult, className }: Roulette
   const mobileCol3 = [25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36];
 
   if (isMobile) {
-    // Layout Mobile - Mesa tradicional com zero vertical
+    // Layout Mobile - Mesa adaptativa responsiva
     return (
-      <div className={cn("bg-gray-900 p-3 rounded-lg", className)}>
-        {/* Zero - Posicionado verticalmente */}
-        <div className="mb-2 flex justify-center">
+      <div className={cn("bg-gray-900 p-1 rounded-lg w-full", className)}>
+        {/* Zero - Compacto */}
+        <div className="mb-1 flex justify-center">
           <Button
             onClick={() => handleNumberClick(0)}
             className={cn(
-              "w-12 h-24 bg-roulette-green text-white font-bold text-lg flex items-center justify-center transition-all duration-200 rounded-md",
+              "w-10 h-16 bg-roulette-green text-white font-bold text-base flex items-center justify-center transition-all duration-200 rounded-sm",
               "hover:bg-green-600 active:scale-95 touch-manipulation",
               isHighlighted(0) && "ring-2 ring-yellow-400"
             )}
@@ -59,11 +59,11 @@ export function RouletteTable({ onNumberClick, lastResult, className }: Roulette
           </Button>
         </div>
 
-        {/* Mesa tradicional - 3 linhas x 12 colunas (mesmo layout do PC) */}
-        <div className="grid grid-rows-3 gap-1">
+        {/* Mesa compacta - 3 linhas x 12 colunas otimizada */}
+        <div className="grid grid-rows-3 gap-0.5 w-full">
           
           {/* Linha Superior: 3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36 */}
-          <div className="grid grid-cols-12 gap-1">
+          <div className="grid grid-cols-12 gap-0.5 w-full">
             {[3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36].map((number) => {
               const color = getNumberColor(number);
               const colorClass = getColorClass(color);
@@ -73,10 +73,10 @@ export function RouletteTable({ onNumberClick, lastResult, className }: Roulette
                   key={number}
                   onClick={() => handleNumberClick(number)}
                   className={cn(
-                    "w-full h-10 text-white font-bold text-sm transition-all duration-200 rounded-md",
+                    "aspect-square w-full min-h-[28px] text-white font-bold text-xs transition-all duration-200 rounded-sm",
                     "active:scale-95 touch-manipulation",
                     colorClass,
-                    isHighlighted(number) && "ring-2 ring-yellow-400"
+                    isHighlighted(number) && "ring-1 ring-yellow-400"
                   )}
                   data-number={number}
                 >
@@ -87,7 +87,7 @@ export function RouletteTable({ onNumberClick, lastResult, className }: Roulette
           </div>
 
           {/* Linha Média: 2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35 */}
-          <div className="grid grid-cols-12 gap-1">
+          <div className="grid grid-cols-12 gap-0.5 w-full">
             {[2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35].map((number) => {
               const color = getNumberColor(number);
               const colorClass = getColorClass(color);
@@ -97,10 +97,10 @@ export function RouletteTable({ onNumberClick, lastResult, className }: Roulette
                   key={number}
                   onClick={() => handleNumberClick(number)}
                   className={cn(
-                    "w-full h-10 text-white font-bold text-sm transition-all duration-200 rounded-md",
+                    "aspect-square w-full min-h-[28px] text-white font-bold text-xs transition-all duration-200 rounded-sm",
                     "active:scale-95 touch-manipulation",
                     colorClass,
-                    isHighlighted(number) && "ring-2 ring-yellow-400"
+                    isHighlighted(number) && "ring-1 ring-yellow-400"
                   )}
                   data-number={number}
                 >
@@ -111,7 +111,7 @@ export function RouletteTable({ onNumberClick, lastResult, className }: Roulette
           </div>
 
           {/* Linha Inferior: 1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34 */}
-          <div className="grid grid-cols-12 gap-1">
+          <div className="grid grid-cols-12 gap-0.5 w-full">
             {[1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34].map((number) => {
               const color = getNumberColor(number);
               const colorClass = getColorClass(color);
@@ -121,10 +121,10 @@ export function RouletteTable({ onNumberClick, lastResult, className }: Roulette
                   key={number}
                   onClick={() => handleNumberClick(number)}
                   className={cn(
-                    "w-full h-10 text-white font-bold text-sm transition-all duration-200 rounded-md",
+                    "aspect-square w-full min-h-[28px] text-white font-bold text-xs transition-all duration-200 rounded-sm",
                     "active:scale-95 touch-manipulation",
                     colorClass,
-                    isHighlighted(number) && "ring-2 ring-yellow-400"
+                    isHighlighted(number) && "ring-1 ring-yellow-400"
                   )}
                   data-number={number}
                 >
@@ -139,30 +139,30 @@ export function RouletteTable({ onNumberClick, lastResult, className }: Roulette
     );
   }
 
-  // Layout Desktop - Horizontal tradicional
+  // Layout Desktop - Horizontal otimizado
   return (
-    <div className={cn("bg-gray-900 p-2 rounded", className)}>
-      {/* Layout Mesa Europeia - Zero + 3 linhas */}
-      <div className="flex items-start justify-center gap-1">
+    <div className={cn("bg-gray-900 p-1 rounded w-full max-w-none overflow-hidden", className)}>
+      {/* Layout Mesa Europeia - Zero + 3 linhas responsivo */}
+      <div className="flex items-start justify-start gap-0.5 w-full">
         
-        {/* Zero - Vertical ocupando as 3 linhas */}
+        {/* Zero - Compacto ocupando as 3 linhas */}
         <Button
           onClick={() => handleNumberClick(0)}
           className={cn(
-            "w-10 h-32 bg-roulette-green text-white font-bold text-lg flex items-center justify-center transition-all duration-200 rounded-sm",
+            "w-8 h-[calc(3*2.5rem+1rem)] bg-roulette-green text-white font-bold text-base flex items-center justify-center transition-all duration-200 rounded-sm flex-shrink-0",
             "hover:bg-green-600",
-            isHighlighted(0) && "ring-2 ring-yellow-400"
+            isHighlighted(0) && "ring-1 ring-yellow-400"
           )}
           data-number="0"
         >
           0
         </Button>
 
-        {/* Grid Principal - 3 linhas horizontais compactas */}
-        <div className="grid grid-rows-3 gap-0.5">
+        {/* Grid Principal - 3 linhas horizontais ultra compactas */}
+        <div className="grid grid-rows-3 gap-0.5 flex-1 min-w-0">
           
           {/* Linha 1 */}
-          <div className="grid grid-cols-12 gap-0.5">
+          <div className="grid grid-cols-12 gap-0.5 w-full">
             {row1.map((number) => {
               const color = getNumberColor(number);
               const colorClass = getColorClass(color);
@@ -172,9 +172,9 @@ export function RouletteTable({ onNumberClick, lastResult, className }: Roulette
                   key={number}
                   onClick={() => handleNumberClick(number)}
                   className={cn(
-                    "w-8 h-10 text-white font-bold text-xs transition-all duration-200 rounded-sm",
+                    "aspect-square w-full h-10 min-w-[24px] text-white font-bold text-xs transition-all duration-200 rounded-sm",
                     colorClass,
-                    isHighlighted(number) && "ring-2 ring-yellow-400"
+                    isHighlighted(number) && "ring-1 ring-yellow-400"
                   )}
                   data-number={number}
                 >
@@ -185,7 +185,7 @@ export function RouletteTable({ onNumberClick, lastResult, className }: Roulette
           </div>
 
           {/* Linha 2 */}
-          <div className="grid grid-cols-12 gap-0.5">
+          <div className="grid grid-cols-12 gap-0.5 w-full">
             {row2.map((number) => {
               const color = getNumberColor(number);
               const colorClass = getColorClass(color);
@@ -195,9 +195,9 @@ export function RouletteTable({ onNumberClick, lastResult, className }: Roulette
                   key={number}
                   onClick={() => handleNumberClick(number)}
                   className={cn(
-                    "w-8 h-10 text-white font-bold text-xs transition-all duration-200 rounded-sm",
+                    "aspect-square w-full h-10 min-w-[24px] text-white font-bold text-xs transition-all duration-200 rounded-sm",
                     colorClass,
-                    isHighlighted(number) && "ring-2 ring-yellow-400"
+                    isHighlighted(number) && "ring-1 ring-yellow-400"
                   )}
                   data-number={number}
                 >
@@ -208,7 +208,7 @@ export function RouletteTable({ onNumberClick, lastResult, className }: Roulette
           </div>
 
           {/* Linha 3 */}
-          <div className="grid grid-cols-12 gap-0.5">
+          <div className="grid grid-cols-12 gap-0.5 w-full">
             {row3.map((number) => {
               const color = getNumberColor(number);
               const colorClass = getColorClass(color);
@@ -218,9 +218,9 @@ export function RouletteTable({ onNumberClick, lastResult, className }: Roulette
                   key={number}
                   onClick={() => handleNumberClick(number)}
                   className={cn(
-                    "w-8 h-10 text-white font-bold text-xs transition-all duration-200 rounded-sm",
+                    "aspect-square w-full h-10 min-w-[24px] text-white font-bold text-xs transition-all duration-200 rounded-sm",
                     colorClass,
-                    isHighlighted(number) && "ring-2 ring-yellow-400"
+                    isHighlighted(number) && "ring-1 ring-yellow-400"
                   )}
                   data-number={number}
                 >
