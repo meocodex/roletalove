@@ -52,12 +52,11 @@ export default function RouletteDashboard() {
   // Mutations
   const addResultMutation = useMutation({
     mutationFn: async (number: number) => {
-      const response = await apiRequest('POST', '/api/results', { 
+      return apiRequest('/api/results', 'POST', { 
         number,
         source: 'manual',
         sessionId: 'current'
       });
-      return response.json();
     },
     onSuccess: (newResult) => {
       queryClient.invalidateQueries({ queryKey: ['/api/results'] });
