@@ -9,6 +9,7 @@ Sistema completo e avançado de análise de padrões de roleta com inteligência
 - **Comunicação**: Português, linguagem simples e cotidiana
 - **Interface**: Dashboard profissional com tema escuro tipo casino
 - **Funcionalidades**: Foco em estratégias automáticas e análise de padrões
+- **Layout**: Preferências de Apostas e Estatísticas acessíveis via botões/modais (removidas da página principal)
 
 ## System Architecture
 

@@ -23,7 +23,7 @@ import { apiRequest } from '@/lib/queryClient';
 import { getNumberColor, getColorClass } from '@/lib/roulette-utils';
 import { ClientPatternAnalyzer } from '@/lib/pattern-analyzer';
 import { type RouletteResult } from '@shared/schema';
-import { Play, Wifi, WifiOff, Layout, Grid, Smartphone } from 'lucide-react';
+import { Play, Wifi, WifiOff, Layout, Grid, Smartphone, Settings, BarChart3 } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 export default function RouletteDashboard() {
@@ -38,7 +38,14 @@ export default function RouletteDashboard() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { isConnected, lastMessage } = useWebSocket();
-  const { user, hasFeature } = useAuth();
+  // Usuário demo simplificado
+  const user = {
+    id: 'demo-user',
+    name: 'Usuário Demo', 
+    planType: 'completo' as const
+  };
+  
+  const hasFeature = (feature: string) => true; // Demo com todas as features
   const isMobile = useIsMobile();
 
   // Queries
@@ -198,6 +205,37 @@ export default function RouletteDashboard() {
               </div>
             )}
 
+            {/* Botões de Configuração - Temporariamente simplificados */}
+            <div className="flex items-center space-x-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-xs hover:bg-gray-800 px-2"
+                title="Preferências de Apostas"
+                onClick={() => {
+                  // TODO: Implementar modal
+                  console.log('Abrir preferências');
+                }}
+              >
+                <Settings className="w-3 h-3 sm:w-4 sm:h-4" />
+                {!isMobile && <span className="ml-1">Preferências</span>}
+              </Button>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-xs hover:bg-gray-800 px-2"
+                title="Estatísticas da Sessão"
+                onClick={() => {
+                  // TODO: Implementar modal
+                  console.log('Abrir estatísticas');
+                }}
+              >
+                <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4" />
+                {!isMobile && <span className="ml-1">Stats</span>}
+              </Button>
+            </div>
+
             {/* Dashboard Mode Toggle - Só desktop */}
             {!isMobile && (
               <FeatureGuard feature="dashboard_customizavel" showUpgrade={false}>
@@ -311,10 +349,7 @@ export default function RouletteDashboard() {
               <MLAnalysisPanel />
             </FeatureGuard>
 
-            {/* Stats compactas para mobile */}
-            <FeatureGuard feature="estatisticas_basicas">
-              <StatsPanel />
-            </FeatureGuard>
+
 
             {/* Pattern Analysis - Compacto */}
             <FeatureGuard feature="analise_padroes">
@@ -514,14 +549,6 @@ export default function RouletteDashboard() {
               <FeatureGuard feature="estrategias_tradicionais">
                 <StrategyPanel />
               </FeatureGuard>
-
-              {/* Betting Preferences */}
-              <BettingPreferences />
-
-              {/* Real-time Stats */}
-              <StatsPanel />
-
-
 
               {/* Alerts Panel */}
               <AlertsPanel />
