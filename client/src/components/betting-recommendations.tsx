@@ -48,13 +48,13 @@ export function BettingRecommendations({ className }: BettingRecommendationsProp
   if (results.length < 10) {
     return (
       <Card className={className}>
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-casino-gold text-lg">
-            <Target className="h-5 w-5" />
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-casino-gold text-base">
+            <Target className="h-4 w-4" />
             🎯 RECOMENDAÇÕES
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-0">
           <div className="text-center py-6 text-yellow-400 border border-yellow-600/30 rounded-lg bg-yellow-900/20">
             <AlertCircle className="h-10 w-10 mx-auto mb-3" />
             <p className="font-medium text-sm">Sistema Aguardando Dados</p>
@@ -67,17 +67,17 @@ export function BettingRecommendations({ className }: BettingRecommendationsProp
 
   return (
     <Card className={`${className} border-casino-gold/50`}>
-      <CardHeader className="bg-casino-gold/10 border-b border-casino-gold/30 pb-3">
-        <CardTitle className="flex items-center gap-2 text-casino-gold text-lg">
-          <Target className="h-5 w-5" />
+      <CardHeader className="bg-casino-gold/10 border-b border-casino-gold/30 pb-2">
+        <CardTitle className="flex items-center gap-2 text-casino-gold text-base">
+          <Target className="h-4 w-4" />
           🎯 RECOMENDAÇÕES
         </CardTitle>
-        <p className="text-xs text-gray-300">
+        <p className="text-xs text-gray-300 mt-1">
           O que você deve jogar agora baseado nas análises
         </p>
       </CardHeader>
       
-      <CardContent className="space-y-4 pt-4">
+      <CardContent className="space-y-3 pt-3">
         
         {/* 1. Estratégias Tradicionais */}
         {activeStrategies.length > 0 && (

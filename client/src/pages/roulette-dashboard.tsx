@@ -237,7 +237,7 @@ export default function RouletteDashboard() {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto p-2 sm:p-4">
+      <div className="max-w-7xl mx-auto p-3 sm:p-4">
         {/* Mobile Layout - Sempre usar layout mobile adaptado em telas pequenas */}
         {isMobile ? (
           <div className="space-y-3">
@@ -297,14 +297,14 @@ export default function RouletteDashboard() {
               </CardContent>
             </Card>
 
+            {/* Recomendações de Apostas - DESTAQUE PRINCIPAL */}
+            <BettingRecommendations />
+
             {/* Preferências e Estatísticas - Botões Mobile */}
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-3">
               <BettingPreferencesModal />
               <SessionStatsModal />
             </div>
-
-            {/* Recomendações de Apostas - Segunda posição no mobile */}
-            <BettingRecommendations />
 
             {/* IA Externa - Terceira posição */}
             <FeatureGuard feature="ia_externa_chatgpt">
@@ -327,7 +327,7 @@ export default function RouletteDashboard() {
           </div>
         ) : dashboardMode === 'custom' ? (
           /* Dashboard Customizável */
-          <div className="space-y-4">
+          <div className="space-y-3">
             {/* Mesa de Roleta sempre no topo no modo customizável */}
             <Card>
               <CardHeader className="pb-3">
@@ -399,7 +399,7 @@ export default function RouletteDashboard() {
             </Card>
 
             {/* Preferências e Estatísticas - Custom Mode */}
-            <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="grid grid-cols-2 gap-3">
               <BettingPreferencesModal />
               <SessionStatsModal />
             </div>
@@ -409,7 +409,7 @@ export default function RouletteDashboard() {
           </div>
         ) : (
           /* Dashboard Padrão */
-          <div className="grid grid-cols-1 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 xl:grid-cols-4 gap-3">
             
             {/* Main Roulette Table */}
             <div className="xl:col-span-3">
@@ -486,47 +486,10 @@ export default function RouletteDashboard() {
             </div>
 
             {/* Right Sidebar - Analysis Dashboard */}
-            <div className="xl:col-span-1 space-y-6">
+            <div className="xl:col-span-1 space-y-3">
               
-              {/* Betting Recommendations - DESTAQUE PRINCIPAL */}
+              {/* Recomendações de Apostas - DESTAQUE PRINCIPAL */}
               <BettingRecommendations />
-              
-              {/* External AI Analysis Panel - Only Complete Plan */}
-              <FeatureGuard feature="ia_externa_chatgpt">
-                <ExternalAIPanel 
-                  insights={aiInsights}
-                  isLoading={aiLoading}
-                  onRefresh={fetchAIAnalysis}
-                />
-              </FeatureGuard>
-              
-              {/* ML Analysis Panel - Intermediate+ Plan */}
-              <FeatureGuard feature="ml_analyzer">
-                <MLAnalysisPanel />
-              </FeatureGuard>
-
-              {/* Combined Strategies Panel - Complete Plan Only - TEMPORARIAMENTE DESATIVADO */}
-              {/* <FeatureGuard feature="estrategias_combinadas">
-                <CombinedStrategiesPanel />
-              </FeatureGuard> */}
-
-              {/* Advanced Charts - Complete Plan */}
-              <FeatureGuard feature="graficos_avancados">
-                <AdvancedCharts />
-              </FeatureGuard>
-
-              {/* Pattern Analysis - Intermediate+ Plan */}
-              <FeatureGuard feature="analise_padroes">
-                <PatternAnalysis patterns={clientPatterns} />
-              </FeatureGuard>
-              
-              {/* Simplified Strategies */}
-              <SimplifiedStrategies results={results} />
-
-              {/* Strategy System - Intermediate+ Plan */}
-              <FeatureGuard feature="estrategias_tradicionais">
-                <StrategyPanel />
-              </FeatureGuard>
 
               {/* Preferências e Estatísticas - Desktop Buttons */}
               <div className="grid grid-cols-2 gap-3">
@@ -534,7 +497,42 @@ export default function RouletteDashboard() {
                 <SessionStatsModal />
               </div>
 
-              {/* Alerts Panel */}
+              {/* Estratégias Simplificadas */}
+              <SimplifiedStrategies results={results} />
+              
+              {/* Seção de Análises Avançadas */}
+              <div className="space-y-3">
+                {/* External AI Analysis Panel - Only Complete Plan */}
+                <FeatureGuard feature="ia_externa_chatgpt">
+                  <ExternalAIPanel 
+                    insights={aiInsights}
+                    isLoading={aiLoading}
+                    onRefresh={fetchAIAnalysis}
+                  />
+                </FeatureGuard>
+                
+                {/* ML Analysis Panel - Intermediate+ Plan */}
+                <FeatureGuard feature="ml_analyzer">
+                  <MLAnalysisPanel />
+                </FeatureGuard>
+
+                {/* Pattern Analysis - Intermediate+ Plan */}
+                <FeatureGuard feature="analise_padroes">
+                  <PatternAnalysis patterns={clientPatterns} />
+                </FeatureGuard>
+
+                {/* Strategy System - Intermediate+ Plan */}
+                <FeatureGuard feature="estrategias_tradicionais">
+                  <StrategyPanel />
+                </FeatureGuard>
+
+                {/* Advanced Charts - Complete Plan */}
+                <FeatureGuard feature="graficos_avancados">
+                  <AdvancedCharts />
+                </FeatureGuard>
+              </div>
+
+              {/* Alertas Panel - Final da sidebar */}
               <AlertsPanel />
             </div>
           </div>
