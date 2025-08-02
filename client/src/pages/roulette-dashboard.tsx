@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RouletteTable } from '@/components/roulette-table';
 import { PatternAnalysis } from '@/components/pattern-analysis';
+import { SimplifiedStrategies } from '@/components/simplified-strategies';
 import { StrategyPanel } from '@/components/strategy-panel';
 import { StatsPanel } from '@/components/stats-panel';
 import { AlertsPanel } from '@/components/alerts-panel';
@@ -21,7 +22,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { FeatureGuard } from '@/components/auth/FeatureGuard';
 import { apiRequest } from '@/lib/queryClient';
 import { getNumberColor, getColorClass } from '@/lib/roulette-utils';
-import { ClientPatternAnalyzer } from '@/lib/pattern-analyzer';
+import { UnifiedPatternAnalyzer } from '@/lib/pattern-analyzer';
 import { type RouletteResult } from '@shared/schema';
 import { Play, Wifi, WifiOff, Layout, Grid, Smartphone } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -105,10 +106,13 @@ export default function RouletteDashboard() {
     }
   }, [lastMessage, queryClient]);
 
-  // Client-side pattern analysis
+  // Análise unificada de padrões
   useEffect(() => {
-    if (results.length > 0) {
-      const patterns = ClientPatternAnalyzer.analyzeAll(results);
+    if (results.length >= 4) {
+      const colorPattern = UnifiedPatternAnalyzer.analyzeColorSequence(results);
+      const dozenPattern = UnifiedPatternAnalyzer.analyzeDozens(results);
+      
+      const patterns = [colorPattern, dozenPattern].filter(Boolean);
       setClientPatterns(patterns);
     }
   }, [results]);
@@ -320,7 +324,7 @@ export default function RouletteDashboard() {
 
             {/* Pattern Analysis - Compacto */}
             <FeatureGuard feature="analise_padroes">
-              <PatternAnalysis />
+              <PatternAnalysis patterns={clientPatterns} />
             </FeatureGuard>
           </div>
         ) : dashboardMode === 'custom' ? (
@@ -509,8 +513,11 @@ export default function RouletteDashboard() {
 
               {/* Pattern Analysis - Intermediate+ Plan */}
               <FeatureGuard feature="analise_padroes">
-                <PatternAnalysis />
+                <PatternAnalysis patterns={clientPatterns} />
               </FeatureGuard>
+              
+              {/* Simplified Strategies */}
+              <SimplifiedStrategies results={results} />
 
               {/* Strategy System - Intermediate+ Plan */}
               <FeatureGuard feature="estrategias_tradicionais">

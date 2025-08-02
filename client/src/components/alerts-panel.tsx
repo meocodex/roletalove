@@ -117,7 +117,10 @@ export function AlertsPanel({ className }: AlertsPanelProps) {
                   </div>
                   <div className="text-gray-400 truncate">{alert.message}</div>
                   <div className="text-gray-500 mt-1">
-                    há {formatDistanceToNow(new Date(alert.timestamp), { locale: ptBR }) as string}
+                    {formatDistanceToNow(new Date(alert.timestamp), { 
+                      addSuffix: true, 
+                      locale: ptBR 
+                    }) || 'há alguns minutos'}
                   </div>
                   
                   {/* Additional data display */}

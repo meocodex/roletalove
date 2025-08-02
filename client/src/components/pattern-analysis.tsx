@@ -1,17 +1,15 @@
-import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Brain } from 'lucide-react';
-import { type Pattern } from '@shared/schema';
+import { Brain, TrendingUp } from 'lucide-react';
+import { type PatternResult } from '@/lib/pattern-analyzer';
 
 interface PatternAnalysisProps {
+  patterns: PatternResult[];
   className?: string;
 }
 
-export function PatternAnalysis({ className }: PatternAnalysisProps) {
-  const { data: patterns = [], isLoading } = useQuery<Pattern[]>({
-    queryKey: ['/api/patterns'],
-  });
+export function PatternAnalysis({ patterns, className }: PatternAnalysisProps) {
+  const isLoading = false;
 
   const getPatternTypeLabel = (type: string) => {
     const labels: Record<string, string> = {

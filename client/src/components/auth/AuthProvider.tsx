@@ -33,32 +33,32 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Simular carregamento do usuário
+    // Sistema de autenticação simplificado para desenvolvimento
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       try {
         setUser(JSON.parse(storedUser));
       } catch {
-        // Se falhar ao parsear, criar usuário demo
-        const demoUser: User = {
-          id: 'demo-user',
-          email: 'demo@roleta.com',
-          name: 'Usuário Demo',
+        // Fallback para usuário padrão
+        const defaultUser: User = {
+          id: 'user-001',
+          email: 'usuario@roleta.app',
+          name: 'Analista Roleta',
           planType: 'completo'
         };
-        setUser(demoUser);
-        localStorage.setItem('user', JSON.stringify(demoUser));
+        setUser(defaultUser);
+        localStorage.setItem('user', JSON.stringify(defaultUser));
       }
     } else {
-      // Usuário demo para desenvolvimento
-      const demoUser: User = {
-        id: 'demo-user',
-        email: 'demo@roleta.com', 
-        name: 'Usuário Demo',
+      // Usuário padrão com acesso completo
+      const defaultUser: User = {
+        id: 'user-001',
+        email: 'usuario@roleta.app', 
+        name: 'Analista Roleta',
         planType: 'completo'
       };
-      setUser(demoUser);
-      localStorage.setItem('user', JSON.stringify(demoUser));
+      setUser(defaultUser);
+      localStorage.setItem('user', JSON.stringify(defaultUser));
     }
     setIsLoading(false);
   }, []);

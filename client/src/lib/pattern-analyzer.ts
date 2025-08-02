@@ -10,7 +10,9 @@ export interface PatternResult {
   suggestion: string;
 }
 
-export class ClientPatternAnalyzer {
+// Análise unificada de padrões - substitui lógica duplicada do servidor
+export class UnifiedPatternAnalyzer {
+  // Análise consolidada de sequências de cores
   static analyzeColorSequence(results: RouletteResult[]): PatternResult | null {
     if (results.length < 4) return null;
     
@@ -34,6 +36,49 @@ export class ClientPatternAnalyzer {
     return null;
   }
   
+  // Gera estratégia de números plenos unificada
+  static generateStraightUpStrategy(results: RouletteResult[]): number[] {
+    if (results.length < 10) {
+      // Números balanceados para início
+      return [7, 17, 23, 32, 1, 14, 29];
+    }
+    
+    const numbers = new Set<number>();
+    const numberCounts = new Map<number, number>();
+    
+    // Analisa últimos 30 resultados
+    results.slice(0, 30).forEach(result => {
+      if (result.number !== 0) {
+        numberCounts.set(result.number, (numberCounts.get(result.number) || 0) + 1);
+      }
+    });
+    
+    // Números quentes (top 3)
+    const hotNumbers = Array.from(numberCounts.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([num]) => num);
+    
+    hotNumbers.forEach(num => numbers.add(num));
+    
+    // Números frios (não apareceram recentemente)
+    const recentNumbers = new Set(results.slice(0, 15).map(r => r.number));
+    const allNumbers = Array.from({length: 36}, (_, i) => i + 1);
+    const coldNumbers = allNumbers.filter(num => !recentNumbers.has(num));
+    
+    // Adiciona 2 números frios
+    coldNumbers.slice(0, 2).forEach(num => numbers.add(num));
+    
+    // Completa com números balanceados
+    const remainingNumbers = allNumbers.filter(num => !numbers.has(num));
+    while (numbers.size < 7 && remainingNumbers.length > 0) {
+      const index = Math.floor(Math.random() * remainingNumbers.length);
+      numbers.add(remainingNumbers.splice(index, 1)[0]);
+    }
+    
+    return Array.from(numbers).slice(0, 7);
+  }
+
   static analyzeDozens(results: RouletteResult[]): PatternResult | null {
     if (results.length < 10) return null;
     
@@ -46,7 +91,7 @@ export class ClientPatternAnalyzer {
       }
     });
     
-    // Find hot dozen
+    // Encontra dúzia quente
     let hotDozen = 0;
     let maxCount = 0;
     

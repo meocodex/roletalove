@@ -12,20 +12,15 @@ export function useWebSocket() {
   const ws = useRef<WebSocket | null>(null);
 
   useEffect(() => {
-    // Evitar conexão WebSocket em desenvolvimento para reduzir erros
-    if (process.env.NODE_ENV === 'development') {
-      console.log('WebSocket disabled in development mode');
-      setIsConnected(false);
-      return;
-    }
-
+    // WebSocket simplificado - conecta apenas se servidor suportar
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
     const wsUrl = `${protocol}//${window.location.host}/ws`;
+
     
     try {
       ws.current = new WebSocket(wsUrl);
     } catch (error) {
-      console.error('Failed to create WebSocket:', error);
+      console.error('WebSocket não disponível:', error);
       setIsConnected(false);
       return;
     }
