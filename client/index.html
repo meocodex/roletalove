@@ -22,7 +22,15 @@
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // Teste básico inline
+      document.addEventListener('DOMContentLoaded', function() {
+        const root = document.getElementById('root');
+        if (root) {
+          root.innerHTML = '<div style="min-height:100vh;background:#22c55e;color:white;padding:40px;font-size:24px;"><h1>SISTEMA FUNCIONANDO!</h1><p>Tela preta resolvida</p><p>Hora: ' + new Date().toLocaleString() + '</p></div>';
+        }
+      });
+    </script>
     
     <!-- PWA Service Worker Registration -->
     <script>

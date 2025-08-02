@@ -18,7 +18,7 @@ import AdvancedCharts from '@/components/advanced-charts';
 import { useWebSocket } from '@/hooks/use-websocket';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
-import { FeatureGuard } from '@/components/auth/FeatureGuard';
+import { FeatureGuard } from '@/components/feature-guard';
 import { apiRequest } from '@/lib/queryClient';
 import { getNumberColor, getColorClass } from '@/lib/roulette-utils';
 import { ClientPatternAnalyzer } from '@/lib/pattern-analyzer';
