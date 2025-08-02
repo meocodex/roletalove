@@ -400,6 +400,12 @@ export default function RouletteDashboard() {
               </CardContent>
             </Card>
 
+            {/* Preferências e Estatísticas - Custom Mode */}
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              <BettingPreferencesModal />
+              <SessionStatsModal />
+            </div>
+
             {/* Dashboard Customizável */}
             <CustomizableDashboard />
           </div>
@@ -523,6 +529,12 @@ export default function RouletteDashboard() {
               <FeatureGuard feature="estrategias_tradicionais">
                 <StrategyPanel />
               </FeatureGuard>
+
+              {/* Preferências e Estatísticas - Desktop Buttons */}
+              <div className="grid grid-cols-2 gap-3">
+                <BettingPreferencesModal />
+                <SessionStatsModal />
+              </div>
 
               {/* Betting Preferences */}
               <BettingPreferences />
