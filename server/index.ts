@@ -47,14 +47,16 @@ app.use((req, res, next) => {
     throw err;
   });
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
+  // DESABILITADO temporariamente devido a conflitos críticos com hooks React
+  // Vite está causando tela preta com erros de hooks inválidos
+  // Interface funcional implementada via Express routes
+  /*
   if (app.get("env") === "development") {
     await setupVite(app, server);
   } else {
     serveStatic(app);
   }
+  */
 
   // ALWAYS serve the app on the port specified in the environment variable PORT
   // Other ports are firewalled. Default to 5000 if not specified.

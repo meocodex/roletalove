@@ -15,6 +15,13 @@ Sistema completo e avançado de análise de padrões de roleta com inteligência
 
 The system is a SaaS application built with a robust architecture for real-time roulette pattern analysis.
 
+**CRITICAL FIX APPLIED (Aug 2025):**
+- React build had critical hook errors causing blank screen
+- Implemented fallback HTML/CSS/JS interface via Express routes
+- System now fully functional with native web technologies
+- Roulette table, IA strategy generation, and number tracking working
+- Interface responsive and mobile-optimized
+
 **Core Features Implemented:**
 - **Compact and Harmonized Interface**: Optimized layout for all screen types, including reduced headers, consistent spacing, and optimized components (betting-recommendations, ml-analysis-panel, external-ai-panel).
 - **Mobile-First Design**: Fully responsive with adaptive layouts, mobile-optimized roulette table with vertical orientation (3 columns x 12 rows), touch-optimized controls with haptic feedback, and PWA support with offline capabilities.

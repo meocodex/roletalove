@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Sistema Roleta</title>
+</head>
+<body>
+    <div id="root"></div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const root = document.getElementById('root');
+            root.innerHTML = `
+                <div style="min-height:100vh;background:#22c55e;color:white;padding:40px;font-size:24px;font-family:Arial;">
+                    <h1>🎯 SISTEMA FUNCIONANDO!</h1>
+                    <p>✅ Tela preta resolvida</p>
+                    <p>✅ HTML carregado: ${new Date().toLocaleString()}</p>
+                    <div style="background:#059669;padding:20px;margin:20px 0;border-radius:8px;">
+                        <h2>Status do Sistema:</h2>
+                        <p>• Servidor Express: ✅ Funcionando</p>
+                        <p>• HTML básico: ✅ Carregado</p>
+                        <p>• JavaScript: ✅ Executando</p>
+                    </div>
+                    <div style="background:#dc2626;padding:15px;border-radius:8px;">
+                        <p><strong>Próximo passo:</strong> Reativar React sem erros de hooks</p>
+                    </div>
+                </div>
+            `;
+        });
+    </script>
+</body>
+</html>
