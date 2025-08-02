@@ -145,9 +145,9 @@ export function RouletteTable({ onNumberClick, lastResult, className }: Roulette
   return (
     <div className={cn("bg-gray-900 p-2 rounded", className)}>
       {/* Layout Mesa Europeia - Zero + 3 linhas */}
-      <div className="flex items-center justify-center gap-1">
+      <div className="flex items-start justify-center gap-1">
         
-        {/* Zero - Preenchendo as 3 linhas */}
+        {/* Zero - Vertical ocupando as 3 linhas */}
         <Button
           onClick={() => handleNumberClick(0)}
           className={cn(
@@ -160,7 +160,7 @@ export function RouletteTable({ onNumberClick, lastResult, className }: Roulette
           0
         </Button>
 
-        {/* Grid Principal - 3 linhas compactas */}
+        {/* Grid Principal - 3 linhas horizontais compactas */}
         <div className="grid grid-rows-3 gap-0.5">
           
           {/* Linha 1 */}
