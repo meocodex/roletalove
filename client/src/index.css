@@ -4,9 +4,15 @@
 
 /* PWA and Mobile Optimizations */
 @media screen and (max-width: 768px) {
-  /* Better touch targets for mobile */
-  button, [role="button"], input, select, textarea {
+  /* Better touch targets for mobile - except roulette table */
+  button:not([data-number]), [role="button"]:not([data-number]), input, select, textarea {
     min-height: 44px;
+    touch-action: manipulation;
+  }
+  
+  /* Roulette table buttons - compact for mobile */
+  button[data-number] {
+    min-height: 32px;
     touch-action: manipulation;
   }
   

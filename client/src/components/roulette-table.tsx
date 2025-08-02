@@ -41,99 +41,101 @@ export function RouletteTable({ onNumberClick, lastResult, className }: Roulette
   const mobileCol3 = [25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36];
 
   if (isMobile) {
-    // Layout Mobile - Vertical com 3 colunas
+    // Layout Mobile - Compacto com Zero lateral
     return (
-      <div className={cn("bg-gray-900 p-3 rounded-lg", className)}>
-        {/* Header com Zero */}
-        <div className="mb-3 flex justify-center">
+      <div className={cn("bg-gray-900 p-2 rounded-lg", className)}>
+        {/* Layout Mobile - Zero + 3 colunas */}
+        <div className="flex items-start gap-1">
+          
+          {/* Zero - Ocupando altura das 3 linhas principais */}
           <Button
             onClick={() => handleNumberClick(0)}
             className={cn(
-              "w-20 h-12 bg-roulette-green text-white font-bold text-xl transition-all duration-200 rounded-lg",
-              "hover:bg-green-600 active:scale-95",
+              "w-8 h-32 bg-roulette-green text-white font-bold text-base flex items-center justify-center transition-all duration-200 rounded-sm",
+              "hover:bg-green-600 active:scale-95 touch-manipulation",
               isHighlighted(0) && "ring-2 ring-yellow-400"
             )}
             data-number="0"
           >
             0
           </Button>
-        </div>
 
-        {/* Grid Vertical - 3 colunas x 12 linhas */}
-        <div className="grid grid-cols-3 gap-2">
-          
-          {/* Coluna 1 */}
-          <div className="grid grid-rows-12 gap-1">
-            {mobileCol1.map((number) => {
-              const color = getNumberColor(number);
-              const colorClass = getColorClass(color);
-              
-              return (
-                <Button
-                  key={number}
-                  onClick={() => handleNumberClick(number)}
-                  className={cn(
-                    "w-full h-12 text-white font-bold text-sm transition-all duration-200 rounded-md",
-                    "active:scale-95 touch-manipulation",
-                    colorClass,
-                    isHighlighted(number) && "ring-2 ring-yellow-400"
-                  )}
-                  data-number={number}
-                >
-                  {number}
-                </Button>
-              );
-            })}
+          {/* Grid Vertical Compacto - 3 colunas x 12 linhas */}
+          <div className="grid grid-cols-3 gap-0.5 flex-1">
+            
+            {/* Coluna 1 */}
+            <div className="grid grid-rows-12 gap-0.5">
+              {mobileCol1.map((number) => {
+                const color = getNumberColor(number);
+                const colorClass = getColorClass(color);
+                
+                return (
+                  <Button
+                    key={number}
+                    onClick={() => handleNumberClick(number)}
+                    className={cn(
+                      "w-full h-8 text-white font-bold text-xs transition-all duration-200 rounded-sm",
+                      "active:scale-95 touch-manipulation",
+                      colorClass,
+                      isHighlighted(number) && "ring-2 ring-yellow-400"
+                    )}
+                    data-number={number}
+                  >
+                    {number}
+                  </Button>
+                );
+              })}
+            </div>
+
+            {/* Coluna 2 */}
+            <div className="grid grid-rows-12 gap-0.5">
+              {mobileCol2.map((number) => {
+                const color = getNumberColor(number);
+                const colorClass = getColorClass(color);
+                
+                return (
+                  <Button
+                    key={number}
+                    onClick={() => handleNumberClick(number)}
+                    className={cn(
+                      "w-full h-8 text-white font-bold text-xs transition-all duration-200 rounded-sm",
+                      "active:scale-95 touch-manipulation",
+                      colorClass,
+                      isHighlighted(number) && "ring-2 ring-yellow-400"
+                    )}
+                    data-number={number}
+                  >
+                    {number}
+                  </Button>
+                );
+              })}
+            </div>
+
+            {/* Coluna 3 */}
+            <div className="grid grid-rows-12 gap-0.5">
+              {mobileCol3.map((number) => {
+                const color = getNumberColor(number);
+                const colorClass = getColorClass(color);
+                
+                return (
+                  <Button
+                    key={number}
+                    onClick={() => handleNumberClick(number)}
+                    className={cn(
+                      "w-full h-8 text-white font-bold text-xs transition-all duration-200 rounded-sm",
+                      "active:scale-95 touch-manipulation",
+                      colorClass,
+                      isHighlighted(number) && "ring-2 ring-yellow-400"
+                    )}
+                    data-number={number}
+                  >
+                    {number}
+                  </Button>
+                );
+              })}
+            </div>
+
           </div>
-
-          {/* Coluna 2 */}
-          <div className="grid grid-rows-12 gap-1">
-            {mobileCol2.map((number) => {
-              const color = getNumberColor(number);
-              const colorClass = getColorClass(color);
-              
-              return (
-                <Button
-                  key={number}
-                  onClick={() => handleNumberClick(number)}
-                  className={cn(
-                    "w-full h-12 text-white font-bold text-sm transition-all duration-200 rounded-md",
-                    "active:scale-95 touch-manipulation",
-                    colorClass,
-                    isHighlighted(number) && "ring-2 ring-yellow-400"
-                  )}
-                  data-number={number}
-                >
-                  {number}
-                </Button>
-              );
-            })}
-          </div>
-
-          {/* Coluna 3 */}
-          <div className="grid grid-rows-12 gap-1">
-            {mobileCol3.map((number) => {
-              const color = getNumberColor(number);
-              const colorClass = getColorClass(color);
-              
-              return (
-                <Button
-                  key={number}
-                  onClick={() => handleNumberClick(number)}
-                  className={cn(
-                    "w-full h-12 text-white font-bold text-sm transition-all duration-200 rounded-md",
-                    "active:scale-95 touch-manipulation",
-                    colorClass,
-                    isHighlighted(number) && "ring-2 ring-yellow-400"
-                  )}
-                  data-number={number}
-                >
-                  {number}
-                </Button>
-              );
-            })}
-          </div>
-
         </div>
       </div>
     );

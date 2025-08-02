@@ -242,19 +242,19 @@ export default function RouletteDashboard() {
             <Card>
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-base font-medium">Mesa Europeia</CardTitle>
+                  <CardTitle className="text-sm font-medium">Mesa Europeia</CardTitle>
                   <div className="flex items-center space-x-2">
                     <Button 
                       onClick={toggleSession}
                       size="sm"
-                      className={`${sessionActive ? 'bg-red-600 hover:bg-red-700' : 'bg-roulette-green hover:bg-green-600'} font-medium transition-colors text-xs px-2 py-1`}
+                      className={`${sessionActive ? 'bg-red-600 hover:bg-red-700' : 'bg-roulette-green hover:bg-green-600'} font-medium transition-colors text-xs px-2 py-1 h-7`}
                     >
-                      <Play className="mr-1" size={12} />
+                      <Play className="mr-1" size={10} />
                       {sessionActive ? 'Pausar' : 'Iniciar'}
                     </Button>
                     {lastResult !== null && (
                       <div className="text-xs text-gray-400">
-                        <span className={`font-bold ${
+                        <span className={`font-bold text-sm ${
                           getNumberColor(lastResult) === 'red' ? 'text-roulette-red' :
                           getNumberColor(lastResult) === 'black' ? 'text-white' :
                           'text-roulette-green'
@@ -264,24 +264,24 @@ export default function RouletteDashboard() {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="pb-3">
+              <CardContent className="pb-2">
                 <RouletteTable 
                   onNumberClick={handleNumberClick}
                   lastResult={lastResult}
                 />
 
-                {/* Recent Results - Mobile compacto */}
-                <div className="mt-3">
-                  <h3 className="text-sm font-medium mb-2">Últimos</h3>
+                {/* Recent Results - Mobile ultra compacto */}
+                <div className="mt-2">
+                  <h3 className="text-xs font-medium mb-1">Últimos</h3>
                   <div className="flex flex-wrap gap-1">
-                    {results.slice(0, 8).map((result, index) => {
+                    {results.slice(0, 10).map((result, index) => {
                       const color = getNumberColor(result.number);
                       const isHighlighted = index === 0;
                       
                       return (
                         <div
                           key={result.id}
-                          className={`w-7 h-7 ${getColorClass(color).split(' ')[0]} rounded-md flex items-center justify-center text-white font-bold text-xs border ${
+                          className={`w-6 h-6 ${getColorClass(color).split(' ')[0]} rounded-sm flex items-center justify-center text-white font-bold text-xs border ${
                             isHighlighted ? 'border-casino-gold' : 'border-transparent'
                           } transition-all duration-300`}
                         >
