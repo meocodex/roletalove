@@ -17,3 +17,25 @@ export function useIsMobile() {
 
   return !!isMobile
 }
+
+// Hook para detectar orientação do dispositivo
+export function useDeviceOrientation() {
+  const [orientation, setOrientation] = React.useState<'portrait' | 'landscape'>('portrait')
+
+  React.useEffect(() => {
+    const updateOrientation = () => {
+      setOrientation(window.innerHeight > window.innerWidth ? 'portrait' : 'landscape')
+    }
+    
+    window.addEventListener('resize', updateOrientation)
+    window.addEventListener('orientationchange', updateOrientation)
+    updateOrientation()
+    
+    return () => {
+      window.removeEventListener('resize', updateOrientation)
+      window.removeEventListener('orientationchange', updateOrientation)
+    }
+  }, [])
+
+  return orientation
+}

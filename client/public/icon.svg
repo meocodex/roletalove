@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="rouletteGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#1a1a1a"/>
+      <stop offset="100%" style="stop-color:#0f172a"/>
+    </radialGradient>
+  </defs>
+  
+  <!-- Background Circle -->
+  <circle cx="256" cy="256" r="240" fill="url(#rouletteGrad)" stroke="#d4af37" stroke-width="8"/>
+  
+  <!-- Inner Circle -->
+  <circle cx="256" cy="256" r="180" fill="#0f172a" stroke="#d4af37" stroke-width="2"/>
+  
+  <!-- Roulette Numbers (simplified) -->
+  <circle cx="256" cy="140" r="12" fill="#dc2626"/>
+  <text x="256" y="145" text-anchor="middle" fill="white" font-family="Arial" font-size="10" font-weight="bold">32</text>
+  
+  <circle cx="350" cy="200" r="12" fill="#1f2937"/>
+  <text x="350" y="205" text-anchor="middle" fill="white" font-family="Arial" font-size="10" font-weight="bold">15</text>
+  
+  <circle cx="350" cy="312" r="12" fill="#dc2626"/>
+  <text x="350" y="317" text-anchor="middle" fill="white" font-family="Arial" font-size="10" font-weight="bold">19</text>
+  
+  <circle cx="256" cy="372" r="12" fill="#1f2937"/>
+  <text x="256" y="377" text-anchor="middle" fill="white" font-family="Arial" font-size="10" font-weight="bold">4</text>
+  
+  <circle cx="162" cy="312" r="12" fill="#dc2626"/>
+  <text x="162" y="317" text-anchor="middle" fill="white" font-family="Arial" font-size="10" font-weight="bold">21</text>
+  
+  <circle cx="162" cy="200" r="12" fill="#1f2937"/>
+  <text x="162" y="205" text-anchor="middle" fill="white" font-family="Arial" font-size="10" font-weight="bold">2</text>
+  
+  <!-- Center Zero -->
+  <circle cx="256" cy="256" r="20" fill="#16a34a"/>
+  <text x="256" y="262" text-anchor="middle" fill="white" font-family="Arial" font-size="14" font-weight="bold">0</text>
+  
+  <!-- AI Symbol -->
+  <g transform="translate(256, 320)">
+    <circle r="25" fill="#d4af37" opacity="0.2"/>
+    <path d="M-15,-10 Q0,-20 15,-10 Q15,10 0,20 Q-15,10 -15,-10" fill="#d4af37"/>
+    <text y="4" text-anchor="middle" fill="#0f172a" font-family="Arial" font-size="10" font-weight="bold">AI</text>
+  </g>
+</svg>

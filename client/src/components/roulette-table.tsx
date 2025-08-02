@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { getNumberColor, getColorClass } from '@/lib/roulette-utils';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface RouletteTableProps {
   onNumberClick: (number: number) => void;
@@ -11,10 +12,16 @@ interface RouletteTableProps {
 
 export function RouletteTable({ onNumberClick, lastResult, className }: RouletteTableProps) {
   const [highlightedNumber, setHighlightedNumber] = useState<number | null>(null);
+  const isMobile = useIsMobile();
 
   const handleNumberClick = (number: number) => {
     setHighlightedNumber(number);
     onNumberClick(number);
+    
+    // Haptic feedback on mobile
+    if (isMobile && 'vibrate' in navigator) {
+      navigator.vibrate(50);
+    }
     
     // Remove highlight after animation
     setTimeout(() => setHighlightedNumber(null), 300);
@@ -28,6 +35,111 @@ export function RouletteTable({ onNumberClick, lastResult, className }: Roulette
   const row2 = [2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35];
   const row3 = [1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34];
 
+  // Layout vertical para mobile: números organizados em colunas
+  const mobileCol1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+  const mobileCol2 = [13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24];
+  const mobileCol3 = [25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36];
+
+  if (isMobile) {
+    // Layout Mobile - Vertical com 3 colunas
+    return (
+      <div className={cn("bg-gray-900 p-3 rounded-lg", className)}>
+        {/* Header com Zero */}
+        <div className="mb-3 flex justify-center">
+          <Button
+            onClick={() => handleNumberClick(0)}
+            className={cn(
+              "w-20 h-12 bg-roulette-green text-white font-bold text-xl transition-all duration-200 rounded-lg",
+              "hover:bg-green-600 active:scale-95",
+              isHighlighted(0) && "ring-2 ring-yellow-400"
+            )}
+            data-number="0"
+          >
+            0
+          </Button>
+        </div>
+
+        {/* Grid Vertical - 3 colunas x 12 linhas */}
+        <div className="grid grid-cols-3 gap-2">
+          
+          {/* Coluna 1 */}
+          <div className="grid grid-rows-12 gap-1">
+            {mobileCol1.map((number) => {
+              const color = getNumberColor(number);
+              const colorClass = getColorClass(color);
+              
+              return (
+                <Button
+                  key={number}
+                  onClick={() => handleNumberClick(number)}
+                  className={cn(
+                    "w-full h-12 text-white font-bold text-sm transition-all duration-200 rounded-md",
+                    "active:scale-95 touch-manipulation",
+                    colorClass,
+                    isHighlighted(number) && "ring-2 ring-yellow-400"
+                  )}
+                  data-number={number}
+                >
+                  {number}
+                </Button>
+              );
+            })}
+          </div>
+
+          {/* Coluna 2 */}
+          <div className="grid grid-rows-12 gap-1">
+            {mobileCol2.map((number) => {
+              const color = getNumberColor(number);
+              const colorClass = getColorClass(color);
+              
+              return (
+                <Button
+                  key={number}
+                  onClick={() => handleNumberClick(number)}
+                  className={cn(
+                    "w-full h-12 text-white font-bold text-sm transition-all duration-200 rounded-md",
+                    "active:scale-95 touch-manipulation",
+                    colorClass,
+                    isHighlighted(number) && "ring-2 ring-yellow-400"
+                  )}
+                  data-number={number}
+                >
+                  {number}
+                </Button>
+              );
+            })}
+          </div>
+
+          {/* Coluna 3 */}
+          <div className="grid grid-rows-12 gap-1">
+            {mobileCol3.map((number) => {
+              const color = getNumberColor(number);
+              const colorClass = getColorClass(color);
+              
+              return (
+                <Button
+                  key={number}
+                  onClick={() => handleNumberClick(number)}
+                  className={cn(
+                    "w-full h-12 text-white font-bold text-sm transition-all duration-200 rounded-md",
+                    "active:scale-95 touch-manipulation",
+                    colorClass,
+                    isHighlighted(number) && "ring-2 ring-yellow-400"
+                  )}
+                  data-number={number}
+                >
+                  {number}
+                </Button>
+              );
+            })}
+          </div>
+
+        </div>
+      </div>
+    );
+  }
+
+  // Layout Desktop - Horizontal tradicional
   return (
     <div className={cn("bg-gray-900 p-2 rounded", className)}>
       {/* Layout Mesa Europeia - Zero + 3 linhas */}

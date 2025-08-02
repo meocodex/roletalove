@@ -23,7 +23,8 @@ import { apiRequest } from '@/lib/queryClient';
 import { getNumberColor, getColorClass } from '@/lib/roulette-utils';
 import { ClientPatternAnalyzer } from '@/lib/pattern-analyzer';
 import { type RouletteResult } from '@shared/schema';
-import { Play, Wifi, WifiOff, Layout, Grid } from 'lucide-react';
+import { Play, Wifi, WifiOff, Layout, Grid, Smartphone } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export default function RouletteDashboard() {
   const [sessionActive, setSessionActive] = useState(false);
@@ -38,6 +39,7 @@ export default function RouletteDashboard() {
   const queryClient = useQueryClient();
   const { isConnected, lastMessage } = useWebSocket();
   const { user, hasFeature } = useAuth();
+  const isMobile = useIsMobile();
 
   // Queries
   const { data: results = [] } = useQuery<RouletteResult[]>({
@@ -168,23 +170,25 @@ export default function RouletteDashboard() {
 
   return (
     <div className="min-h-screen bg-dashboard-dark text-white font-casino">
-      {/* Header Compacto */}
-      <header className="bg-gray-900 border-b border-gray-700 px-4 py-3">
+      {/* Header Responsivo */}
+      <header className="bg-gray-900 border-b border-gray-700 px-3 sm:px-4 py-2 sm:py-3 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-roulette-green rounded-full flex items-center justify-center">
-              <Play className="w-4 h-4 text-white" />
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-roulette-green rounded-full flex items-center justify-center">
+              <Play className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-white">Sistema Roleta IA</h1>
-              <p className="text-xs text-gray-400">Análise em tempo real</p>
+              <h1 className="text-sm sm:text-lg font-bold text-white">
+                {isMobile ? 'Roleta IA' : 'Sistema Roleta IA'}
+              </h1>
+              {!isMobile && <p className="text-xs text-gray-400">Análise em tempo real</p>}
             </div>
           </div>
           
-          <div className="flex items-center space-x-3">
-            {/* User Info Compacto */}
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            {/* User Info - Adaptado para mobile */}
             {user && (
-              <div className="text-right">
+              <div className="text-right hidden sm:block">
                 <div className="text-xs text-gray-400">{user.name || 'Usuário'}</div>
                 <div className="text-xs text-roulette-green font-medium">
                   {user.planType === 'basico' ? 'Básico' : 
@@ -194,42 +198,130 @@ export default function RouletteDashboard() {
               </div>
             )}
 
-            {/* Dashboard Mode Toggle - Compacto */}
-            <FeatureGuard feature="dashboard_customizavel" showUpgrade={false}>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setDashboardMode(dashboardMode === 'standard' ? 'custom' : 'standard')}
-                className="text-xs hover:bg-gray-800"
-              >
-                {dashboardMode === 'standard' ? (
-                  <>
-                    <Grid className="w-3 h-3 mr-1" />
-                    Custom
-                  </>
-                ) : (
-                  <>
-                    <Layout className="w-3 h-3 mr-1" />
-                    Padrão
-                  </>
-                )}
-              </Button>
-            </FeatureGuard>
+            {/* Dashboard Mode Toggle - Só desktop */}
+            {!isMobile && (
+              <FeatureGuard feature="dashboard_customizavel" showUpgrade={false}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setDashboardMode(dashboardMode === 'standard' ? 'custom' : 'standard')}
+                  className="text-xs hover:bg-gray-800"
+                >
+                  {dashboardMode === 'standard' ? (
+                    <>
+                      <Grid className="w-3 h-3 mr-1" />
+                      Custom
+                    </>
+                  ) : (
+                    <>
+                      <Layout className="w-3 h-3 mr-1" />
+                      Padrão
+                    </>
+                  )}
+                </Button>
+              </FeatureGuard>
+            )}
             
-            {/* Status Compacto */}
+            {/* Status Connection */}
             <div className="flex items-center space-x-1">
               {isConnected ? (
-                <Wifi className="w-4 h-4 text-green-500" />
+                <Wifi className="w-3 h-3 sm:w-4 sm:h-4 text-green-500" />
               ) : (
-                <WifiOff className="w-4 h-4 text-red-500" />
+                <WifiOff className="w-3 h-3 sm:w-4 sm:h-4 text-red-500" />
               )}
             </div>
           </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto p-4">
-        {dashboardMode === 'custom' ? (
+      <div className="max-w-7xl mx-auto p-2 sm:p-4">
+        {/* Mobile Layout - Sempre usar layout mobile adaptado em telas pequenas */}
+        {isMobile ? (
+          <div className="space-y-3">
+            {/* Mesa de Roleta - Principal no mobile */}
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base font-medium">Mesa Europeia</CardTitle>
+                  <div className="flex items-center space-x-2">
+                    <Button 
+                      onClick={toggleSession}
+                      size="sm"
+                      className={`${sessionActive ? 'bg-red-600 hover:bg-red-700' : 'bg-roulette-green hover:bg-green-600'} font-medium transition-colors text-xs px-2 py-1`}
+                    >
+                      <Play className="mr-1" size={12} />
+                      {sessionActive ? 'Pausar' : 'Iniciar'}
+                    </Button>
+                    {lastResult !== null && (
+                      <div className="text-xs text-gray-400">
+                        <span className={`font-bold ${
+                          getNumberColor(lastResult) === 'red' ? 'text-roulette-red' :
+                          getNumberColor(lastResult) === 'black' ? 'text-white' :
+                          'text-roulette-green'
+                        }`}>{lastResult}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="pb-3">
+                <RouletteTable 
+                  onNumberClick={handleNumberClick}
+                  lastResult={lastResult}
+                />
+
+                {/* Recent Results - Mobile compacto */}
+                <div className="mt-3">
+                  <h3 className="text-sm font-medium mb-2">Últimos</h3>
+                  <div className="flex flex-wrap gap-1">
+                    {results.slice(0, 8).map((result, index) => {
+                      const color = getNumberColor(result.number);
+                      const isHighlighted = index === 0;
+                      
+                      return (
+                        <div
+                          key={result.id}
+                          className={`w-7 h-7 ${getColorClass(color).split(' ')[0]} rounded-md flex items-center justify-center text-white font-bold text-xs border ${
+                            isHighlighted ? 'border-casino-gold' : 'border-transparent'
+                          } transition-all duration-300`}
+                        >
+                          {result.number}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Recomendações de Apostas - Segunda posição no mobile */}
+            <BettingRecommendations />
+
+            {/* IA Externa - Terceira posição */}
+            <FeatureGuard feature="ia_externa_chatgpt">
+              <ExternalAIPanel 
+                insights={aiInsights}
+                isLoading={aiLoading}
+                onRefresh={fetchAIAnalysis}
+              />
+            </FeatureGuard>
+
+            {/* ML Analysis - Quarta posição */}
+            <FeatureGuard feature="ml_analyzer">
+              <MLAnalysisPanel />
+            </FeatureGuard>
+
+            {/* Stats compactas para mobile */}
+            <FeatureGuard feature="estatisticas_basicas">
+              <StatsPanel />
+            </FeatureGuard>
+
+            {/* Pattern Analysis - Compacto */}
+            <FeatureGuard feature="analise_padroes">
+              <PatternAnalysis />
+            </FeatureGuard>
+          </div>
+        ) : dashboardMode === 'custom' ? (
           /* Dashboard Customizável */
           <div className="space-y-4">
             {/* Mesa de Roleta sempre no topo no modo customizável */}

@@ -2,6 +2,60 @@
 @tailwind components;
 @tailwind utilities;
 
+/* PWA and Mobile Optimizations */
+@media screen and (max-width: 768px) {
+  /* Better touch targets for mobile */
+  button, [role="button"], input, select, textarea {
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+  
+  /* Prevent zoom on input focus */
+  input, select, textarea {
+    font-size: 16px;
+  }
+  
+  /* Smooth scrolling for mobile */
+  html {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Hide scrollbars but keep functionality */
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+  }
+}
+
+/* PWA Status Bar */
+@media (display-mode: standalone) {
+  /* Add padding for iOS status bar when in PWA mode */
+  .pwa-safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  
+  .pwa-safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Prevent text selection on buttons for better mobile UX */
+button, [role="button"] {
+  -webkit-user-select: none;
+  -moz-user-select: none; 
+  -ms-user-select: none;
+  user-select: none;
+}
+
 :root {
   --background: hsl(222, 84%, 5%);
   --foreground: hsl(210, 40%, 98%);
