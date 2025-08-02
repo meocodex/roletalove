@@ -16,7 +16,7 @@ import MLAnalysisPanel from './ml-analysis-panel';
 import CombinedStrategiesPanel from './combined-strategies-panel';
 import { PatternAnalysis } from './pattern-analysis';
 import { StrategyPanel } from './strategy-panel';
-import { StatsPanel } from './stats-panel';
+
 import { AlertsPanel } from './alerts-panel';
 import AdvancedCharts from './advanced-charts';
 
@@ -69,14 +69,7 @@ const AVAILABLE_PANELS: DashboardPanel[] = [
     defaultVisible: true,
     size: 'medium'
   },
-  {
-    id: 'stats-panel',
-    name: 'Estatísticas',
-    component: StatsPanel,
-    category: 'stats',
-    defaultVisible: true,
-    size: 'small'
-  },
+
   {
     id: 'alerts-panel',
     name: 'Alertas',
@@ -99,7 +92,7 @@ const PRESET_LAYOUTS: LayoutConfig[] = [
   {
     name: 'Iniciante',
     description: 'Layout simples com informações básicas',
-    panels: ['stats-panel', 'pattern-analysis', 'alerts-panel'],
+    panels: ['pattern-analysis', 'alerts-panel'],
     columns: 2
   },
   {
@@ -111,7 +104,7 @@ const PRESET_LAYOUTS: LayoutConfig[] = [
   {
     name: 'Analista',
     description: 'Foco em visualizações e métricas',
-    panels: ['advanced-charts', 'ml-analysis', 'stats-panel', 'alerts-panel'],
+    panels: ['advanced-charts', 'ml-analysis', 'alerts-panel'],
     columns: 2
   },
   {

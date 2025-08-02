@@ -6,9 +6,7 @@ import { RouletteTable } from '@/components/roulette-table';
 import { PatternAnalysis } from '@/components/pattern-analysis';
 import { SimplifiedStrategies } from '@/components/simplified-strategies';
 import { StrategyPanel } from '@/components/strategy-panel';
-import { StatsPanel } from '@/components/stats-panel';
 import { AlertsPanel } from '@/components/alerts-panel';
-import { BettingPreferences } from '@/components/betting-preferences';
 import { BettingRecommendations } from '@/components/betting-recommendations';
 import MLAnalysisPanel from '@/components/ml-analysis-panel';
 import CombinedStrategiesPanel from '@/components/combined-strategies-panel';
@@ -535,14 +533,6 @@ export default function RouletteDashboard() {
                 <BettingPreferencesModal />
                 <SessionStatsModal />
               </div>
-
-              {/* Betting Preferences */}
-              <BettingPreferences />
-
-              {/* Real-time Stats */}
-              <StatsPanel />
-
-
 
               {/* Alerts Panel */}
               <AlertsPanel />
