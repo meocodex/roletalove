@@ -117,20 +117,17 @@ export function AlertsPanel({ className }: AlertsPanelProps) {
                   </div>
                   <div className="text-gray-400 truncate">{alert.message}</div>
                   <div className="text-gray-500 mt-1">
-                    {formatDistanceToNow(new Date(alert.timestamp), { 
-                      addSuffix: true, 
-                      locale: ptBR 
-                    })}
+                    há {formatDistanceToNow(new Date(alert.timestamp), { locale: ptBR })}
                   </div>
                   
                   {/* Additional data display */}
                   {alert.data && typeof alert.data === 'object' && (
                     <div className="text-gray-400 text-xs mt-1">
-                      {alert.type === 'strategy_hit' && alert.data.number && (
-                        <span>Número: {alert.data.number}</span>
+                      {alert.type === 'strategy_hit' && (alert.data as any)?.number && (
+                        <span>Número: {(alert.data as any).number}</span>
                       )}
-                      {alert.type === 'pattern_detected' && alert.data.probability && (
-                        <span>Probabilidade: {Math.round(alert.data.probability * 100)}%</span>
+                      {alert.type === 'pattern_detected' && (alert.data as any)?.probability && (
+                        <span>Probabilidade: {Math.round((alert.data as any).probability * 100)}%</span>
                       )}
                     </div>
                   )}

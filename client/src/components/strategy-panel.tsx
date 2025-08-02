@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Settings, ChevronRight } from 'lucide-react';
-import { type Strategy } from '@shared/schema';
+import { type Strategy, type RouletteResult } from '@shared/schema';
 import { apiRequest } from '@/lib/queryClient';
 
 interface StrategyPanelProps {
@@ -17,7 +17,7 @@ export function StrategyPanel({ className }: StrategyPanelProps) {
     queryKey: ['/api/strategies'],
   });
 
-  const { data: results = [] } = useQuery({
+  const { data: results = [] } = useQuery<RouletteResult[]>({
     queryKey: ['/api/results'],
   });
 
@@ -43,14 +43,18 @@ export function StrategyPanel({ className }: StrategyPanelProps) {
   const getStrategyStatusColor = (strategy: Strategy) => {
     if (!hasEnoughData) return 'text-yellow-400';
     if (!strategy.isActive) return 'text-gray-400';
-    if (strategy.currentAttempts >= strategy.maxAttempts - 1) return 'text-red-400';
+    const currentAttempts = strategy.currentAttempts ?? 0;
+    const maxAttempts = strategy.maxAttempts ?? 5;
+    if (currentAttempts >= maxAttempts - 1) return 'text-red-400';
     return strategy.type === 'straight_up' ? 'text-blue-400' : 'text-purple-400';
   };
 
   const getStrategyStatusBg = (strategy: Strategy) => {
     if (!hasEnoughData) return 'bg-yellow-900/20 border-yellow-600/50';
     if (!strategy.isActive) return 'bg-gray-900/30 border-gray-600';
-    if (strategy.currentAttempts >= strategy.maxAttempts - 1) return 'bg-red-900/30 border-red-600';
+    const currentAttempts = strategy.currentAttempts ?? 0;
+    const maxAttempts = strategy.maxAttempts ?? 5;
+    if (currentAttempts >= maxAttempts - 1) return 'bg-red-900/30 border-red-600';
     return strategy.type === 'straight_up' ? 'bg-blue-900/30 border-blue-600' : 'bg-purple-900/30 border-purple-600';
   };
 
@@ -126,15 +130,15 @@ export function StrategyPanel({ className }: StrategyPanelProps) {
                 {!hasEnoughData ? (
                   `Precisa de ${10 - results.length} resultados para ativar`
                 ) : strategy.isActive ? (
-                  <>Tentativa {strategy.currentAttempts + 1}/{strategy.maxAttempts}</>
+                  <>Tentativa {(strategy.currentAttempts ?? 0) + 1}/{strategy.maxAttempts ?? 5}</>
                 ) : (
                   'Aguardando ativação'
                 )}
               </div>
               
-              {strategy.successRate > 0 && (
+              {(strategy.successRate ?? 0) > 0 && (
                 <div className="mt-1 text-xs text-gray-500">
-                  Taxa de acerto: {Math.round(strategy.successRate * 100)}%
+                  Taxa de acerto: {Math.round((strategy.successRate ?? 0) * 100)}%
                 </div>
               )}
             </div>

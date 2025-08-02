@@ -169,9 +169,22 @@ export class MemStorage implements IStorage {
 
   async addResult(insertResult: InsertRouletteResult): Promise<RouletteResult> {
     const id = randomUUID();
+    
+    // Calculate number properties
+    const numberProps = {
+      color: insertResult.number === 0 ? 'green' : 
+             [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36].includes(insertResult.number) ? 'red' : 'black',
+      dozen: insertResult.number === 0 ? null : Math.ceil(insertResult.number / 12),
+      column: insertResult.number === 0 ? null : ((insertResult.number - 1) % 3) + 1,
+      half: insertResult.number === 0 ? null : insertResult.number <= 18 ? 'low' : 'high',
+      parity: insertResult.number === 0 ? null : insertResult.number % 2 === 0 ? 'even' : 'odd'
+    };
+    
     const result: RouletteResult = {
       ...insertResult,
+      ...numberProps,
       id,
+      source: insertResult.source || 'manual',
       timestamp: new Date()
     };
     
@@ -180,8 +193,9 @@ export class MemStorage implements IStorage {
     // Update current session
     if (this.currentSessionId) {
       const session = this.sessions.get(this.currentSessionId);
-      if (session) {
+      if (session && session.totalSpins !== null) {
         session.totalSpins += 1;
+        session.patternsDetected = (session.patternsDetected || 0) + 1;
         this.sessions.set(this.currentSessionId, session);
       }
     }
@@ -207,6 +221,8 @@ export class MemStorage implements IStorage {
     const pattern: Pattern = {
       ...insertPattern,
       id,
+      isActive: insertPattern.isActive ?? true,
+      lastTriggered: insertPattern.lastTriggered ?? null,
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -239,6 +255,11 @@ export class MemStorage implements IStorage {
     const strategy: Strategy = {
       ...insertStrategy,
       id,
+      isActive: insertStrategy.isActive ?? true,
+      maxAttempts: insertStrategy.maxAttempts ?? 5,
+      currentAttempts: insertStrategy.currentAttempts ?? 0,
+      lastUsed: insertStrategy.lastUsed ?? null,
+      successRate: insertStrategy.successRate ?? null,
       createdAt: new Date()
     };
     
@@ -265,6 +286,8 @@ export class MemStorage implements IStorage {
     const alert: Alert = {
       ...insertAlert,
       id,
+      data: insertAlert.data || {},
+      read: insertAlert.read ?? null,
       timestamp: new Date()
     };
     
@@ -291,6 +314,12 @@ export class MemStorage implements IStorage {
     const session: Session = {
       ...insertSession,
       id,
+      name: insertSession.name ?? null,
+      isActive: insertSession.isActive ?? true,
+      successRate: insertSession.successRate ?? null,
+      endTime: insertSession.endTime ?? null,
+      totalSpins: insertSession.totalSpins ?? 0,
+      patternsDetected: insertSession.patternsDetected ?? 0,
       startTime: new Date()
     };
     
@@ -332,6 +361,9 @@ export class MemStorage implements IStorage {
     const preference: BettingPreference = {
       ...insertPreference,
       id,
+      enabled: insertPreference.enabled ?? true,
+      description: insertPreference.description ?? null,
+      priority: insertPreference.priority ?? 1,
       createdAt: new Date(),
       updatedAt: new Date()
     };
