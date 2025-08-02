@@ -4,22 +4,25 @@ import { randomUUID } from "crypto";
 export interface IStorage {
   // Roulette Results
   addResult(result: InsertRouletteResult): Promise<RouletteResult>;
-  getResults(sessionId: string, limit?: number): Promise<RouletteResult[]>;
+  getResults(sessionId?: string, limit?: number): Promise<RouletteResult[]>;
   getRecentResults(limit: number): Promise<RouletteResult[]>;
   
   // Patterns
   savePattern(pattern: InsertPattern): Promise<Pattern>;
+  getPatterns(): Promise<Pattern[]>;
   getActivePatterns(): Promise<Pattern[]>;
   getPatternById(id: string): Promise<Pattern | undefined>;
   updatePattern(id: string, updates: Partial<Pattern>): Promise<Pattern | undefined>;
   
   // Strategies
   saveStrategy(strategy: InsertStrategy): Promise<Strategy>;
+  getStrategies(): Promise<Strategy[]>;
   getActiveStrategies(): Promise<Strategy[]>;
   updateStrategy(id: string, updates: Partial<Strategy>): Promise<Strategy | undefined>;
   
   // Alerts
   addAlert(alert: InsertAlert): Promise<Alert>;
+  getAlerts(): Promise<Alert[]>;
   getRecentAlerts(limit: number): Promise<Alert[]>;
   markAlertAsRead(id: string): Promise<void>;
   
@@ -203,9 +206,17 @@ export class MemStorage implements IStorage {
     return result;
   }
 
-  async getResults(sessionId: string, limit = 100): Promise<RouletteResult[]> {
-    return Array.from(this.results.values())
-      .filter(r => r.sessionId === sessionId)
+  async getResults(sessionId?: string, limit = 100): Promise<RouletteResult[]> {
+    const results = Array.from(this.results.values());
+    
+    if (sessionId) {
+      return results
+        .filter(r => r.sessionId === sessionId)
+        .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+        .slice(0, limit);
+    }
+    
+    return results
       .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
       .slice(0, limit);
   }
@@ -229,6 +240,11 @@ export class MemStorage implements IStorage {
     
     this.patterns.set(id, pattern);
     return pattern;
+  }
+
+  async getPatterns(): Promise<Pattern[]> {
+    return Array.from(this.patterns.values())
+      .sort((a, b) => b.probability - a.probability);
   }
 
   async getActivePatterns(): Promise<Pattern[]> {
@@ -267,6 +283,10 @@ export class MemStorage implements IStorage {
     return strategy;
   }
 
+  async getStrategies(): Promise<Strategy[]> {
+    return Array.from(this.strategies.values());
+  }
+
   async getActiveStrategies(): Promise<Strategy[]> {
     return Array.from(this.strategies.values())
       .filter(s => s.isActive);
@@ -293,6 +313,11 @@ export class MemStorage implements IStorage {
     
     this.alerts.set(id, alert);
     return alert;
+  }
+
+  async getAlerts(): Promise<Alert[]> {
+    return Array.from(this.alerts.values())
+      .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
   }
 
   async getRecentAlerts(limit: number): Promise<Alert[]> {

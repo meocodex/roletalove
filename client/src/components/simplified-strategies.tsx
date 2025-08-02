@@ -55,73 +55,76 @@ export function SimplifiedStrategies({ results, className }: SimplifiedStrategie
     return neighbors.filter(n => n !== 0).slice(0, 4);
   };
 
+  const clearStrategy = () => {
+    setCurrentStrategy([]);
+  };
+
   return (
     <Card className={className}>
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between text-lg">
-          <div className="flex items-center">
-            <Zap className="text-yellow-500 mr-2" size={20} />
-            Estratégias Automáticas
-          </div>
-          <Badge variant="outline" className="text-xs">
-            {results.length} números
-          </Badge>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-lg flex items-center">
+          <Target className="mr-2 text-casino-gold" size={20} />
+          Estratégias Automáticas
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Strategy Type Selection */}
-        <div className="flex gap-2">
+        <div className="flex space-x-2">
           <Button
             variant={strategyType === 'straight-up' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setStrategyType('straight-up')}
+            className="flex-1"
           >
-            Números Plenos
+            <Zap className="mr-1" size={14} />
+            Plenos
           </Button>
           <Button
             variant={strategyType === 'neighbors' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setStrategyType('neighbors')}
+            className="flex-1"
           >
+            <Target className="mr-1" size={14} />
             Vizinhos
           </Button>
         </div>
 
         {/* Generate Strategy Button */}
-        <Button 
+        <Button
           onClick={generateStrategy}
-          className="w-full"
-          disabled={results.length < 5}
+          disabled={results.length < 10}
+          className="w-full bg-casino-gold hover:bg-casino-gold/80 text-black font-medium"
         >
-          <Target className="w-4 h-4 mr-2" />
+          <RefreshCw className="mr-2" size={16} />
           Gerar Estratégia {strategyType === 'straight-up' ? '(7 números)' : '(5 números)'}
         </Button>
 
-        {/* Strategy Display */}
+        {/* Current Strategy Display */}
         {currentStrategy.length > 0 && (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">
+              <h4 className="text-sm font-medium text-green-400">
                 Estratégia {strategyType === 'straight-up' ? 'Números Plenos' : 'Vizinhos'}:
-              </span>
+              </h4>
               <Button
-                variant="ghost"
+                variant="outline"
                 size="sm"
-                onClick={generateStrategy}
+                onClick={clearStrategy}
+                className="text-xs px-2 py-1 h-auto"
               >
-                <RefreshCw className="w-3 h-3" />
+                Limpar
               </Button>
             </div>
             
-            <div className="grid grid-cols-7 gap-2">
-              {currentStrategy.map((number, index) => {
+            <div className="grid grid-cols-7 gap-1">
+              {currentStrategy.slice(0, 7).map((number, index) => {
                 const color = getNumberColor(number);
-                const colorClass = getColorClass(color);
-                
                 return (
                   <div
                     key={index}
-                    className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold ${colorClass}`}
+                    className={`h-8 w-8 ${getColorClass(color).split(' ')[0]} rounded-md flex items-center justify-center text-white font-bold text-xs border border-gray-600`}
+                    title={`Número ${number}`}
                   >
                     {number}
                   </div>
@@ -129,18 +132,23 @@ export function SimplifiedStrategies({ results, className }: SimplifiedStrategie
               })}
             </div>
 
-            <div className="text-xs text-gray-400">
-              {strategyType === 'straight-up' 
-                ? 'Baseado em números quentes e frios dos últimos 30 resultados'
-                : 'Número principal com 4 vizinhos da roda'
-              }
+            <div className="text-xs text-gray-400 space-y-1">
+              <div>• Total de números: {currentStrategy.length}</div>
+              <div>• Baseado nos últimos {Math.min(results.length, 20)} resultados</div>
+              {strategyType === 'straight-up' && (
+                <div>• Pagamento: 35:1 por acerto</div>
+              )}
+              {strategyType === 'neighbors' && (
+                <div>• Cobertura da mesa: ~{Math.round((currentStrategy.length / 37) * 100)}%</div>
+              )}
             </div>
           </div>
         )}
 
-        {results.length < 5 && (
-          <div className="text-center text-gray-500 text-sm py-4">
-            Mínimo 5 números necessários para gerar estratégias
+        {/* No Data Message */}
+        {results.length < 10 && (
+          <div className="text-center text-gray-400 text-sm py-4">
+            Pelo menos 10 resultados são necessários para gerar estratégias
           </div>
         )}
       </CardContent>
