@@ -25,6 +25,8 @@ import { ClientPatternAnalyzer } from '@/lib/pattern-analyzer';
 import { type RouletteResult } from '@shared/schema';
 import { Play, Wifi, WifiOff, Layout, Grid, Smartphone } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { BettingPreferencesModal } from '@/components/betting-preferences-modal';
+import { SessionStatsModal } from '@/components/session-stats-modal';
 
 export default function RouletteDashboard() {
   const [sessionActive, setSessionActive] = useState(false);
@@ -294,6 +296,12 @@ export default function RouletteDashboard() {
               </CardContent>
             </Card>
 
+            {/* Preferências e Estatísticas - Botões Mobile */}
+            <div className="grid grid-cols-2 gap-2">
+              <BettingPreferencesModal />
+              <SessionStatsModal />
+            </div>
+
             {/* Recomendações de Apostas - Segunda posição no mobile */}
             <BettingRecommendations />
 
@@ -309,11 +317,6 @@ export default function RouletteDashboard() {
             {/* ML Analysis - Quarta posição */}
             <FeatureGuard feature="ml_analyzer">
               <MLAnalysisPanel />
-            </FeatureGuard>
-
-            {/* Stats compactas para mobile */}
-            <FeatureGuard feature="estatisticas_basicas">
-              <StatsPanel />
             </FeatureGuard>
 
             {/* Pattern Analysis - Compacto */}
