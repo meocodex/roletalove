@@ -28,6 +28,7 @@ import { Link } from 'wouter';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { BettingPreferencesModal } from '@/components/betting-preferences-modal';
 import { SessionStatsModal } from '@/components/session-stats-modal';
+import { SubscriptionCard } from '@/components/subscription/SubscriptionCard';
 
 export default function RouletteDashboard() {
   const [sessionActive, setSessionActive] = useState(false);
@@ -317,6 +318,9 @@ export default function RouletteDashboard() {
             {/* Recomendações de Apostas - DESTAQUE PRINCIPAL */}
             <BettingRecommendations />
 
+            {/* Assinatura Card - Mobile */}
+            <SubscriptionCard />
+            
             {/* Preferências e Estatísticas - Botões Mobile */}
             <div className="grid grid-cols-2 gap-3">
               <BettingPreferencesModal />
@@ -549,6 +553,9 @@ export default function RouletteDashboard() {
                 </FeatureGuard>
               </div>
 
+              {/* Assinatura Card - Desktop Sidebar */}
+              <SubscriptionCard />
+              
               {/* Alertas Panel - Final da sidebar */}
               <AlertsPanel />
             </div>

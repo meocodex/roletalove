@@ -27,6 +27,7 @@ import {
   Plus
 } from 'lucide-react';
 import { Link } from 'wouter';
+import { BillingManagement } from '@/components/admin/BillingManagement';
 
 // Component para estatísticas do sistema - Design 2025
 function SystemStats() {
@@ -461,6 +462,12 @@ export default function AdminDashboard() {
                 <Activity className="w-4 h-4 mr-2" />
                 Logs
               </TabsTrigger>
+              <AdminOnly role="admin">
+                <TabsTrigger value="billing" className="data-[state=active]:bg-roulette-green">
+                  <DollarSign className="w-4 h-4 mr-2" />
+                  Cobrança
+                </TabsTrigger>
+              </AdminOnly>
               <AdminOnly role="super_admin">
                 <TabsTrigger value="system" className="data-[state=active]:bg-roulette-green">
                   <Shield className="w-4 h-4 mr-2" />
@@ -489,6 +496,12 @@ export default function AdminDashboard() {
             <TabsContent value="logs" className="space-y-4">
               <ActivityLogs />
             </TabsContent>
+
+            <AdminOnly role="admin">
+              <TabsContent value="billing" className="space-y-4">
+                <BillingManagement />
+              </TabsContent>
+            </AdminOnly>
 
             <AdminOnly role="super_admin">
               <TabsContent value="system" className="space-y-4">
