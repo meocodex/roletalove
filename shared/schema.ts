@@ -6,6 +6,19 @@ import { z } from "zod";
 // Sistema de Planos SaaS
 export const planTypeEnum = pgEnum('plan_type', ['basico', 'intermediario', 'completo']);
 
+// Sistema de Pagamentos
+export const subscriptionStatusEnum = pgEnum('subscription_status', [
+  'active', 'canceled', 'past_due', 'unpaid', 'incomplete', 'trialing'
+]);
+
+export const paymentStatusEnum = pgEnum('payment_status', [
+  'pending', 'paid', 'failed', 'refunded', 'canceled'
+]);
+
+export const paymentMethodEnum = pgEnum('payment_method', [
+  'stripe_card', 'stripe_pix', 'mercado_pago', 'pagseguro', 'asaas', 'boleto'
+]);
+
 // Sistema de Roles de Usuário
 export const userRoleEnum = pgEnum('user_role', ['user', 'admin', 'super_admin']);
 
@@ -114,6 +127,102 @@ export const bettingPreferences = pgTable("betting_preferences", {
   updatedAt: timestamp("updated_at").defaultNow().notNull()
 });
 
+// Tabelas do Sistema de Pagamentos
+export const subscriptions = pgTable("subscriptions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  planType: planTypeEnum("plan_type").notNull(),
+  status: subscriptionStatusEnum("status").default('active').notNull(),
+  priceMonthly: real("price_monthly").notNull(), // Preço mensal em reais
+  currency: varchar("currency").default('BRL').notNull(),
+  
+  // Datas importantes
+  startDate: timestamp("start_date").defaultNow().notNull(),
+  endDate: timestamp("end_date"),
+  nextBillingDate: timestamp("next_billing_date"),
+  canceledAt: timestamp("canceled_at"),
+  
+  // Integração com gateways
+  stripeSubscriptionId: varchar("stripe_subscription_id"),
+  mercadoPagoSubscriptionId: varchar("mercado_pago_subscription_id"),
+  asaasSubscriptionId: varchar("asaas_subscription_id"),
+  
+  // Controle interno
+  trialDays: integer("trial_days").default(7),
+  isTrialUsed: boolean("is_trial_used").default(false),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull()
+});
+
+export const payments = pgTable("payments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  subscriptionId: varchar("subscription_id").references(() => subscriptions.id).notNull(),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  
+  // Detalhes do pagamento
+  amount: real("amount").notNull(), // Valor em reais
+  currency: varchar("currency").default('BRL').notNull(),
+  status: paymentStatusEnum("status").default('pending').notNull(),
+  paymentMethod: paymentMethodEnum("payment_method").notNull(),
+  
+  // IDs dos gateways
+  stripePaymentIntentId: varchar("stripe_payment_intent_id"),
+  mercadoPagoPaymentId: varchar("mercado_pago_payment_id"),
+  asaasPaymentId: varchar("asaas_payment_id"),
+  
+  // Metadados
+  description: text("description"),
+  metadata: json("metadata"), // Dados adicionais do gateway
+  
+  // Controle temporal
+  paidAt: timestamp("paid_at"),
+  failedAt: timestamp("failed_at"),
+  refundedAt: timestamp("refunded_at"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull()
+});
+
+export const paymentMethods = pgTable("payment_methods", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  
+  type: paymentMethodEnum("type").notNull(),
+  isDefault: boolean("is_default").default(false),
+  isActive: boolean("is_active").default(true),
+  
+  // Dados do cartão (últimos 4 dígitos, bandeira)
+  cardLast4: varchar("card_last4"),
+  cardBrand: varchar("card_brand"), // visa, mastercard, etc
+  cardExpMonth: integer("card_exp_month"),
+  cardExpYear: integer("card_exp_year"),
+  
+  // IDs dos gateways
+  stripePaymentMethodId: varchar("stripe_payment_method_id"),
+  mercadoPagoCardId: varchar("mercado_pago_card_id"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull()
+});
+
+export const billingEvents = pgTable("billing_events", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  subscriptionId: varchar("subscription_id").references(() => subscriptions.id),
+  paymentId: varchar("payment_id").references(() => payments.id),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  
+  // Tipo do evento
+  eventType: text("event_type").notNull(), // 'subscription_created', 'payment_success', 'payment_failed', etc
+  source: text("source").notNull(), // 'stripe', 'mercado_pago', 'asaas', 'manual'
+  
+  // Dados do evento
+  data: json("data"), // Payload completo do webhook
+  processed: boolean("processed").default(false),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull()
+});
+
 // Insert schemas
 export const insertRouletteResultSchema = createInsertSchema(rouletteResults).omit({
   id: true,
@@ -152,6 +261,37 @@ export const insertBettingPreferenceSchema = createInsertSchema(bettingPreferenc
   updatedAt: true
 });
 
+// Schema de inserção para usuários
+export const insertUserSchema = createInsertSchema(users).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
+
+// Schemas de inserção para pagamentos
+export const insertSubscriptionSchema = createInsertSchema(subscriptions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
+
+export const insertPaymentSchema = createInsertSchema(payments).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
+
+export const insertPaymentMethodSchema = createInsertSchema(paymentMethods).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
+
+export const insertBillingEventSchema = createInsertSchema(billingEvents).omit({
+  id: true,
+  createdAt: true
+});
+
 // Types
 export type RouletteResult = typeof rouletteResults.$inferSelect;
 export type InsertRouletteResult = z.infer<typeof insertRouletteResultSchema>;
@@ -171,6 +311,24 @@ export type InsertSession = z.infer<typeof insertSessionSchema>;
 export type BettingPreference = typeof bettingPreferences.$inferSelect;
 export type InsertBettingPreference = z.infer<typeof insertBettingPreferenceSchema>;
 
+// Tipos do sistema de pagamentos
+export type Subscription = typeof subscriptions.$inferSelect;
+export type InsertSubscription = z.infer<typeof insertSubscriptionSchema>;
+
+export type Payment = typeof payments.$inferSelect;
+export type InsertPayment = z.infer<typeof insertPaymentSchema>;
+
+export type PaymentMethod = typeof paymentMethods.$inferSelect;
+export type InsertPaymentMethod = z.infer<typeof insertPaymentMethodSchema>;
+
+export type BillingEvent = typeof billingEvents.$inferSelect;
+export type InsertBillingEvent = z.infer<typeof insertBillingEventSchema>;
+
+// Tipos auxiliares
+export type SubscriptionStatus = 'active' | 'canceled' | 'past_due' | 'unpaid' | 'incomplete' | 'trialing';
+export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded' | 'canceled';
+export type PaymentMethodType = 'stripe_card' | 'stripe_pix' | 'mercado_pago' | 'pagseguro' | 'asaas' | 'boleto';
+
 // Novos tipos para sistema SaaS
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
@@ -187,41 +345,72 @@ export type PlanType = 'basico' | 'intermediario' | 'completo';
 // Tipos de roles de usuário
 export type UserRole = 'user' | 'admin' | 'super_admin';
 
-// Configuração de features por plano
+// Configuração de planos com preços (em reais)
+export const PLAN_CONFIG = {
+  basico: {
+    name: 'Plano Básico',
+    price: 29.90,
+    features: [
+      'mesa_roleta',
+      'entrada_manual',
+      'resultados_recentes',
+      'estatisticas_basicas'
+    ],
+    limits: {
+      sessionsPerMonth: 10,
+      resultsPerSession: 100
+    }
+  },
+  intermediario: {
+    name: 'Plano Intermediário',
+    price: 59.90,
+    features: [
+      'mesa_roleta',
+      'entrada_manual', 
+      'resultados_recentes',
+      'estatisticas_basicas',
+      'analise_padroes',
+      'estrategias_tradicionais',
+      'ml_analyzer',
+      'graficos_basicos'
+    ],
+    limits: {
+      sessionsPerMonth: 50,
+      resultsPerSession: 500
+    }
+  },
+  completo: {
+    name: 'Plano Completo',
+    price: 99.90,
+    features: [
+      'mesa_roleta',
+      'entrada_manual',
+      'resultados_recentes', 
+      'estatisticas_basicas',
+      'analise_padroes',
+      'estrategias_tradicionais',
+      'ml_analyzer',
+      'graficos_basicos',
+      'ia_externa_chatgpt',
+      'ia_externa_claude',
+      'estrategias_combinadas',
+      'graficos_avancados',
+      'dashboard_customizavel',
+      'exportacao_dados',
+      'historico_sessoes'
+    ],
+    limits: {
+      sessionsPerMonth: -1, // ilimitado
+      resultsPerSession: -1  // ilimitado
+    }
+  }
+} as const;
+
+// Manter compatibilidade com código existente
 export const PLAN_FEATURES = {
-  basico: [
-    'mesa_roleta',
-    'entrada_manual',
-    'resultados_recentes',
-    'estatisticas_basicas'
-  ],
-  intermediario: [
-    'mesa_roleta',
-    'entrada_manual', 
-    'resultados_recentes',
-    'estatisticas_basicas',
-    'analise_padroes',
-    'estrategias_tradicionais',
-    'ml_analyzer',
-    'graficos_basicos'
-  ],
-  completo: [
-    'mesa_roleta',
-    'entrada_manual',
-    'resultados_recentes', 
-    'estatisticas_basicas',
-    'analise_padroes',
-    'estrategias_tradicionais',
-    'ml_analyzer',
-    'graficos_basicos',
-    'ia_externa_chatgpt',
-    'ia_externa_claude',
-    'estrategias_combinadas',
-    'graficos_avancados',
-    'dashboard_customizavel',
-    'exportacao_dados',
-    'historico_sessoes'
-  ]
+  basico: PLAN_CONFIG.basico.features,
+  intermediario: PLAN_CONFIG.intermediario.features,
+  completo: PLAN_CONFIG.completo.features
 } as const;
 
 // Funcionalidades administrativas por role
@@ -230,15 +419,19 @@ export const ADMIN_FEATURES = {
     'user_management',
     'system_stats',
     'feature_control',
-    'activity_logs'
+    'activity_logs',
+    'subscription_management'
   ],
   super_admin: [
     'user_management',
     'system_stats', 
     'feature_control',
     'activity_logs',
+    'subscription_management',
     'system_config',
     'billing_management',
-    'advanced_analytics'
+    'payment_config',
+    'advanced_analytics',
+    'financial_reports'
   ]
 } as const;

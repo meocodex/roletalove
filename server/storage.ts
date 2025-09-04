@@ -1,4 +1,16 @@
-import { type RouletteResult, type InsertRouletteResult, type Pattern, type InsertPattern, type Strategy, type InsertStrategy, type Alert, type InsertAlert, type Session, type InsertSession, type BettingPreference, type InsertBettingPreference } from "@shared/schema";
+import { 
+  type RouletteResult, type InsertRouletteResult, 
+  type Pattern, type InsertPattern, 
+  type Strategy, type InsertStrategy, 
+  type Alert, type InsertAlert, 
+  type Session, type InsertSession, 
+  type BettingPreference, type InsertBettingPreference,
+  type User, type InsertUser,
+  type Subscription, type InsertSubscription,
+  type Payment, type InsertPayment,
+  type PaymentMethod, type InsertPaymentMethod,
+  type BillingEvent, type InsertBillingEvent
+} from "@shared/schema";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -35,6 +47,42 @@ export interface IStorage {
   getBettingPreferences(): Promise<BettingPreference[]>;
   updateBettingPreference(id: string, updates: Partial<BettingPreference>): Promise<BettingPreference | undefined>;
   saveBettingPreference(preference: InsertBettingPreference): Promise<BettingPreference>;
+  
+  // Users
+  createUser(user: InsertUser): Promise<User>;
+  getUserById(id: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  getUsers(): Promise<User[]>;
+  updateUser(id: string, updates: Partial<User>): Promise<User | undefined>;
+  deleteUser(id: string): Promise<boolean>;
+  
+  // Subscriptions
+  createSubscription(subscription: InsertSubscription): Promise<Subscription>;
+  getSubscriptionById(id: string): Promise<Subscription | undefined>;
+  getSubscriptionByUserId(userId: string): Promise<Subscription | undefined>;
+  getSubscriptions(): Promise<Subscription[]>;
+  updateSubscription(id: string, updates: Partial<Subscription>): Promise<Subscription | undefined>;
+  
+  // Payments
+  createPayment(payment: InsertPayment): Promise<Payment>;
+  getPaymentById(id: string): Promise<Payment | undefined>;
+  getPaymentsByUserId(userId: string): Promise<Payment[]>;
+  getPaymentsBySubscriptionId(subscriptionId: string): Promise<Payment[]>;
+  getPayments(): Promise<Payment[]>;
+  updatePayment(id: string, updates: Partial<Payment>): Promise<Payment | undefined>;
+  
+  // Payment Methods
+  createPaymentMethod(paymentMethod: InsertPaymentMethod): Promise<PaymentMethod>;
+  getPaymentMethodsByUserId(userId: string): Promise<PaymentMethod[]>;
+  getDefaultPaymentMethod(userId: string): Promise<PaymentMethod | undefined>;
+  updatePaymentMethod(id: string, updates: Partial<PaymentMethod>): Promise<PaymentMethod | undefined>;
+  deletePaymentMethod(id: string): Promise<boolean>;
+  
+  // Billing Events
+  createBillingEvent(event: InsertBillingEvent): Promise<BillingEvent>;
+  getBillingEvents(): Promise<BillingEvent[]>;
+  getBillingEventsByUserId(userId: string): Promise<BillingEvent[]>;
+  markBillingEventProcessed(id: string): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -44,13 +92,73 @@ export class MemStorage implements IStorage {
   private alerts: Map<string, Alert> = new Map();
   private sessions: Map<string, Session> = new Map();
   private bettingPreferences: Map<string, BettingPreference> = new Map();
+  private users: Map<string, User> = new Map();
+  private subscriptions: Map<string, Subscription> = new Map();
+  private payments: Map<string, Payment> = new Map();
+  private paymentMethods: Map<string, PaymentMethod> = new Map();
+  private billingEvents: Map<string, BillingEvent> = new Map();
   private currentSessionId: string | null = null;
 
   constructor() {
-    // Initialize with default session and strategies
+    // Initialize with default data
+    this.initializeDefaultUsers();
     this.initializeDefaultSession();
     this.initializeDefaultStrategies();
     this.initializeDefaultBettingPreferences();
+  }
+
+  private async initializeDefaultUsers() {
+    // Usuário padrão para desenvolvimento
+    const defaultUser: User = {
+      id: 'user-default-id',
+      email: 'usuario@exemplo.com',
+      name: 'Usuário Teste',
+      planType: 'basico',
+      userRole: 'user',
+      isActive: true,
+      lastLoginAt: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    
+    // Usuário admin para testes
+    const adminUser: User = {
+      id: 'admin-default-id',
+      email: 'admin@exemplo.com',
+      name: 'Admin Teste',
+      planType: 'completo',
+      userRole: 'admin',
+      isActive: true,
+      lastLoginAt: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    
+    this.users.set(defaultUser.id, defaultUser);
+    this.users.set(adminUser.id, adminUser);
+    
+    // Criar assinatura padrão
+    const defaultSubscription: Subscription = {
+      id: 'sub-default-id',
+      userId: defaultUser.id,
+      planType: 'basico',
+      status: 'active',
+      priceMonthly: 29.90,
+      currency: 'BRL',
+      startDate: new Date(),
+      endDate: null,
+      nextBillingDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 dias
+      canceledAt: null,
+      stripeSubscriptionId: null,
+      mercadoPagoSubscriptionId: null,
+      asaasSubscriptionId: null,
+      trialDays: 7,
+      isTrialUsed: false,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    
+    this.subscriptions.set(defaultSubscription.id, defaultSubscription);
   }
 
   private async initializeDefaultSession() {
@@ -395,6 +503,234 @@ export class MemStorage implements IStorage {
     
     this.bettingPreferences.set(id, preference);
     return preference;
+  }
+  
+  // User management methods
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const id = randomUUID();
+    const user: User = {
+      ...insertUser,
+      id,
+      planType: insertUser.planType ?? 'basico',
+      userRole: insertUser.userRole ?? 'user',
+      isActive: insertUser.isActive ?? true,
+      lastLoginAt: insertUser.lastLoginAt ?? null,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    
+    this.users.set(id, user);
+    return user;
+  }
+  
+  async getUserById(id: string): Promise<User | undefined> {
+    return this.users.get(id);
+  }
+  
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(u => u.email === email);
+  }
+  
+  async getUsers(): Promise<User[]> {
+    return Array.from(this.users.values())
+      .sort((a, b) => b.createdAt!.getTime() - a.createdAt!.getTime());
+  }
+  
+  async updateUser(id: string, updates: Partial<User>): Promise<User | undefined> {
+    const user = this.users.get(id);
+    if (!user) return undefined;
+    
+    const updatedUser = { ...user, ...updates, updatedAt: new Date() };
+    this.users.set(id, updatedUser);
+    return updatedUser;
+  }
+  
+  async deleteUser(id: string): Promise<boolean> {
+    return this.users.delete(id);
+  }
+  
+  // Subscription management methods
+  async createSubscription(insertSubscription: InsertSubscription): Promise<Subscription> {
+    const id = randomUUID();
+    const subscription: Subscription = {
+      ...insertSubscription,
+      id,
+      status: insertSubscription.status ?? 'active',
+      currency: insertSubscription.currency ?? 'BRL',
+      startDate: insertSubscription.startDate ?? new Date(),
+      endDate: insertSubscription.endDate ?? null,
+      nextBillingDate: insertSubscription.nextBillingDate ?? null,
+      canceledAt: insertSubscription.canceledAt ?? null,
+      stripeSubscriptionId: insertSubscription.stripeSubscriptionId ?? null,
+      mercadoPagoSubscriptionId: insertSubscription.mercadoPagoSubscriptionId ?? null,
+      asaasSubscriptionId: insertSubscription.asaasSubscriptionId ?? null,
+      trialDays: insertSubscription.trialDays ?? 7,
+      isTrialUsed: insertSubscription.isTrialUsed ?? false,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    
+    this.subscriptions.set(id, subscription);
+    return subscription;
+  }
+  
+  async getSubscriptionById(id: string): Promise<Subscription | undefined> {
+    return this.subscriptions.get(id);
+  }
+  
+  async getSubscriptionByUserId(userId: string): Promise<Subscription | undefined> {
+    return Array.from(this.subscriptions.values())
+      .find(s => s.userId === userId && s.status === 'active');
+  }
+  
+  async getSubscriptions(): Promise<Subscription[]> {
+    return Array.from(this.subscriptions.values())
+      .sort((a, b) => b.createdAt!.getTime() - a.createdAt!.getTime());
+  }
+  
+  async updateSubscription(id: string, updates: Partial<Subscription>): Promise<Subscription | undefined> {
+    const subscription = this.subscriptions.get(id);
+    if (!subscription) return undefined;
+    
+    const updatedSubscription = { ...subscription, ...updates, updatedAt: new Date() };
+    this.subscriptions.set(id, updatedSubscription);
+    return updatedSubscription;
+  }
+  
+  // Payment management methods
+  async createPayment(insertPayment: InsertPayment): Promise<Payment> {
+    const id = randomUUID();
+    const payment: Payment = {
+      ...insertPayment,
+      id,
+      currency: insertPayment.currency ?? 'BRL',
+      status: insertPayment.status ?? 'pending',
+      description: insertPayment.description ?? null,
+      metadata: insertPayment.metadata ?? null,
+      stripePaymentIntentId: insertPayment.stripePaymentIntentId ?? null,
+      mercadoPagoPaymentId: insertPayment.mercadoPagoPaymentId ?? null,
+      asaasPaymentId: insertPayment.asaasPaymentId ?? null,
+      paidAt: insertPayment.paidAt ?? null,
+      failedAt: insertPayment.failedAt ?? null,
+      refundedAt: insertPayment.refundedAt ?? null,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    
+    this.payments.set(id, payment);
+    return payment;
+  }
+  
+  async getPaymentById(id: string): Promise<Payment | undefined> {
+    return this.payments.get(id);
+  }
+  
+  async getPaymentsByUserId(userId: string): Promise<Payment[]> {
+    return Array.from(this.payments.values())
+      .filter(p => p.userId === userId)
+      .sort((a, b) => b.createdAt!.getTime() - a.createdAt!.getTime());
+  }
+  
+  async getPaymentsBySubscriptionId(subscriptionId: string): Promise<Payment[]> {
+    return Array.from(this.payments.values())
+      .filter(p => p.subscriptionId === subscriptionId)
+      .sort((a, b) => b.createdAt!.getTime() - a.createdAt!.getTime());
+  }
+  
+  async getPayments(): Promise<Payment[]> {
+    return Array.from(this.payments.values())
+      .sort((a, b) => b.createdAt!.getTime() - a.createdAt!.getTime());
+  }
+  
+  async updatePayment(id: string, updates: Partial<Payment>): Promise<Payment | undefined> {
+    const payment = this.payments.get(id);
+    if (!payment) return undefined;
+    
+    const updatedPayment = { ...payment, ...updates, updatedAt: new Date() };
+    this.payments.set(id, updatedPayment);
+    return updatedPayment;
+  }
+  
+  // Payment Method management methods
+  async createPaymentMethod(insertPaymentMethod: InsertPaymentMethod): Promise<PaymentMethod> {
+    const id = randomUUID();
+    const paymentMethod: PaymentMethod = {
+      ...insertPaymentMethod,
+      id,
+      isDefault: insertPaymentMethod.isDefault ?? false,
+      isActive: insertPaymentMethod.isActive ?? true,
+      cardLast4: insertPaymentMethod.cardLast4 ?? null,
+      cardBrand: insertPaymentMethod.cardBrand ?? null,
+      cardExpMonth: insertPaymentMethod.cardExpMonth ?? null,
+      cardExpYear: insertPaymentMethod.cardExpYear ?? null,
+      stripePaymentMethodId: insertPaymentMethod.stripePaymentMethodId ?? null,
+      mercadoPagoCardId: insertPaymentMethod.mercadoPagoCardId ?? null,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    
+    this.paymentMethods.set(id, paymentMethod);
+    return paymentMethod;
+  }
+  
+  async getPaymentMethodsByUserId(userId: string): Promise<PaymentMethod[]> {
+    return Array.from(this.paymentMethods.values())
+      .filter(pm => pm.userId === userId && pm.isActive)
+      .sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
+  }
+  
+  async getDefaultPaymentMethod(userId: string): Promise<PaymentMethod | undefined> {
+    return Array.from(this.paymentMethods.values())
+      .find(pm => pm.userId === userId && pm.isDefault && pm.isActive);
+  }
+  
+  async updatePaymentMethod(id: string, updates: Partial<PaymentMethod>): Promise<PaymentMethod | undefined> {
+    const paymentMethod = this.paymentMethods.get(id);
+    if (!paymentMethod) return undefined;
+    
+    const updatedPaymentMethod = { ...paymentMethod, ...updates, updatedAt: new Date() };
+    this.paymentMethods.set(id, updatedPaymentMethod);
+    return updatedPaymentMethod;
+  }
+  
+  async deletePaymentMethod(id: string): Promise<boolean> {
+    return this.paymentMethods.delete(id);
+  }
+  
+  // Billing Event management methods
+  async createBillingEvent(insertBillingEvent: InsertBillingEvent): Promise<BillingEvent> {
+    const id = randomUUID();
+    const billingEvent: BillingEvent = {
+      ...insertBillingEvent,
+      id,
+      subscriptionId: insertBillingEvent.subscriptionId ?? null,
+      paymentId: insertBillingEvent.paymentId ?? null,
+      data: insertBillingEvent.data ?? {},
+      processed: insertBillingEvent.processed ?? false,
+      createdAt: new Date()
+    };
+    
+    this.billingEvents.set(id, billingEvent);
+    return billingEvent;
+  }
+  
+  async getBillingEvents(): Promise<BillingEvent[]> {
+    return Array.from(this.billingEvents.values())
+      .sort((a, b) => b.createdAt!.getTime() - a.createdAt!.getTime());
+  }
+  
+  async getBillingEventsByUserId(userId: string): Promise<BillingEvent[]> {
+    return Array.from(this.billingEvents.values())
+      .filter(be => be.userId === userId)
+      .sort((a, b) => b.createdAt!.getTime() - a.createdAt!.getTime());
+  }
+  
+  async markBillingEventProcessed(id: string): Promise<void> {
+    const billingEvent = this.billingEvents.get(id);
+    if (billingEvent) {
+      billingEvent.processed = true;
+      this.billingEvents.set(id, billingEvent);
+    }
   }
 }
 
