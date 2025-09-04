@@ -6,11 +6,17 @@ import { z } from "zod";
 // Sistema de Planos SaaS
 export const planTypeEnum = pgEnum('plan_type', ['basico', 'intermediario', 'completo']);
 
+// Sistema de Roles de Usuário
+export const userRoleEnum = pgEnum('user_role', ['user', 'admin', 'super_admin']);
+
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   email: varchar("email").unique().notNull(),
   name: varchar("name").notNull(),
   planType: planTypeEnum("plan_type").default('basico').notNull(),
+  userRole: userRoleEnum("user_role").default('user').notNull(),
+  isActive: boolean("is_active").default(true),
+  lastLoginAt: timestamp("last_login_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -178,6 +184,9 @@ export type InsertUserSession = typeof userSessions.$inferInsert;
 // Tipos de planos
 export type PlanType = 'basico' | 'intermediario' | 'completo';
 
+// Tipos de roles de usuário
+export type UserRole = 'user' | 'admin' | 'super_admin';
+
 // Configuração de features por plano
 export const PLAN_FEATURES = {
   basico: [
@@ -212,5 +221,24 @@ export const PLAN_FEATURES = {
     'dashboard_customizavel',
     'exportacao_dados',
     'historico_sessoes'
+  ]
+} as const;
+
+// Funcionalidades administrativas por role
+export const ADMIN_FEATURES = {
+  admin: [
+    'user_management',
+    'system_stats',
+    'feature_control',
+    'activity_logs'
+  ],
+  super_admin: [
+    'user_management',
+    'system_stats', 
+    'feature_control',
+    'activity_logs',
+    'system_config',
+    'billing_management',
+    'advanced_analytics'
   ]
 } as const;

@@ -1,11 +1,14 @@
 import { createContext, useState, useEffect } from 'react';
-import { PlanType, PLAN_FEATURES } from '@shared/schema';
+import { PlanType, UserRole, PLAN_FEATURES, ADMIN_FEATURES } from '@shared/schema';
 
 interface User {
   id: string;
   email: string;
   name: string;
   planType: PlanType;
+  userRole: UserRole;
+  isActive?: boolean;
+  lastLoginAt?: Date | null;
 }
 
 interface AuthContextType {
@@ -13,6 +16,9 @@ interface AuthContextType {
   login: (userData: User) => void;
   logout: () => void;
   hasFeature: (feature: string) => boolean;
+  hasAdminFeature: (feature: string) => boolean;
+  isAdmin: () => boolean;
+  isSuperAdmin: () => boolean;
   isLoading: boolean;
 }
 
@@ -21,6 +27,9 @@ export const AuthContext = createContext<AuthContextType>({
   login: () => {},
   logout: () => {},
   hasFeature: () => false,
+  hasAdminFeature: () => false,
+  isAdmin: () => false,
+  isSuperAdmin: () => false,
   isLoading: false
 });
 
@@ -44,7 +53,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
           id: 'user-001',
           email: 'usuario@roleta.app',
           name: 'Analista Roleta',
-          planType: 'completo'
+          planType: 'completo',
+          userRole: 'admin'
         };
         setUser(defaultUser);
         localStorage.setItem('user', JSON.stringify(defaultUser));
@@ -55,7 +65,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         id: 'user-001',
         email: 'usuario@roleta.app', 
         name: 'Analista Roleta',
-        planType: 'completo'
+        planType: 'completo',
+        userRole: 'admin'
       };
       setUser(defaultUser);
       localStorage.setItem('user', JSON.stringify(defaultUser));
@@ -78,11 +89,27 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return PLAN_FEATURES[user.planType]?.includes(feature as any) || false;
   };
 
+  const hasAdminFeature = (feature: string): boolean => {
+    if (!user) return false;
+    return ADMIN_FEATURES[user.userRole as keyof typeof ADMIN_FEATURES]?.includes(feature as any) || false;
+  };
+
+  const isAdmin = (): boolean => {
+    return user?.userRole === 'admin' || user?.userRole === 'super_admin';
+  };
+
+  const isSuperAdmin = (): boolean => {
+    return user?.userRole === 'super_admin';
+  };
+
   const contextValue: AuthContextType = {
     user,
     login,
     logout,
     hasFeature,
+    hasAdminFeature,
+    isAdmin,
+    isSuperAdmin,
     isLoading
   };
 

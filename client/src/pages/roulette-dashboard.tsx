@@ -18,11 +18,13 @@ import { useWebSocket } from '@/hooks/use-websocket';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { FeatureGuard } from '@/components/auth/FeatureGuard';
+import { AdminOnly } from '@/components/auth/AdminGuard';
 import { apiRequest } from '@/lib/queryClient';
 import { getNumberColor, getColorClass } from '@/lib/roulette-utils';
 import { UnifiedPatternAnalyzer } from '@/lib/pattern-analyzer';
 import { type RouletteResult } from '@shared/schema';
-import { Play, Wifi, WifiOff, Layout, Grid, Smartphone } from 'lucide-react';
+import { Play, Wifi, WifiOff, Layout, Grid, Smartphone, Shield } from 'lucide-react';
+import { Link } from 'wouter';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { BettingPreferencesModal } from '@/components/betting-preferences-modal';
 import { SessionStatsModal } from '@/components/session-stats-modal';
@@ -224,6 +226,21 @@ export default function RouletteDashboard() {
                 </Button>
               </FeatureGuard>
             )}
+
+            {/* Admin Panel Link - Para usuários admin */}
+            <AdminOnly role="admin">
+              <Link href="/admin">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-xs hover:bg-gray-800 text-roulette-green hover:text-green-400"
+                  title="Painel Administrativo"
+                >
+                  <Shield className="w-3 h-3 mr-1" />
+                  {!isMobile && 'Admin'}
+                </Button>
+              </Link>
+            </AdminOnly>
             
             {/* Status Connection */}
             <div className="flex items-center space-x-1">
