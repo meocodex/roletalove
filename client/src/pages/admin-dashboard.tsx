@@ -74,46 +74,24 @@ function SystemStats() {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       {statsData.map((stat, index) => (
-        <Card 
-          key={index} 
-          className={`relative overflow-hidden bg-gradient-to-br ${stat.bgGradient} bg-gray-900/50 backdrop-blur-sm border ${stat.borderColor} hover:border-opacity-60 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-black/20 group cursor-pointer`}
-        >
+        <Card key={index} className="bg-gray-800 border-gray-700">
           <CardContent className="p-6">
-            <div className="flex items-start justify-between">
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <p className="text-sm font-medium text-gray-300 tracking-wide">{stat.title}</p>
-                  <div className={`p-1 rounded-full bg-gradient-to-r ${stat.bgGradient} opacity-60`}>
-                    <div className="w-1 h-1 rounded-full bg-white" />
-                  </div>
-                </div>
-                <p className="text-3xl font-bold text-white tracking-tight">{stat.value}</p>
-                <div className="flex items-center gap-2">
-                  <div className={`flex items-center gap-1 px-2 py-1 rounded-full ${
-                    stat.trend === 'up' 
-                      ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
-                      : 'bg-red-500/20 text-red-400 border border-red-500/30'
-                  }`}>
-                    {stat.trend === 'up' ? (
-                      <ArrowUp className="w-3 h-3" />
-                    ) : (
-                      <ArrowDown className="w-3 h-3" />
-                    )}
-                    <span className="text-xs font-semibold">{stat.change}</span>
-                  </div>
-                  <span className="text-xs text-gray-500">vs último mês</span>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-400">{stat.title}</p>
+                <p className="text-2xl font-bold text-white">{stat.value}</p>
+                <div className="flex items-center mt-1">
+                  <Badge 
+                    variant={stat.trend === 'up' ? 'default' : 'destructive'}
+                    className="text-xs"
+                  >
+                    {stat.change}
+                  </Badge>
                 </div>
               </div>
-              <div className={`p-3 rounded-xl bg-gradient-to-r ${stat.bgGradient} group-hover:scale-110 transition-transform duration-300`}>
-                <stat.icon className={`w-6 h-6 ${stat.iconColor}`} />
-              </div>
-            </div>
-            
-            {/* Elemento decorativo */}
-            <div className="absolute top-0 right-0 w-32 h-32 -translate-y-16 translate-x-16 opacity-10">
-              <stat.icon className="w-full h-full" />
+              <stat.icon className="w-8 h-8 text-roulette-green" />
             </div>
           </CardContent>
         </Card>
@@ -197,56 +175,47 @@ function UserManagement() {
   };
 
   return (
-    <Card className="bg-gray-900/50 backdrop-blur-sm border-gray-700/50 hover:border-gray-600/50 transition-all duration-300">
-      <CardHeader className="border-b border-gray-700/50">
+    <Card className="bg-gray-800 border-gray-700">
+      <CardHeader>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-blue-500/20 border border-blue-500/30">
-              <Users className="w-5 h-5 text-blue-400" />
-            </div>
-            <div>
-              <CardTitle className="text-xl text-white">Gestão de Usuários</CardTitle>
-              <p className="text-sm text-gray-400 mt-1">{mockUsers.length} usuários cadastrados</p>
-            </div>
-          </div>
+          <CardTitle className="text-white flex items-center gap-2">
+            <Users className="w-5 h-5" />
+            Gestão de Usuários
+          </CardTitle>
           
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <Button size="sm" className="bg-roulette-green hover:bg-green-600">
               <Plus className="w-4 h-4 mr-2" />
-              Novo Usuário
+              Novo
             </Button>
             <Button size="sm" variant="outline">
-              <Download className="w-4 h-4 mr-2" />
-              Exportar
+              <Download className="w-4 h-4" />
             </Button>
           </div>
         </div>
         
-        {/* Barra de busca e filtros */}
+        {/* Barra de busca e filtros - Simplificada */}
         <div className="flex flex-col sm:flex-row gap-3 mt-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Buscar por nome ou email..."
+              placeholder="Buscar usuário..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-gray-800/50 border border-gray-600/50 rounded-lg text-white placeholder-gray-400 focus:border-roulette-green focus:ring-1 focus:ring-roulette-green transition-colors"
+              className="w-full pl-10 pr-4 py-2 bg-gray-900 border border-gray-600 rounded text-white placeholder-gray-400 focus:border-roulette-green focus:outline-none"
             />
           </div>
           
-          <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-gray-400" />
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-3 py-2 bg-gray-800/50 border border-gray-600/50 rounded-lg text-white focus:border-roulette-green focus:ring-1 focus:ring-roulette-green transition-colors"
-            >
-              <option value="all">Todos</option>
-              <option value="active">Ativos</option>
-              <option value="inactive">Inativos</option>
-            </select>
-          </div>
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="px-3 py-2 bg-gray-900 border border-gray-600 rounded text-white focus:border-roulette-green focus:outline-none"
+          >
+            <option value="all">Todos</option>
+            <option value="active">Ativos</option>
+            <option value="inactive">Inativos</option>
+          </select>
         </div>
       </CardHeader>
       
@@ -272,20 +241,20 @@ function UserManagement() {
                 >
                   <td className="p-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold text-sm">
+                      <div className="w-10 h-10 rounded-full bg-roulette-green flex items-center justify-center text-white font-semibold text-sm">
                         {user.name.split(' ').map(n => n[0]).join('')}
                       </div>
                       <div>
-                        <p className="font-medium text-white group-hover:text-roulette-green transition-colors">{user.name}</p>
+                        <p className="font-medium text-white">{user.name}</p>
                         <p className="text-sm text-gray-400">{user.email}</p>
                       </div>
                     </div>
                   </td>
                   
                   <td className="p-4 hidden sm:table-cell">
-                    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${getPlanBadge(user.plan)}`}>
-                      {user.plan.charAt(0).toUpperCase() + user.plan.slice(1)}
-                    </span>
+                    <Badge variant={user.plan === 'completo' ? 'default' : 'secondary'}>
+                      {user.plan}
+                    </Badge>
                   </td>
                   
                   <td className="p-4 hidden md:table-cell">
@@ -297,24 +266,15 @@ function UserManagement() {
                   </td>
                   
                   <td className="p-4">
-                    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${getStatusBadge(user.status)}`}>
-                      <div className={`w-1.5 h-1.5 rounded-full mr-1.5 ${
-                        user.status === 'active' ? 'bg-green-400' : 'bg-red-400'
-                      }`} />
+                    <Badge variant={user.status === 'active' ? 'default' : 'destructive'}>
                       {user.status === 'active' ? 'Ativo' : 'Inativo'}
-                    </span>
+                    </Badge>
                   </td>
                   
                   <td className="p-4">
-                    <div className="flex items-center gap-2">
-                      <Button size="sm" variant="ghost" className="hover:bg-blue-500/20 hover:text-blue-400">
-                        <Eye className="w-4 h-4" />
-                      </Button>
-                      <Button size="sm" variant="ghost" className="hover:bg-yellow-500/20 hover:text-yellow-400">
+                    <div className="flex items-center gap-1">
+                      <Button size="sm" variant="ghost">
                         <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button size="sm" variant="ghost" className="hover:bg-red-500/20 hover:text-red-400">
-                        <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
                   </td>
@@ -397,29 +357,12 @@ function ActivityLogs() {
   };
 
   return (
-    <Card className="bg-gray-900/50 backdrop-blur-sm border-gray-700/50 hover:border-gray-600/50 transition-all duration-300">
-      <CardHeader className="border-b border-gray-700/50">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-orange-500/20 border border-orange-500/30">
-              <Activity className="w-5 h-5 text-orange-400" />
-            </div>
-            <div>
-              <CardTitle className="text-xl text-white">Logs de Atividade</CardTitle>
-              <p className="text-sm text-gray-400 mt-1">Atividades recentes do sistema</p>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <Button size="sm" variant="outline" className="text-xs">
-              <Download className="w-4 h-4 mr-1" />
-              Exportar
-            </Button>
-            <Button size="sm" variant="ghost">
-              <MoreVertical className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
+    <Card className="bg-gray-800 border-gray-700">
+      <CardHeader>
+        <CardTitle className="text-white flex items-center gap-2">
+          <Activity className="w-5 h-5" />
+          Logs de Atividade
+        </CardTitle>
       </CardHeader>
       
       <CardContent className="p-0">
@@ -427,51 +370,19 @@ function ActivityLogs() {
           {mockLogs.map((log, index) => {
             const logStyle = getLogIcon(log.type);
             return (
-              <div 
-                key={log.id} 
-                className="flex items-start gap-4 p-4 border-b border-gray-800/50 last:border-b-0 hover:bg-gray-800/30 transition-all duration-200 group"
-              >
-                <div className={`flex items-center justify-center w-8 h-8 rounded-full border ${logStyle.bg} ${logStyle.color} text-sm font-bold mt-1`}>
-                  {logStyle.icon}
+              <div key={log.id} className="flex items-center justify-between p-3 bg-gray-900 rounded">
+                <div>
+                  <p className="text-white text-sm">
+                    <span className="font-medium">{log.action}</span> - {log.user}
+                  </p>
+                  <p className="text-gray-400 text-xs">{log.details}</p>
                 </div>
-                
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1">
-                      <p className="text-white text-sm font-medium group-hover:text-roulette-green transition-colors">
-                        <span className="font-semibold">{log.action}</span> por {log.user}
-                      </p>
-                      <p className="text-gray-400 text-sm mt-1">{log.details}</p>
-                      <div className="flex items-center gap-3 mt-2">
-                        <span className="text-xs text-gray-500">IP: {log.ip}</span>
-                        <span className="text-xs text-gray-500">•</span>
-                        <span className="text-xs text-gray-500">Há {index + 1}h</span>
-                      </div>
-                    </div>
-                    
-                    <div className="text-right">
-                      <span className="text-xs text-gray-400 font-mono">{log.time}</span>
-                      <div className="mt-1">
-                        <Button size="sm" variant="ghost" className="opacity-0 group-hover:opacity-100 transition-opacity p-1 h-6">
-                          <Eye className="w-3 h-3" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <span className="text-gray-400 text-xs">{log.time}</span>
               </div>
             );
           })}
         </div>
         
-        <div className="p-4 border-t border-gray-700/50 bg-gray-800/30">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-400">Mostrando últimas 5 atividades</span>
-            <Button size="sm" variant="ghost" className="text-roulette-green hover:text-green-400">
-              Ver todos os logs
-            </Button>
-          </div>
-        </div>
       </CardContent>
     </Card>
   );
@@ -482,176 +393,97 @@ export default function AdminDashboard() {
 
   return (
     <AdminGuard requiredRole="admin">
-      <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950">
-        {/* Header Moderno com Gradiente */}
-        <div className="relative">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-green-600/10" />
-          <div className="relative container mx-auto px-6 py-8">
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-              <div className="space-y-3">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 rounded-xl bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30">
-                    <Shield className="w-8 h-8 text-blue-400" />
-                  </div>
-                  <div>
-                    <h1 className="text-4xl font-bold bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent">
-                      Painel Administrativo
-                    </h1>
-                    <p className="text-gray-400 mt-2 text-lg">
-                      Bem-vindo de volta, <span className="text-roulette-green font-semibold">{user?.name}</span>
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                    <span className="text-sm text-gray-300">Sistema Online</span>
-                  </div>
-                  <div className="h-4 w-px bg-gray-600" />
-                  <span className="text-sm text-gray-400">Perfil: </span>
-                  <Badge className="bg-gradient-to-r from-purple-500/20 to-blue-500/20 text-purple-400 border-purple-500/30">
-                    {user?.userRole?.replace('_', ' ').toUpperCase()}
-                  </Badge>
-                </div>
+      <div className="min-h-screen bg-dashboard-dark text-white font-casino">
+        {/* Header Simples - Padrão do Sistema */}
+        <header className="bg-gray-900 border-b border-gray-700 px-3 sm:px-4 py-2 sm:py-3 sticky top-0 z-50">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <div className="w-6 h-6 sm:w-8 sm:h-8 bg-roulette-green rounded-full flex items-center justify-center">
+                <Shield className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
               </div>
-              
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                <Button 
-                  variant="ghost" 
-                  className="bg-gray-800/50 hover:bg-gray-700/50 border border-gray-600/50 hover:border-gray-500/50 transition-all duration-300"
-                >
-                  <RefreshCw className="w-4 h-4 mr-2" />
-                  Atualizar
-                </Button>
-                
-                <Link href="/">
-                  <Button 
-                    variant="outline"
-                    className="bg-gray-800/30 border-gray-600/50 hover:bg-gray-700/50 hover:border-gray-500/50 text-white transition-all duration-300"
-                  >
-                    <ArrowUp className="w-4 h-4 mr-2 rotate-[-45deg]" />
-                    Dashboard Principal
-                  </Button>
-                </Link>
-                
-                <AdminOnly role="super_admin">
-                  <Button className="bg-gradient-to-r from-roulette-green to-green-600 hover:from-green-600 hover:to-green-700 shadow-lg hover:shadow-green-500/25 transition-all duration-300">
-                    <Settings className="w-4 h-4 mr-2" />
-                    Config. Sistema
-                  </Button>
-                </AdminOnly>
+              <div>
+                <h1 className="text-sm sm:text-lg font-bold text-white">
+                  Painel Administrativo
+                </h1>
+                <p className="text-xs text-gray-400 hidden sm:block">Gestão do sistema</p>
               </div>
             </div>
+            
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              {/* User Info - Padrão do sistema */}
+              {user && (
+                <div className="text-right hidden sm:block">
+                  <div className="text-xs text-gray-400">{user.name || 'Admin'}</div>
+                  <div className="text-xs text-roulette-green font-medium">
+                    {user?.userRole?.replace('_', ' ')}
+                  </div>
+                </div>
+              )}
+              
+              <Link href="/">
+                <Button variant="ghost" size="sm" className="text-xs hover:bg-gray-800">
+                  <ArrowUp className="w-3 h-3 mr-1 rotate-[-45deg]" />
+                  Dashboard
+                </Button>
+              </Link>
+              
+              <AdminOnly role="super_admin">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-xs hover:bg-gray-800 text-roulette-green hover:text-green-400"
+                >
+                  <Settings className="w-3 h-3 mr-1" />
+                  Config
+                </Button>
+              </AdminOnly>
+            </div>
           </div>
-        </div>
+        </header>
         
-        <div className="container mx-auto px-6 pb-8">
+        <div className="max-w-7xl mx-auto p-3 sm:p-4">
 
           {/* Stats Cards */}
           <SystemStats />
 
-          {/* Navegação por Tabs Moderna */}
-          <Tabs defaultValue="users" className="space-y-6">
-            <div className="relative">
-              <TabsList className="grid w-full grid-cols-3 lg:grid-cols-4 bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-1.5 gap-1">
-                <TabsTrigger 
-                  value="users" 
-                  className="relative flex items-center gap-2 px-4 py-3 rounded-lg text-gray-400 hover:text-white transition-all duration-300 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500/20 data-[state=active]:to-cyan-500/20 data-[state=active]:text-blue-400 data-[state=active]:border data-[state=active]:border-blue-500/30 data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/10"
-                >
-                  <Users className="w-4 h-4" />
-                  <span className="font-medium">Usuários</span>
-                  {/* Indicador ativo */}
-                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-12 h-0.5 bg-blue-400 rounded-full opacity-0 data-[state=active]:opacity-100 transition-opacity duration-300" />
+          {/* Tabs - Padrão do Sistema */}
+          <Tabs defaultValue="users" className="space-y-4">
+            <TabsList className="bg-gray-800">
+              <TabsTrigger value="users" className="data-[state=active]:bg-roulette-green">
+                <Users className="w-4 h-4 mr-2" />
+                Usuários
+              </TabsTrigger>
+              <TabsTrigger value="analytics" className="data-[state=active]:bg-roulette-green">
+                <BarChart3 className="w-4 h-4 mr-2" />
+                Relatórios
+              </TabsTrigger>
+              <TabsTrigger value="logs" className="data-[state=active]:bg-roulette-green">
+                <Activity className="w-4 h-4 mr-2" />
+                Logs
+              </TabsTrigger>
+              <AdminOnly role="super_admin">
+                <TabsTrigger value="system" className="data-[state=active]:bg-roulette-green">
+                  <Shield className="w-4 h-4 mr-2" />
+                  Sistema
                 </TabsTrigger>
-                
-                <TabsTrigger 
-                  value="analytics" 
-                  className="relative flex items-center gap-2 px-4 py-3 rounded-lg text-gray-400 hover:text-white transition-all duration-300 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500/20 data-[state=active]:to-pink-500/20 data-[state=active]:text-purple-400 data-[state=active]:border data-[state=active]:border-purple-500/30 data-[state=active]:shadow-lg data-[state=active]:shadow-purple-500/10"
-                >
-                  <BarChart3 className="w-4 h-4" />
-                  <span className="font-medium hidden sm:inline">Relatórios</span>
-                  <span className="font-medium sm:hidden">Charts</span>
-                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-12 h-0.5 bg-purple-400 rounded-full opacity-0 data-[state=active]:opacity-100 transition-opacity duration-300" />
-                </TabsTrigger>
-                
-                <TabsTrigger 
-                  value="logs" 
-                  className="relative flex items-center gap-2 px-4 py-3 rounded-lg text-gray-400 hover:text-white transition-all duration-300 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500/20 data-[state=active]:to-yellow-500/20 data-[state=active]:text-orange-400 data-[state=active]:border data-[state=active]:border-orange-500/30 data-[state=active]:shadow-lg data-[state=active]:shadow-orange-500/10"
-                >
-                  <Activity className="w-4 h-4" />
-                  <span className="font-medium">Logs</span>
-                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-12 h-0.5 bg-orange-400 rounded-full opacity-0 data-[state=active]:opacity-100 transition-opacity duration-300" />
-                </TabsTrigger>
-                
-                <AdminOnly role="super_admin">
-                  <TabsTrigger 
-                    value="system" 
-                    className="relative flex items-center gap-2 px-4 py-3 rounded-lg text-gray-400 hover:text-white transition-all duration-300 data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500/20 data-[state=active]:to-pink-500/20 data-[state=active]:text-red-400 data-[state=active]:border data-[state=active]:border-red-500/30 data-[state=active]:shadow-lg data-[state=active]:shadow-red-500/10"
-                  >
-                    <Shield className="w-4 h-4" />
-                    <span className="font-medium hidden lg:inline">Sistema</span>
-                    <span className="font-medium lg:hidden">Sys</span>
-                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-12 h-0.5 bg-red-400 rounded-full opacity-0 data-[state=active]:opacity-100 transition-opacity duration-300" />
-                  </TabsTrigger>
-                </AdminOnly>
-              </TabsList>
-            </div>
+              </AdminOnly>
+            </TabsList>
 
             <TabsContent value="users" className="space-y-4">
               <UserManagement />
             </TabsContent>
 
-            <TabsContent value="analytics" className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card className="bg-gray-900/50 backdrop-blur-sm border-gray-700/50 hover:border-gray-600/50 transition-all duration-300">
-                  <CardHeader className="border-b border-gray-700/50">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-purple-500/20 border border-purple-500/30">
-                        <BarChart3 className="w-5 h-5 text-purple-400" />
-                      </div>
-                      <CardTitle className="text-xl text-white">Relatórios Financeiros</CardTitle>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="p-6">
-                    <div className="space-y-4">
-                      <div className="h-32 bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-lg border border-purple-500/20 flex items-center justify-center">
-                        <p className="text-gray-400 text-center">
-                          <BarChart3 className="w-8 h-8 mx-auto mb-2 text-purple-400" />
-                          Gráfico de receita mensal será exibido aqui
-                        </p>
-                      </div>
-                      <Button className="w-full bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 border border-purple-500/30">
-                        Gerar Relatório
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <Card className="bg-gray-900/50 backdrop-blur-sm border-gray-700/50 hover:border-gray-600/50 transition-all duration-300">
-                  <CardHeader className="border-b border-gray-700/50">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-blue-500/20 border border-blue-500/30">
-                        <TrendingUp className="w-5 h-5 text-blue-400" />
-                      </div>
-                      <CardTitle className="text-xl text-white">Analytics de Uso</CardTitle>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="p-6">
-                    <div className="space-y-4">
-                      <div className="h-32 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-lg border border-blue-500/20 flex items-center justify-center">
-                        <p className="text-gray-400 text-center">
-                          <TrendingUp className="w-8 h-8 mx-auto mb-2 text-blue-400" />
-                          Métricas de engajamento serão exibidas aqui
-                        </p>
-                      </div>
-                      <Button className="w-full bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 border border-blue-500/30">
-                        Ver Métricas
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
+            <TabsContent value="analytics" className="space-y-4">
+              <Card className="bg-gray-800 border-gray-700">
+                <CardHeader>
+                  <CardTitle className="text-white">Relatórios e Analytics</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-400">
+                    Gráficos e relatórios detalhados serão implementados aqui.
+                  </p>
+                </CardContent>
+              </Card>
             </TabsContent>
 
             <TabsContent value="logs" className="space-y-4">
@@ -659,64 +491,27 @@ export default function AdminDashboard() {
             </TabsContent>
 
             <AdminOnly role="super_admin">
-              <TabsContent value="system" className="space-y-6">
-                <Card className="bg-gradient-to-br from-red-500/5 via-gray-900/50 to-pink-500/5 backdrop-blur-sm border-red-500/30 hover:border-red-500/50 transition-all duration-300">
-                  <CardHeader className="border-b border-red-500/20">
-                    <div className="flex items-center gap-3">
-                      <div className="p-3 rounded-xl bg-gradient-to-r from-red-500/20 to-pink-500/20 border border-red-500/30">
-                        <Database className="w-6 h-6 text-red-400" />
-                      </div>
-                      <div>
-                        <CardTitle className="text-xl text-white flex items-center gap-2">
-                          Configurações do Sistema
-                          <Badge className="bg-red-500/20 text-red-400 border-red-500/30 text-xs">
-                            SUPER ADMIN
-                          </Badge>
-                        </CardTitle>
-                        <p className="text-gray-400 mt-1">Acesso exclusivo para super administradores</p>
-                      </div>
-                    </div>
+              <TabsContent value="system" className="space-y-4">
+                <Card className="bg-gray-800 border-gray-700">
+                  <CardHeader>
+                    <CardTitle className="text-white flex items-center gap-2">
+                      <Database className="w-5 h-5" />
+                      Configurações do Sistema
+                    </CardTitle>
                   </CardHeader>
-                  
-                  <CardContent className="p-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      <Button 
-                        variant="outline" 
-                        className="h-20 flex-col bg-gray-800/30 hover:bg-red-500/10 border-gray-600/50 hover:border-red-500/30 transition-all duration-300 group"
-                      >
-                        <Database className="w-6 h-6 mb-2 text-gray-400 group-hover:text-red-400 transition-colors" />
-                        <span className="text-sm font-medium">Backup do Banco</span>
+                  <CardContent>
+                    <p className="text-gray-400 mb-4">
+                      Configurações avançadas disponíveis apenas para super administradores.
+                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Button variant="outline" className="justify-start">
+                        <Database className="w-4 h-4 mr-2" />
+                        Backup do Banco
                       </Button>
-                      
-                      <Button 
-                        variant="outline" 
-                        className="h-20 flex-col bg-gray-800/30 hover:bg-red-500/10 border-gray-600/50 hover:border-red-500/30 transition-all duration-300 group"
-                      >
-                        <Settings className="w-6 h-6 mb-2 text-gray-400 group-hover:text-red-400 transition-colors" />
-                        <span className="text-sm font-medium">Config. API</span>
+                      <Button variant="outline" className="justify-start">
+                        <Settings className="w-4 h-4 mr-2" />
+                        Configurações API
                       </Button>
-                      
-                      <Button 
-                        variant="outline" 
-                        className="h-20 flex-col bg-gray-800/30 hover:bg-red-500/10 border-gray-600/50 hover:border-red-500/30 transition-all duration-300 group"
-                      >
-                        <Shield className="w-6 h-6 mb-2 text-gray-400 group-hover:text-red-400 transition-colors" />
-                        <span className="text-sm font-medium">Segurança</span>
-                      </Button>
-                    </div>
-                    
-                    <div className="mt-6 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
-                      <div className="flex items-start gap-3">
-                        <div className="p-1 rounded-full bg-red-500/20">
-                          <span className="text-red-400 text-xs font-bold">!</span>
-                        </div>
-                        <div>
-                          <p className="text-red-400 text-sm font-medium">Zona de Perigo</p>
-                          <p className="text-gray-400 text-xs mt-1">
-                            Ações aqui podem afetar todo o sistema. Proceda com cautela.
-                          </p>
-                        </div>
-                      </div>
                     </div>
                   </CardContent>
                 </Card>
