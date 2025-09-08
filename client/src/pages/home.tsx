@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'wouter';
 import { useAuth } from '@/hooks/useAuth';
+import { LoginModal } from '@/components/auth/LoginModal';
+import { Footer } from '@/components/layout/Footer';
 import { 
   BarChart3, 
   TrendingUp, 
@@ -17,11 +19,12 @@ import {
   Users,
   Award,
   DollarSign,
-  Activity
+  Activity,
+  LogIn
 } from 'lucide-react';
 
 // Hero Section
-function HeroSection() {
+function HeroSection({ onLoginClick }: { onLoginClick?: () => void }) {
   const { user } = useAuth();
 
   return (
@@ -49,20 +52,22 @@ function HeroSection() {
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           {user ? (
-            <Link href="/app">
+            <Link href="/dashboard">
               <Button size="lg" className="bg-roulette-green hover:bg-roulette-green/90 text-white px-8 py-4 text-lg">
                 <Activity className="w-5 h-5 mr-2" />
-                Ir para o Sistema
+                Ir para Dashboard
               </Button>
             </Link>
           ) : (
             <>
-              <Link href="/plans">
-                <Button size="lg" className="bg-roulette-green hover:bg-roulette-green/90 text-white px-8 py-4 text-lg">
-                  <Zap className="w-5 h-5 mr-2" />
-                  Começar Agora
-                </Button>
-              </Link>
+              <Button 
+                size="lg" 
+                className="bg-roulette-green hover:bg-roulette-green/90 text-white px-8 py-4 text-lg"
+                onClick={onLoginClick}
+              >
+                <LogIn className="w-5 h-5 mr-2" />
+                Começar Agora
+              </Button>
               <Button 
                 size="lg" 
                 variant="outline" 
@@ -200,7 +205,7 @@ function DemoSection() {
 }
 
 // Pricing Section
-function PricingSection() {
+function PricingSection({ onLoginClick }: { onLoginClick?: () => void }) {
   const plans = [
     {
       name: "Básico",
@@ -384,7 +389,7 @@ function TestimonialsSection() {
 }
 
 // CTA Section
-function CTASection() {
+function CTASection({ onLoginClick }: { onLoginClick?: () => void }) {
   return (
     <section className="py-20 bg-gradient-to-r from-roulette-green to-green-600">
       <div className="max-w-4xl mx-auto text-center px-4">
@@ -396,12 +401,14 @@ function CTASection() {
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link href="/plans">
-            <Button size="lg" className="bg-white text-roulette-green hover:bg-gray-100 px-8 py-4 text-lg font-semibold">
-              <Crown className="w-5 h-5 mr-2" />
-              Escolher Plano
-            </Button>
-          </Link>
+          <Button 
+            size="lg" 
+            className="bg-white text-roulette-green hover:bg-gray-100 px-8 py-4 text-lg font-semibold"
+            onClick={onLoginClick}
+          >
+            <Crown className="w-5 h-5 mr-2" />
+            Escolher Plano
+          </Button>
           <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-roulette-green px-8 py-4 text-lg">
             Falar com Especialista
           </Button>
@@ -413,14 +420,23 @@ function CTASection() {
 
 // Main Home Component
 export default function HomePage() {
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const { user } = useAuth();
+
   return (
     <div className="min-h-screen">
-      <HeroSection />
+      <HeroSection onLoginClick={() => setShowLoginModal(true)} />
       <FeaturesSection />
       <DemoSection />
-      <PricingSection />
+      <PricingSection onLoginClick={() => setShowLoginModal(true)} />
       <TestimonialsSection />
-      <CTASection />
+      <CTASection onLoginClick={() => setShowLoginModal(true)} />
+      <Footer />
+      
+      <LoginModal 
+        open={showLoginModal && !user} 
+        onOpenChange={setShowLoginModal} 
+      />
     </div>
   );
 }
