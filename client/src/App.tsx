@@ -4,7 +4,10 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/components/auth/AuthProvider";
+import { Header } from "@/components/layout/Header";
 import { PlanSelector } from "@/components/auth/PlanSelector";
+import HomePage from "@/pages/home";
+import UserDashboard from "@/pages/user-dashboard";
 import RouletteDashboard from "@/pages/roulette-dashboard";
 import AdminDashboard from "@/pages/admin-dashboard";
 import NotFound from "@/pages/not-found";
@@ -12,8 +15,30 @@ import NotFound from "@/pages/not-found";
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={RouletteDashboard} />
-      <Route path="/plans" component={PlanSelector} />
+      <Route path="/" component={() => (
+        <>
+          <Header transparent />
+          <HomePage />
+        </>
+      )} />
+      <Route path="/dashboard" component={() => (
+        <>
+          <Header />
+          <UserDashboard />
+        </>
+      )} />
+      <Route path="/app" component={() => (
+        <>
+          <Header />
+          <RouletteDashboard />
+        </>
+      )} />
+      <Route path="/plans" component={() => (
+        <>
+          <Header />
+          <PlanSelector />
+        </>
+      )} />
       <Route path="/admin" component={AdminDashboard} />
       <Route component={NotFound} />
     </Switch>
