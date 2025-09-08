@@ -47,7 +47,7 @@ export function Header({ transparent = false }: HeaderProps) {
   };
 
   return (
-    <header className={`sticky top-0 z-50 ${transparent ? 'bg-transparent' : 'bg-white dark:bg-gray-900'} ${!transparent && 'shadow-sm border-b border-gray-200 dark:border-gray-700'}`}>
+    <header className={`sticky top-0 z-50 ${transparent ? 'bg-transparent' : 'bg-gray-900'} ${!transparent && 'shadow-sm border-b border-gray-700'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -57,7 +57,7 @@ export function Header({ transparent = false }: HeaderProps) {
                 <div className="w-8 h-8 bg-roulette-green rounded-full flex items-center justify-center">
                   <BarChart3 className="w-5 h-5 text-white" />
                 </div>
-                <span className={`text-xl font-bold ${transparent ? 'text-white' : 'text-gray-900 dark:text-white'}`}>
+                <span className={`text-xl font-bold ${transparent ? 'text-white' : 'text-white'}`}>
                   RouletteAI
                 </span>
               </div>
@@ -70,7 +70,7 @@ export function Header({ transparent = false }: HeaderProps) {
               <Link key={item.name} href={item.href}>
                 <Button 
                   variant="ghost" 
-                  className={`${transparent ? 'text-white hover:text-gray-200 hover:bg-white/10' : 'text-gray-700 dark:text-gray-300'} ${location === item.href ? 'bg-gray-100 dark:bg-gray-800' : ''}`}
+                  className={`${transparent ? 'text-white hover:text-gray-200 hover:bg-white/10' : 'text-gray-300 hover:text-white hover:bg-gray-800'} ${location === item.href ? 'bg-gray-800' : ''}`}
                 >
                   {item.icon}
                   <span className="ml-2">{item.name}</span>
@@ -82,7 +82,7 @@ export function Header({ transparent = false }: HeaderProps) {
               <Link key={item.name} href={item.href}>
                 <Button 
                   variant="ghost" 
-                  className={`${transparent ? 'text-white hover:text-gray-200 hover:bg-white/10' : 'text-gray-700 dark:text-gray-300'} ${location === item.href ? 'bg-gray-100 dark:bg-gray-800' : ''}`}
+                  className={`${transparent ? 'text-white hover:text-gray-200 hover:bg-white/10' : 'text-gray-300 hover:text-white hover:bg-gray-800'} ${location === item.href ? 'bg-gray-800' : ''}`}
                 >
                   {item.icon}
                   <span className="ml-2">{item.name}</span>
