@@ -36,9 +36,24 @@ import { BillingManagement } from '@/components/admin/BillingManagement';
 import { EditUserModal } from '@/components/admin/EditUserModal';
 import { CreateUserModal } from '@/components/admin/CreateUserModal';
 
+// Interfaces para tipagem
+interface StatValue {
+  value: number;
+  change: string;
+  trend: 'up' | 'down';
+  total?: number;
+}
+
+interface AdminStats {
+  activeUsers: StatValue;
+  monthlyRevenue: StatValue;
+  sessionsToday: StatValue;
+  conversionRate: StatValue;
+}
+
 // Component para estatísticas do sistema
 function SystemStats() {
-  const { data: stats, isLoading: statsLoading, error: statsError } = useQuery({
+  const { data: stats, isLoading: statsLoading, error: statsError } = useQuery<AdminStats>({
     queryKey: ['/api/admin/stats'],
     refetchInterval: 60000,
   });
@@ -162,7 +177,7 @@ function UserManagement() {
   const queryClient = useQueryClient();
 
   // Fetch users
-  const { data: users = [], isLoading } = useQuery({
+  const { data: users = [], isLoading } = useQuery<any[]>({
     queryKey: ['/api/users'],
     refetchInterval: 30000,
   });
@@ -210,7 +225,7 @@ function UserManagement() {
     }
   });
 
-  const filteredUsers = users.filter((user: any) => {
+  const filteredUsers = (users as any[]).filter((user: any) => {
     const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          user.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = filterStatus === 'all' || 
@@ -402,19 +417,17 @@ function UserManagement() {
       </AlertDialog>
 
       {/* Edit User Modal */}
-      {selectedUser && (
-        <EditUserModal 
-          user={selectedUser} 
-          onClose={() => setSelectedUser(null)} 
-        />
-      )}
+      <EditUserModal 
+        user={selectedUser} 
+        open={!!selectedUser}
+        onOpenChange={(open) => !open && setSelectedUser(null)}
+      />
 
       {/* Create User Modal */}
-      {showCreateModal && (
-        <CreateUserModal 
-          onClose={() => setShowCreateModal(false)} 
-        />
-      )}
+      <CreateUserModal 
+        open={showCreateModal}
+        onOpenChange={setShowCreateModal}
+      />
     </Card>
   );
 }
@@ -492,7 +505,7 @@ export default function AdminDashboard() {
               <div className="text-right">
                 <div className="text-xs text-gray-400">{user?.name || 'Admin'}</div>
                 <div className="text-xs text-roulette-green font-medium">
-                  {isSuperAdmin ? 'Super Admin' : 'Admin'}
+                  {isSuperAdmin() ? 'Super Admin' : 'Admin'}
                 </div>
               </div>
               <Link href="/">
