@@ -52,54 +52,54 @@ function QuickStats() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      <Card className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border-blue-500/20">
+      <Card className="bg-gray-800 border-gray-700">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Sessões Esta Semana</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.sessionsThisWeek}</p>
+              <p className="text-sm font-medium text-gray-400">Sessões Esta Semana</p>
+              <p className="text-2xl font-bold text-white">{stats.sessionsThisWeek}</p>
             </div>
             <div className="p-3 bg-blue-500/20 rounded-full">
-              <Calendar className="w-6 h-6 text-blue-600" />
+              <Calendar className="w-6 h-6 text-blue-400" />
             </div>
           </div>
         </CardContent>
       </Card>
 
-      <Card className="bg-gradient-to-br from-emerald-500/10 to-green-500/10 border-emerald-500/20">
+      <Card className="bg-gray-800 border-gray-700">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total de Resultados</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalResults.toLocaleString()}</p>
+              <p className="text-sm font-medium text-gray-400">Total de Resultados</p>
+              <p className="text-2xl font-bold text-white">{stats.totalResults.toLocaleString()}</p>
             </div>
             <div className="p-3 bg-emerald-500/20 rounded-full">
-              <BarChart3 className="w-6 h-6 text-emerald-600" />
+              <BarChart3 className="w-6 h-6 text-emerald-400" />
             </div>
           </div>
         </CardContent>
       </Card>
 
-      <Card className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-purple-500/20">
+      <Card className="bg-gray-800 border-gray-700">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Taxa de Acerto</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.accuracyRate}%</p>
+              <p className="text-sm font-medium text-gray-400">Taxa de Acerto</p>
+              <p className="text-2xl font-bold text-white">{stats.accuracyRate}%</p>
             </div>
             <div className="p-3 bg-purple-500/20 rounded-full">
-              <TrendingUp className="w-6 h-6 text-purple-600" />
+              <TrendingUp className="w-6 h-6 text-purple-400" />
             </div>
           </div>
         </CardContent>
       </Card>
 
-      <Card className={`bg-gradient-to-br ${planColors[stats.planType as keyof typeof planColors]}/10 border-current/20`}>
+      <Card className="bg-gray-800 border-gray-700">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Plano Atual</p>
-              <p className="text-lg font-bold text-gray-900 dark:text-white capitalize">{stats.planType}</p>
+              <p className="text-sm font-medium text-gray-400">Plano Atual</p>
+              <p className="text-lg font-bold text-white capitalize">{stats.planType}</p>
             </div>
             <div className={`p-3 bg-gradient-to-r ${planColors[stats.planType as keyof typeof planColors]} rounded-full text-white`}>
               {planIcons[stats.planType as keyof typeof planIcons]}
@@ -150,9 +150,9 @@ function RecentActivity() {
   ];
 
   return (
-    <Card>
+    <Card className="bg-gray-800 border-gray-700">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex items-center gap-2 text-white">
           <Activity className="w-5 h-5" />
           Atividade Recente
         </CardTitle>
@@ -187,9 +187,9 @@ function RecentActivity() {
 function PerformanceChart() {
   // Mock data - em produção seria um gráfico real
   return (
-    <Card>
+    <Card className="bg-gray-800 border-gray-700">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex items-center gap-2 text-white">
           <PieChart className="w-5 h-5" />
           Performance dos Últimos 30 Dias
         </CardTitle>
@@ -212,9 +212,9 @@ function ProfileSettings() {
   const { user } = useAuth();
 
   return (
-    <Card>
+    <Card className="bg-gray-800 border-gray-700">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex items-center gap-2 text-white">
           <User className="w-5 h-5" />
           Informações do Perfil
         </CardTitle>
@@ -227,26 +227,26 @@ function ProfileSettings() {
             </AvatarFallback>
           </Avatar>
           <div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+            <h3 className="text-xl font-semibold text-white">
               {user?.name || 'Usuário'}
             </h3>
-            <p className="text-gray-600 dark:text-gray-400">{user?.email}</p>
+            <p className="text-gray-400">{user?.email}</p>
             <Badge className="mt-2 capitalize">
               Plano {user?.planType || 'básico'}
             </Badge>
           </div>
         </div>
 
-        <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
+        <div className="pt-6 border-t border-gray-700">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label className="text-sm font-medium text-gray-300">
                 Membro desde
               </label>
-              <p className="text-gray-900 dark:text-white">Janeiro 2025</p>
+              <p className="text-white">Janeiro 2025</p>
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label className="text-sm font-medium text-gray-300">
                 Status da conta
               </label>
               <p className="text-roulette-green font-medium">Ativa</p>
@@ -274,9 +274,9 @@ function ProfileSettings() {
 // Quick Actions Component
 function QuickActions() {
   return (
-    <Card>
+    <Card className="bg-gray-800 border-gray-700">
       <CardHeader>
-        <CardTitle>Ações Rápidas</CardTitle>
+        <CardTitle className="text-white">Ações Rápidas</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
         <Link href="/app">
@@ -309,14 +309,14 @@ export default function UserDashboard() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-dashboard-dark flex items-center justify-center">
-        <Card className="w-full max-w-md mx-4">
+      <div className="min-h-screen bg-dashboard-dark font-casino flex items-center justify-center">
+        <Card className="w-full max-w-md mx-4 bg-gray-800 border-gray-700">
           <CardContent className="p-8 text-center">
             <User className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+            <h2 className="text-xl font-semibold text-white mb-2">
               Acesso Necessário
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
+            <p className="text-gray-400 mb-6">
               Faça login para acessar seu dashboard
             </p>
             <Link href="/">
@@ -329,16 +329,16 @@ export default function UserDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-dashboard-dark">
+    <div className="min-h-screen bg-dashboard-dark font-casino">
       {/* Header */}
-      <header className="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-700">
+      <header className="bg-gray-900 shadow-sm border-b border-gray-700">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-2xl font-bold text-white">
                 Dashboard
               </h1>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-gray-400">
                 Bem-vindo de volta, {user.name}
               </p>
             </div>
@@ -367,7 +367,7 @@ export default function UserDashboard() {
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+          <TabsList className="bg-gray-800 border border-gray-700">
             <TabsTrigger value="overview">Visão Geral</TabsTrigger>
             <TabsTrigger value="activity">Atividade</TabsTrigger>
             <TabsTrigger value="profile">Perfil</TabsTrigger>
