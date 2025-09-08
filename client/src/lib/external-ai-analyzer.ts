@@ -1,4 +1,4 @@
-import { RouletteResult } from '@/../../shared/schema';
+import { RouletteResult } from '@shared/schema';
 
 export interface ExternalAIInsight {
   provider: 'openai' | 'anthropic';

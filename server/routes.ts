@@ -522,6 +522,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin statistics endpoint
+  app.get('/api/admin/stats', async (req, res) => {
+    try {
+      const users = await storage.getUsers();
+      const results = await storage.getResults();
+      
+      // Calcular estatísticas
+      const activeUsers = users.filter(user => user.isActive).length;
+      const totalUsers = users.length;
+      
+      // Receita mensal estimada (baseada nos planos dos usuários ativos)
+      const monthlyRevenue = users
+        .filter(user => user.isActive)
+        .reduce((total, user) => {
+          const planPrices = { basico: 29.90, intermediario: 59.90, completo: 99.90 };
+          return total + (planPrices[user.planType] || 0);
+        }, 0);
+      
+      // Sessões hoje (resultados das últimas 24h)
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const sessionsToday = results.filter(result => 
+        new Date(result.timestamp) >= today
+      ).length;
+      
+      // Taxa de conversão (usuários ativos vs total)
+      const conversionRate = totalUsers > 0 ? (activeUsers / totalUsers * 100) : 0;
+      
+      const stats = {
+        activeUsers: {
+          value: activeUsers,
+          total: totalUsers,
+          change: '+12%', // Placeholder - poderia ser calculado comparando com período anterior
+          trend: 'up'
+        },
+        monthlyRevenue: {
+          value: monthlyRevenue,
+          change: '+8%', // Placeholder
+          trend: 'up'
+        },
+        sessionsToday: {
+          value: sessionsToday,
+          change: '+23%', // Placeholder  
+          trend: 'up'
+        },
+        conversionRate: {
+          value: conversionRate,
+          change: '+2.1%', // Placeholder
+          trend: 'up'
+        }
+      };
+      
+      res.json(stats);
+    } catch (error) {
+      console.error('Error fetching admin stats:', error);
+      res.status(500).json({ error: 'Failed to fetch admin statistics' });
+    }
+  });
+
   // Plan information endpoint
   app.get('/api/plans', async (req, res) => {
     try {
