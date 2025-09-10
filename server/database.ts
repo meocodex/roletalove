@@ -43,6 +43,13 @@ export async function testConnection() {
     return true;
   } catch (error) {
     console.error("❌ Database connection test failed:", error);
+    
+    // Em desenvolvimento, desabilitar database e usar in-memory storage
+    if (process.env.NODE_ENV === 'development') {
+      console.log("⚠️ Switching to in-memory storage for development");
+      db = null;
+      sql = null;
+    }
     return false;
   }
 }
@@ -50,7 +57,7 @@ export async function testConnection() {
 // Inicializar banco se necessário
 export async function initializeDatabase() {
   if (!db) {
-    console.log("Database not configured - skipping initialization");
+    console.log("Database not configured - using in-memory storage");
     return;
   }
 
@@ -75,5 +82,12 @@ export async function initializeDatabase() {
 
   } catch (error) {
     console.error("❌ Database initialization failed:", error);
+    
+    // Em desenvolvimento, desabilitar database e usar in-memory storage
+    if (process.env.NODE_ENV === 'development') {
+      console.log("⚠️ Switching to in-memory storage for development");
+      db = null;
+      sql = null;
+    }
   }
 }
