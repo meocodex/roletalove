@@ -171,14 +171,14 @@ export function hasStrategyAccess(userPlan: PlanType, strategyId: StrategyType):
   const strategy = STRATEGY_DEFINITIONS[strategyId];
   const planConfig = PLAN_CONFIG[userPlan];
   
-  return planConfig.strategies.includes(strategyId);
+  return (planConfig.strategies as readonly StrategyType[]).includes(strategyId);
 }
 
 // Função para obter estratégias disponíveis por plano
 export function getAvailableStrategies(userPlan: PlanType): StrategyInfo[] {
   const planConfig = PLAN_CONFIG[userPlan];
   
-  return planConfig.strategies.map(strategyId => STRATEGY_DEFINITIONS[strategyId]);
+  return (planConfig.strategies as readonly StrategyType[]).map(strategyId => STRATEGY_DEFINITIONS[strategyId]);
 }
 
 // Função para obter estratégias bloqueadas (para upgrade)
