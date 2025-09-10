@@ -18,7 +18,7 @@ const loginSchema = z.object({
 });
 
 // Simulação de banco de dados (substituir por Drizzle na Fase 2.2)
-let users: Array<{
+export let MOCK_USERS: Array<{
   id: string;
   email: string;
   name: string;

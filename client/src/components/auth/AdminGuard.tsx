@@ -56,10 +56,26 @@ export function AdminGuard({
   feature,
   fallback 
 }: AdminGuardProps) {
-  const { user, isAdmin, isSuperAdmin, hasAdminFeature } = useAuth();
+  const { user, isAdmin, isSuperAdmin, hasAdminFeature, isLoading } = useAuth();
   
-  // Check if user exists and is active
-  if (!user || user.isActive === false) {
+  // Show loading state while checking authentication
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-dashboard-dark flex items-center justify-center">
+        <div className="text-roulette-green">Verificando autenticação...</div>
+      </div>
+    );
+  }
+  
+  // If no user, redirect to login instead of showing access denied
+  if (!user) {
+    // Use dynamic import to avoid circular dependency with Router
+    window.location.href = '/login?redirect=/admin';
+    return null;
+  }
+  
+  // Check if user is active
+  if (user.isActive === false) {
     return fallback || <AccessDenied requiredRole={requiredRole} />;
   }
   

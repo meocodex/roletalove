@@ -60,7 +60,24 @@ class DatabaseService {
 
   async findUserByEmail(email: string): Promise<(User & { password: string }) | null> {
     if (!this.isDbAvailable()) {
-      // Fallback para storage em memória (implementação futura)
+      // Fallback para storage em memória - importar usuários mock
+      const { MOCK_USERS } = await import("./auth-routes");
+      const mockUser = MOCK_USERS.find(u => u.email.toLowerCase() === email.toLowerCase());
+      if (mockUser) {
+        return {
+          id: mockUser.id,
+          email: mockUser.email,
+          name: mockUser.name,
+          phone: '(11) 98888-8888', // Fallback para phone que é required
+          planType: mockUser.planType,
+          userRole: mockUser.userRole,
+          isActive: mockUser.isActive,
+          lastLoginAt: mockUser.lastLoginAt || null,
+          createdAt: mockUser.createdAt,
+          updatedAt: mockUser.createdAt,
+          password: mockUser.password
+        };
+      }
       return null;
     }
 
