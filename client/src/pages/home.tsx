@@ -60,14 +60,15 @@ function HeroSection({ onLoginClick }: { onLoginClick?: () => void }) {
             </Link>
           ) : (
             <>
-              <Button 
-                size="lg" 
-                className="bg-roulette-green hover:bg-roulette-green/90 text-white px-8 py-4 text-lg"
-                onClick={onLoginClick}
-              >
-                <LogIn className="w-5 h-5 mr-2" />
-                Começar Agora
-              </Button>
+              <Link href="/register">
+                <Button 
+                  size="lg" 
+                  className="bg-roulette-green hover:bg-roulette-green/90 text-white px-8 py-4 text-lg"
+                >
+                  <LogIn className="w-5 h-5 mr-2" />
+                  Começar Agora
+                </Button>
+              </Link>
               <Button 
                 size="lg" 
                 variant="outline" 
@@ -132,14 +133,14 @@ function FeaturesSection() {
   ];
 
   return (
-    <section id="features" className="py-20 bg-gray-50 dark:bg-gray-900">
+    <section id="features" className="py-20 bg-dashboard-dark">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-16">
-          <Badge className="mb-4">Funcionalidades</Badge>
-          <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+          <Badge className="mb-4 bg-roulette-green/20 text-roulette-green border-roulette-green/30">Funcionalidades</Badge>
+          <h2 className="text-4xl font-bold text-white mb-4">
             Tecnologia de Ponta para Análise
           </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
             Ferramentas profissionais desenvolvidas especificamente para maximizar 
             seus resultados na roleta através de análise científica.
           </p>
@@ -147,15 +148,15 @@ function FeaturesSection() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {features.map((feature, index) => (
-            <Card key={index} className="border-0 bg-white dark:bg-gray-800 shadow-xl hover:shadow-2xl transition-all duration-300">
+            <Card key={index} className="border-gray-700 bg-gray-800/50 shadow-xl hover:shadow-2xl hover:shadow-roulette-green/10 transition-all duration-300">
               <CardContent className="p-8">
                 <div className={`w-16 h-16 rounded-lg bg-gradient-to-r ${feature.gradient} flex items-center justify-center text-white mb-6`}>
                   {feature.icon}
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                <h3 className="text-2xl font-bold text-white mb-4">
                   {feature.title}
                 </h3>
-                <p className="text-gray-600 dark:text-gray-300 text-lg leading-relaxed">
+                <p className="text-gray-300 text-lg leading-relaxed">
                   {feature.description}
                 </p>
               </CardContent>
@@ -214,10 +215,10 @@ function PricingSection({ onLoginClick }: { onLoginClick?: () => void }) {
       icon: <Zap className="w-6 h-6" />,
       gradient: "from-blue-500 to-blue-600",
       features: [
-        "Análise de padrões básica",
-        "Mesa de roleta interativa", 
-        "Histórico de 100 resultados",
-        "Estratégias automáticas",
+        "Mesa de roleta interativa",
+        "Entrada manual de resultados", 
+        "Estratégias básicas automáticas",
+        "Análise de cores e padrões",
         "Suporte por email"
       ],
       recommended: false
@@ -229,11 +230,11 @@ function PricingSection({ onLoginClick }: { onLoginClick?: () => void }) {
       icon: <Target className="w-6 h-6" />,
       gradient: "from-purple-500 to-purple-600",
       features: [
+        "Tudo do Básico +",
         "Análise avançada de padrões",
-        "Histórico ilimitado",
-        "Alertas personalizados",
+        "Estratégias ML Analyzer",
         "15+ tipos de estratégias",
-        "Relatórios detalhados",
+        "Alertas personalizados",
         "Suporte prioritário"
       ],
       recommended: true
@@ -245,34 +246,33 @@ function PricingSection({ onLoginClick }: { onLoginClick?: () => void }) {
       icon: <Crown className="w-6 h-6" />,
       gradient: "from-yellow-500 to-yellow-600",
       features: [
-        "Análise com IA avançada",
-        "Múltiplas mesas simultâneas",
-        "Estratégias personalizadas",
-        "API para integração",
-        "Relatórios personalizados",
-        "Suporte 24/7 dedicado",
-        "Análise preditiva"
+        "Tudo do Intermediário +",
+        "IA Externa (ChatGPT + Claude)",
+        "Dashboard personalizável",
+        "Estratégias combinadas",
+        "Histórico ilimitado",
+        "Suporte 24/7 dedicado"
       ],
       recommended: false
     }
   ];
 
   return (
-    <section id="pricing" className="py-20 bg-gray-50 dark:bg-gray-900">
+    <section id="pricing" className="py-20 bg-gray-900">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-16">
-          <Badge className="mb-4">Planos</Badge>
-          <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+          <Badge className="mb-4 bg-roulette-green/20 text-roulette-green border-roulette-green/30">Planos</Badge>
+          <h2 className="text-4xl font-bold text-white mb-4">
             Escolha Seu Plano
           </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300">
+          <p className="text-xl text-gray-300">
             Investimento que se paga com os primeiros resultados
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {plans.map((plan, index) => (
-            <Card key={index} className={`relative ${plan.recommended ? 'ring-2 ring-roulette-green shadow-2xl scale-105' : 'shadow-lg'} hover:shadow-xl transition-all duration-300`}>
+            <Card key={index} className={`relative bg-gray-800/50 border-gray-700 ${plan.recommended ? 'ring-2 ring-roulette-green shadow-2xl shadow-roulette-green/20 scale-105' : 'shadow-lg'} hover:shadow-xl hover:shadow-roulette-green/10 transition-all duration-300`}>
               {plan.recommended && (
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                   <Badge className="bg-roulette-green text-white">Mais Popular</Badge>
@@ -283,12 +283,12 @@ function PricingSection({ onLoginClick }: { onLoginClick?: () => void }) {
                 <div className={`w-16 h-16 mx-auto rounded-full bg-gradient-to-r ${plan.gradient} flex items-center justify-center text-white mb-4`}>
                   {plan.icon}
                 </div>
-                <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
+                <CardTitle className="text-2xl font-bold text-white">
                   {plan.name}
                 </CardTitle>
                 <div className="mt-4">
-                  <span className="text-4xl font-bold text-gray-900 dark:text-white">R$ {plan.price}</span>
-                  <span className="text-gray-600 dark:text-gray-300">/{plan.period}</span>
+                  <span className="text-4xl font-bold text-white">R$ {plan.price}</span>
+                  <span className="text-gray-300">/{plan.period}</span>
                 </div>
               </CardHeader>
 
@@ -297,14 +297,14 @@ function PricingSection({ onLoginClick }: { onLoginClick?: () => void }) {
                   {plan.features.map((feature, featureIndex) => (
                     <li key={featureIndex} className="flex items-center">
                       <CheckCircle className="w-5 h-5 text-roulette-green mr-3 flex-shrink-0" />
-                      <span className="text-gray-700 dark:text-gray-300">{feature}</span>
+                      <span className="text-gray-300">{feature}</span>
                     </li>
                   ))}
                 </ul>
 
-                <Link href="/plans">
+                <Link href={`/register?plan=${plan.name.toLowerCase()}`}>
                   <Button 
-                    className={`w-full ${plan.recommended ? 'bg-roulette-green hover:bg-roulette-green/90' : 'bg-gray-800 hover:bg-gray-700'} text-white`}
+                    className={`w-full ${plan.recommended ? 'bg-roulette-green hover:bg-roulette-green/90' : 'bg-gray-700 hover:bg-gray-600'} text-white`}
                     size="lg"
                   >
                     Escolher {plan.name}
@@ -347,26 +347,26 @@ function TestimonialsSection() {
   ];
 
   return (
-    <section className="py-20 bg-white dark:bg-dashboard-dark">
+    <section className="py-20 bg-dashboard-dark">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-16">
-          <Badge className="mb-4">Depoimentos</Badge>
-          <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+          <Badge className="mb-4 bg-roulette-green/20 text-roulette-green border-roulette-green/30">Depoimentos</Badge>
+          <h2 className="text-4xl font-bold text-white mb-4">
             O que nossos usuários dizem
           </h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {testimonials.map((testimonial, index) => (
-            <Card key={index} className="shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <Card key={index} className="bg-gray-800/50 border-gray-700 shadow-lg hover:shadow-xl hover:shadow-roulette-green/10 transition-all duration-300">
               <CardContent className="p-8">
                 <div className="flex mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                    <Star key={i} className="w-5 h-5 text-roulette-green fill-current" />
                   ))}
                 </div>
                 
-                <p className="text-gray-700 dark:text-gray-300 mb-6 italic text-lg leading-relaxed">
+                <p className="text-gray-300 mb-6 italic text-lg leading-relaxed">
                   "{testimonial.content}"
                 </p>
                 
@@ -375,8 +375,8 @@ function TestimonialsSection() {
                     {testimonial.avatar}
                   </div>
                   <div>
-                    <div className="font-semibold text-gray-900 dark:text-white">{testimonial.name}</div>
-                    <div className="text-gray-600 dark:text-gray-400">{testimonial.role}</div>
+                    <div className="font-semibold text-white">{testimonial.name}</div>
+                    <div className="text-gray-400">{testimonial.role}</div>
                   </div>
                 </div>
               </CardContent>
@@ -401,14 +401,15 @@ function CTASection({ onLoginClick }: { onLoginClick?: () => void }) {
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button 
-            size="lg" 
-            className="bg-white text-roulette-green hover:bg-gray-100 px-8 py-4 text-lg font-semibold"
-            onClick={onLoginClick}
-          >
-            <Crown className="w-5 h-5 mr-2" />
-            Escolher Plano
-          </Button>
+          <Link href="/register">
+            <Button 
+              size="lg" 
+              className="bg-white text-roulette-green hover:bg-gray-100 px-8 py-4 text-lg font-semibold"
+            >
+              <Crown className="w-5 h-5 mr-2" />
+              Escolher Plano
+            </Button>
+          </Link>
           <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-roulette-green px-8 py-4 text-lg">
             Falar com Especialista
           </Button>

@@ -26,6 +26,7 @@ export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   email: varchar("email").unique().notNull(),
   name: varchar("name").notNull(),
+  phone: varchar("phone").notNull(),
   planType: planTypeEnum("plan_type").default('basico').notNull(),
   userRole: userRoleEnum("user_role").default('user').notNull(),
   isActive: boolean("is_active").default(true),
@@ -345,25 +346,30 @@ export type PlanType = 'basico' | 'intermediario' | 'completo';
 // Tipos de roles de usuário
 export type UserRole = 'user' | 'admin' | 'super_admin';
 
-// Configuração de planos com preços (em reais)
+// Configuração de planos com preços (em reais) - NOVO SISTEMA
 export const PLAN_CONFIG = {
   basico: {
     name: 'Plano Básico',
     price: 29.90,
+    description: 'Funcionalidades básicas para iniciantes',
     features: [
       'mesa_roleta',
       'entrada_manual',
       'resultados_recentes',
       'estatisticas_basicas'
     ],
-    limits: {
-      sessionsPerMonth: 10,
-      resultsPerSession: 100
-    }
+    strategies: [
+      'basic_patterns',        // Padrões básicos de cores
+      'color_analysis',        // Análise de sequências de cores
+      'simple_recommendations' // Recomendações simples
+    ],
+    maxStrategies: 3,
+    aiAnalysis: false
   },
   intermediario: {
     name: 'Plano Intermediário',
     price: 59.90,
+    description: 'Análises avançadas e múltiplas estratégias',
     features: [
       'mesa_roleta',
       'entrada_manual', 
@@ -374,14 +380,24 @@ export const PLAN_CONFIG = {
       'ml_analyzer',
       'graficos_basicos'
     ],
-    limits: {
-      sessionsPerMonth: 50,
-      resultsPerSession: 500
-    }
+    strategies: [
+      'basic_patterns',
+      'color_analysis', 
+      'simple_recommendations',
+      'dozen_patterns',        // Análise de dúzias
+      'column_patterns',       // Análise de colunas
+      'hot_cold_numbers',      // Números quentes/frios
+      'neighbor_strategies',   // Estratégias de vizinhos
+      'ml_predictions',        // Predições ML
+      'pattern_alerts'         // Alertas de padrões
+    ],
+    maxStrategies: 9,
+    aiAnalysis: false
   },
   completo: {
     name: 'Plano Completo',
     price: 99.90,
+    description: 'Acesso completo com IA externa e personalização',
     features: [
       'mesa_roleta',
       'entrada_manual',
@@ -399,10 +415,28 @@ export const PLAN_CONFIG = {
       'exportacao_dados',
       'historico_sessoes'
     ],
-    limits: {
-      sessionsPerMonth: -1, // ilimitado
-      resultsPerSession: -1  // ilimitado
-    }
+    strategies: [
+      // Todas as estratégias dos planos anteriores +
+      'basic_patterns',
+      'color_analysis',
+      'simple_recommendations', 
+      'dozen_patterns',
+      'column_patterns',
+      'hot_cold_numbers',
+      'neighbor_strategies',
+      'ml_predictions',
+      'pattern_alerts',
+      // Estratégias exclusivas do plano completo:
+      'ai_external_gpt',       // Análise GPT-4
+      'ai_external_claude',    // Análise Claude-4
+      'combined_strategies',   // Estratégias combinadas
+      'custom_algorithms',     // Algoritmos personalizados
+      'advanced_predictions',  // Predições avançadas
+      'multi_table_analysis',  // Análise múltiplas mesas
+      'probability_engine'     // Engine de probabilidades
+    ],
+    maxStrategies: -1, // Ilimitado
+    aiAnalysis: true
   }
 } as const;
 

@@ -7,9 +7,12 @@ import { AuthProvider } from "@/components/auth/AuthProvider";
 import { Header } from "@/components/layout/Header";
 import { PlanSelector } from "@/components/auth/PlanSelector";
 import HomePage from "@/pages/home";
+import LoginPage from "@/pages/login";
+import RegisterPage from "@/pages/register";
 import UserDashboard from "@/pages/user-dashboard";
 import RouletteDashboard from "@/pages/roulette-dashboard";
 import AdminDashboard from "@/pages/admin-dashboard";
+import StrategiesDemoPage from "@/pages/strategies-demo";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -21,6 +24,8 @@ function Router() {
           <HomePage />
         </>
       )} />
+      <Route path="/login" component={LoginPage} />
+      <Route path="/register" component={RegisterPage} />
       <Route path="/dashboard" component={() => (
         <>
           <Header />
@@ -40,6 +45,7 @@ function Router() {
         </>
       )} />
       <Route path="/admin" component={AdminDashboard} />
+      <Route path="/strategies-demo" component={StrategiesDemoPage} />
       <Route component={NotFound} />
     </Switch>
   );

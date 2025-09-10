@@ -14,10 +14,27 @@ import {
 import { z } from "zod";
 import { AIServices } from "./ai-services";
 import { PaymentService } from "./payment-service";
+import { 
+  registerUser, 
+  loginUser, 
+  refreshUserToken, 
+  logoutUser, 
+  getCurrentUser 
+} from "./auth-routes";
+import { authenticateToken } from "./auth-utils";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // API Routes
-  app.post('/api/results', async (req, res) => {
+  // Auth Routes - PUBLIC
+  app.post('/api/auth/register', registerUser);
+  app.post('/api/auth/login', loginUser);
+  app.post('/api/auth/refresh', refreshUserToken);
+  app.post('/api/auth/logout', logoutUser);
+  
+  // Auth Routes - PROTECTED
+  app.get('/api/auth/me', authenticateToken, getCurrentUser);
+
+  // API Routes - PROTECTED
+  app.post('/api/results', authenticateToken, async (req, res) => {
     try {
       const body = insertRouletteResultSchema.parse(req.body);
       const result = await storage.addResult(body);
@@ -28,7 +45,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/results', async (req, res) => {
+  app.get('/api/results', authenticateToken, async (req, res) => {
     try {
       const results = await storage.getResults();
       res.json(results);
@@ -39,7 +56,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Simplified patterns endpoint - client does analysis
-  app.get('/api/patterns', async (req, res) => {
+  app.get('/api/patterns', authenticateToken, async (req, res) => {
     try {
       const patterns = await storage.getPatterns();
       res.json(patterns);

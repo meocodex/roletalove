@@ -13,7 +13,7 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
-  login: (userData: User) => void;
+  login: (userData: User, token?: string) => void;
   logout: () => void;
   hasFeature: (feature: string) => boolean;
   hasAdminFeature: (feature: string) => boolean;
@@ -41,47 +41,75 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Verificar se há token válido e restaurar usuário
   useEffect(() => {
-    // Sistema de autenticação simplificado para desenvolvimento
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch {
-        // Fallback para usuário padrão
-        const defaultUser: User = {
-          id: 'user-001',
-          email: 'usuario@roleta.app',
-          name: 'Analista Roleta',
-          planType: 'completo',
-          userRole: 'admin'
-        };
-        setUser(defaultUser);
-        localStorage.setItem('user', JSON.stringify(defaultUser));
+    const checkAuth = async () => {
+      const token = localStorage.getItem('auth_token');
+      
+      if (!token) {
+        setIsLoading(false);
+        return;
       }
-    } else {
-      // Usuário padrão com acesso completo
-      const defaultUser: User = {
-        id: 'user-001',
-        email: 'usuario@roleta.app', 
-        name: 'Analista Roleta',
-        planType: 'completo',
-        userRole: 'admin'
-      };
-      setUser(defaultUser);
-      localStorage.setItem('user', JSON.stringify(defaultUser));
-    }
-    setIsLoading(false);
+
+      try {
+        const response = await fetch('/api/auth/me', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setUser(data.user);
+        } else {
+          // Token inválido ou expirado
+          localStorage.removeItem('auth_token');
+          localStorage.removeItem('user');
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('user');
+      }
+
+      setIsLoading(false);
+    };
+
+    checkAuth();
   }, []);
 
-  const login = (userData: User) => {
+  const login = (userData: User, token?: string) => {
     setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
+    
+    if (token) {
+      localStorage.setItem('auth_token', token);
+    }
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('user');
+  const logout = async () => {
+    try {
+      const token = localStorage.getItem('auth_token');
+      
+      if (token) {
+        // Notificar o servidor sobre logout (opcional)
+        await fetch('/api/auth/logout', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Logout request failed:', error);
+    } finally {
+      // Limpar dados locais independente do resultado da requisição
+      setUser(null);
+      localStorage.removeItem('user');
+      localStorage.removeItem('auth_token');
+    }
   };
 
   const hasFeature = (feature: string): boolean => {

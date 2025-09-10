@@ -139,7 +139,15 @@ export function Header({ transparent = false }: HeaderProps) {
               </DropdownMenu>
             ) : (
               <div className="flex items-center space-x-2">
-                <Link href="/plans">
+                <Link href="/login">
+                  <Button 
+                    variant="ghost"
+                    className={transparent ? 'text-white hover:bg-white/10' : 'text-gray-300 hover:text-white hover:bg-gray-800'}
+                  >
+                    Entrar
+                  </Button>
+                </Link>
+                <Link href="/register">
                   <Button 
                     variant={transparent ? "outline" : "default"}
                     className={transparent ? 'border-white text-white hover:bg-white hover:text-gray-900' : 'bg-roulette-green hover:bg-roulette-green/90'}
@@ -224,8 +232,14 @@ export function Header({ transparent = false }: HeaderProps) {
                   </div>
                 </>
               ) : (
-                <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
-                  <Link href="/plans">
+                <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4 space-y-2">
+                  <Link href="/login">
+                    <Button variant="ghost" className="w-full justify-start">
+                      <LogIn className="w-4 h-4 mr-2" />
+                      Entrar
+                    </Button>
+                  </Link>
+                  <Link href="/register">
                     <Button className="w-full bg-roulette-green hover:bg-roulette-green/90">
                       Começar Agora
                     </Button>

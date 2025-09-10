@@ -77,7 +77,7 @@ button, [role="button"] {
   --primary-foreground: hsl(222, 84%, 5%);
   --secondary: hsl(217, 33%, 17%);
   --secondary-foreground: hsl(210, 40%, 98%);
-  --accent: hsl(217, 33%, 17%);
+  --accent: hsl(217, 33%, 25%);
   --accent-foreground: hsl(210, 40%, 98%);
   --destructive: hsl(0, 62.8%, 30.6%);
   --destructive-foreground: hsl(210, 40%, 98%);
@@ -106,7 +106,7 @@ button, [role="button"] {
   --primary-foreground: hsl(222, 84%, 5%);
   --secondary: hsl(217, 33%, 17%);
   --secondary-foreground: hsl(210, 40%, 98%);
-  --accent: hsl(217, 33%, 17%);
+  --accent: hsl(217, 33%, 25%);
   --accent-foreground: hsl(210, 40%, 98%);
   --destructive: hsl(0, 62.8%, 30.6%);
   --destructive-foreground: hsl(210, 40%, 98%);

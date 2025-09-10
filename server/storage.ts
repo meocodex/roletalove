@@ -113,6 +113,7 @@ export class MemStorage implements IStorage {
       id: 'user-default-id',
       email: 'usuario@exemplo.com',
       name: 'Usuário Teste',
+      phone: '(11) 99999-9999',
       planType: 'basico',
       userRole: 'user',
       isActive: true,
@@ -123,9 +124,10 @@ export class MemStorage implements IStorage {
     
     // Usuário admin para testes
     const adminUser: User = {
-      id: 'admin-default-id',
-      email: 'admin@exemplo.com',
-      name: 'Admin Teste',
+      id: 'admin-001',
+      email: 'admin@roleta.app',
+      name: 'Administrador',
+      phone: '(11) 98888-8888',
       planType: 'completo',
       userRole: 'admin',
       isActive: true,
