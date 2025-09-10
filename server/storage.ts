@@ -9,9 +9,13 @@ import {
   type Subscription, type InsertSubscription,
   type Payment, type InsertPayment,
   type PaymentMethod, type InsertPaymentMethod,
-  type BillingEvent, type InsertBillingEvent
+  type BillingEvent, type InsertBillingEvent,
+  users, subscriptions, payments, paymentMethods, billingEvents,
+  rouletteResults, patterns, strategies, alerts, sessions, bettingPreferences
 } from "@shared/schema";
 import { randomUUID } from "crypto";
+import { db } from "./database";
+import { eq, desc, and } from "drizzle-orm";
 
 export interface IStorage {
   // Roulette Results
@@ -83,6 +87,305 @@ export interface IStorage {
   getBillingEvents(): Promise<BillingEvent[]>;
   getBillingEventsByUserId(userId: string): Promise<BillingEvent[]>;
   markBillingEventProcessed(id: string): Promise<void>;
+}
+
+export class DatabaseStorage implements IStorage {
+  // Roulette Results
+  async addResult(insertResult: InsertRouletteResult): Promise<RouletteResult> {
+    // Calculate number properties
+    const numberProps = {
+      color: insertResult.number === 0 ? 'green' : 
+             [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36].includes(insertResult.number) ? 'red' : 'black',
+      dozen: insertResult.number === 0 ? null : Math.ceil(insertResult.number / 12),
+      column: insertResult.number === 0 ? null : ((insertResult.number - 1) % 3) + 1,
+      half: insertResult.number === 0 ? null : insertResult.number <= 18 ? 'low' : 'high',
+      parity: insertResult.number === 0 ? null : insertResult.number % 2 === 0 ? 'even' : 'odd'
+    };
+    
+    const result = {
+      ...insertResult,
+      ...numberProps,
+      source: insertResult.source || 'manual'
+    };
+    
+    const [newResult] = await db.insert(rouletteResults).values(result).returning();
+    return newResult;
+  }
+
+  async getResults(sessionId?: string, limit = 100): Promise<RouletteResult[]> {
+    const query = db.select().from(rouletteResults);
+    if (sessionId) {
+      return await query.where(eq(rouletteResults.sessionId, sessionId))
+        .orderBy(desc(rouletteResults.timestamp))
+        .limit(limit);
+    }
+    return await query.orderBy(desc(rouletteResults.timestamp)).limit(limit);
+  }
+
+  async getRecentResults(limit: number): Promise<RouletteResult[]> {
+    return await db.select().from(rouletteResults)
+      .orderBy(desc(rouletteResults.timestamp))
+      .limit(limit);
+  }
+
+  // Patterns
+  async savePattern(insertPattern: InsertPattern): Promise<Pattern> {
+    const [pattern] = await db.insert(patterns).values(insertPattern).returning();
+    return pattern;
+  }
+
+  async getPatterns(): Promise<Pattern[]> {
+    return await db.select().from(patterns).orderBy(desc(patterns.probability));
+  }
+
+  async getActivePatterns(): Promise<Pattern[]> {
+    return await db.select().from(patterns)
+      .where(eq(patterns.isActive, true))
+      .orderBy(desc(patterns.probability));
+  }
+
+  async getPatternById(id: string): Promise<Pattern | undefined> {
+    const [pattern] = await db.select().from(patterns).where(eq(patterns.id, id));
+    return pattern || undefined;
+  }
+
+  async updatePattern(id: string, updates: Partial<Pattern>): Promise<Pattern | undefined> {
+    const [pattern] = await db.update(patterns)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(patterns.id, id))
+      .returning();
+    return pattern || undefined;
+  }
+
+  // Strategies
+  async saveStrategy(insertStrategy: InsertStrategy): Promise<Strategy> {
+    const [strategy] = await db.insert(strategies).values(insertStrategy).returning();
+    return strategy;
+  }
+
+  async getStrategies(): Promise<Strategy[]> {
+    return await db.select().from(strategies);
+  }
+
+  async getActiveStrategies(): Promise<Strategy[]> {
+    return await db.select().from(strategies).where(eq(strategies.isActive, true));
+  }
+
+  async updateStrategy(id: string, updates: Partial<Strategy>): Promise<Strategy | undefined> {
+    const [strategy] = await db.update(strategies)
+      .set(updates)
+      .where(eq(strategies.id, id))
+      .returning();
+    return strategy || undefined;
+  }
+
+  // Alerts
+  async addAlert(insertAlert: InsertAlert): Promise<Alert> {
+    const [alert] = await db.insert(alerts).values(insertAlert).returning();
+    return alert;
+  }
+
+  async getAlerts(): Promise<Alert[]> {
+    return await db.select().from(alerts).orderBy(desc(alerts.timestamp));
+  }
+
+  async getRecentAlerts(limit: number): Promise<Alert[]> {
+    return await db.select().from(alerts)
+      .orderBy(desc(alerts.timestamp))
+      .limit(limit);
+  }
+
+  async markAlertAsRead(id: string): Promise<void> {
+    await db.update(alerts).set({ read: true }).where(eq(alerts.id, id));
+  }
+
+  // Sessions
+  async createSession(insertSession: InsertSession): Promise<Session> {
+    const [session] = await db.insert(sessions).values(insertSession).returning();
+    return session;
+  }
+
+  async getCurrentSession(): Promise<Session | undefined> {
+    const [session] = await db.select().from(sessions)
+      .where(eq(sessions.isActive, true))
+      .orderBy(desc(sessions.startTime))
+      .limit(1);
+    return session || undefined;
+  }
+
+  async updateSession(id: string, updates: Partial<Session>): Promise<Session | undefined> {
+    const [session] = await db.update(sessions)
+      .set(updates)
+      .where(eq(sessions.id, id))
+      .returning();
+    return session || undefined;
+  }
+
+  // Betting Preferences
+  async getBettingPreferences(): Promise<BettingPreference[]> {
+    return await db.select().from(bettingPreferences).orderBy(desc(bettingPreferences.priority));
+  }
+
+  async updateBettingPreference(id: string, updates: Partial<BettingPreference>): Promise<BettingPreference | undefined> {
+    const [preference] = await db.update(bettingPreferences)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(bettingPreferences.id, id))
+      .returning();
+    return preference || undefined;
+  }
+
+  async saveBettingPreference(insertPreference: InsertBettingPreference): Promise<BettingPreference> {
+    const [preference] = await db.insert(bettingPreferences).values(insertPreference).returning();
+    return preference;
+  }
+
+  // Users
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db.insert(users).values(insertUser).returning();
+    return user;
+  }
+
+  async getUserById(id: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user || undefined;
+  }
+
+  async getUsers(): Promise<User[]> {
+    return await db.select().from(users).orderBy(desc(users.createdAt));
+  }
+
+  async updateUser(id: string, updates: Partial<User>): Promise<User | undefined> {
+    const [user] = await db.update(users)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
+    return user || undefined;
+  }
+
+  async deleteUser(id: string): Promise<boolean> {
+    const result = await db.delete(users).where(eq(users.id, id));
+    return result.rowCount !== null && result.rowCount > 0;
+  }
+
+  // Subscriptions
+  async createSubscription(insertSubscription: InsertSubscription): Promise<Subscription> {
+    const [subscription] = await db.insert(subscriptions).values(insertSubscription).returning();
+    return subscription;
+  }
+
+  async getSubscriptionById(id: string): Promise<Subscription | undefined> {
+    const [subscription] = await db.select().from(subscriptions).where(eq(subscriptions.id, id));
+    return subscription || undefined;
+  }
+
+  async getSubscriptionByUserId(userId: string): Promise<Subscription | undefined> {
+    const [subscription] = await db.select().from(subscriptions)
+      .where(and(eq(subscriptions.userId, userId), eq(subscriptions.status, 'active')));
+    return subscription || undefined;
+  }
+
+  async getSubscriptions(): Promise<Subscription[]> {
+    return await db.select().from(subscriptions).orderBy(desc(subscriptions.createdAt));
+  }
+
+  async updateSubscription(id: string, updates: Partial<Subscription>): Promise<Subscription | undefined> {
+    const [subscription] = await db.update(subscriptions)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(subscriptions.id, id))
+      .returning();
+    return subscription || undefined;
+  }
+
+  // Payments
+  async createPayment(insertPayment: InsertPayment): Promise<Payment> {
+    const [payment] = await db.insert(payments).values(insertPayment).returning();
+    return payment;
+  }
+
+  async getPaymentById(id: string): Promise<Payment | undefined> {
+    const [payment] = await db.select().from(payments).where(eq(payments.id, id));
+    return payment || undefined;
+  }
+
+  async getPaymentsByUserId(userId: string): Promise<Payment[]> {
+    return await db.select().from(payments)
+      .where(eq(payments.userId, userId))
+      .orderBy(desc(payments.createdAt));
+  }
+
+  async getPaymentsBySubscriptionId(subscriptionId: string): Promise<Payment[]> {
+    return await db.select().from(payments)
+      .where(eq(payments.subscriptionId, subscriptionId))
+      .orderBy(desc(payments.createdAt));
+  }
+
+  async getPayments(): Promise<Payment[]> {
+    return await db.select().from(payments).orderBy(desc(payments.createdAt));
+  }
+
+  async updatePayment(id: string, updates: Partial<Payment>): Promise<Payment | undefined> {
+    const [payment] = await db.update(payments)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(payments.id, id))
+      .returning();
+    return payment || undefined;
+  }
+
+  // Payment Methods
+  async createPaymentMethod(insertPaymentMethod: InsertPaymentMethod): Promise<PaymentMethod> {
+    const [paymentMethod] = await db.insert(paymentMethods).values(insertPaymentMethod).returning();
+    return paymentMethod;
+  }
+
+  async getPaymentMethodsByUserId(userId: string): Promise<PaymentMethod[]> {
+    return await db.select().from(paymentMethods)
+      .where(eq(paymentMethods.userId, userId))
+      .orderBy(desc(paymentMethods.createdAt));
+  }
+
+  async getDefaultPaymentMethod(userId: string): Promise<PaymentMethod | undefined> {
+    const [paymentMethod] = await db.select().from(paymentMethods)
+      .where(and(eq(paymentMethods.userId, userId), eq(paymentMethods.isDefault, true)));
+    return paymentMethod || undefined;
+  }
+
+  async updatePaymentMethod(id: string, updates: Partial<PaymentMethod>): Promise<PaymentMethod | undefined> {
+    const [paymentMethod] = await db.update(paymentMethods)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(paymentMethods.id, id))
+      .returning();
+    return paymentMethod || undefined;
+  }
+
+  async deletePaymentMethod(id: string): Promise<boolean> {
+    const result = await db.delete(paymentMethods).where(eq(paymentMethods.id, id));
+    return result.rowCount !== null && result.rowCount > 0;
+  }
+
+  // Billing Events
+  async createBillingEvent(insertEvent: InsertBillingEvent): Promise<BillingEvent> {
+    const [event] = await db.insert(billingEvents).values(insertEvent).returning();
+    return event;
+  }
+
+  async getBillingEvents(): Promise<BillingEvent[]> {
+    return await db.select().from(billingEvents).orderBy(desc(billingEvents.createdAt));
+  }
+
+  async getBillingEventsByUserId(userId: string): Promise<BillingEvent[]> {
+    return await db.select().from(billingEvents)
+      .where(eq(billingEvents.userId, userId))
+      .orderBy(desc(billingEvents.createdAt));
+  }
+
+  async markBillingEventProcessed(id: string): Promise<void> {
+    await db.update(billingEvents).set({ processed: true }).where(eq(billingEvents.id, id));
+  }
 }
 
 export class MemStorage implements IStorage {
@@ -736,4 +1039,4 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
