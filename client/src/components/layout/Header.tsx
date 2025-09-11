@@ -19,7 +19,8 @@ import {
   X,
   Home,
   Crown,
-  Activity
+  Activity,
+  LogIn
 } from 'lucide-react';
 
 interface HeaderProps {

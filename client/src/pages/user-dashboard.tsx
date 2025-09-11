@@ -24,6 +24,8 @@ import {
   Play,
   PieChart
 } from 'lucide-react';
+import StrategySelectionCards, { type Strategy } from '@/components/dashboard/StrategySelectionCards';
+import AnalysisSystemModal from '@/components/dashboard/AnalysisSystemModal';
 
 // Quick Stats Component
 function QuickStats() {
@@ -271,8 +273,8 @@ function ProfileSettings() {
   );
 }
 
-// Quick Actions Component
-function QuickActions() {
+// Quick Actions Component (Legacy)
+function QuickActionsLegacy() {
   return (
     <Card className="bg-gray-800 border-gray-700">
       <CardHeader>
@@ -282,7 +284,7 @@ function QuickActions() {
         <Link href="/app">
           <Button className="w-full justify-start bg-roulette-green hover:bg-roulette-green/90">
             <Play className="w-4 h-4 mr-2" />
-            Iniciar Nova Sessão
+            Sistema Original
             <ArrowRight className="w-4 h-4 ml-auto" />
           </Button>
         </Link>
@@ -306,6 +308,18 @@ function QuickActions() {
 // Main Dashboard Component
 export default function UserDashboard() {
   const { user } = useAuth();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedStrategy, setSelectedStrategy] = useState<Strategy | undefined>();
+
+  const handleStrategySelect = (strategy: Strategy) => {
+    setSelectedStrategy(strategy);
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setSelectedStrategy(undefined);
+  };
 
   if (!user) {
     return (
@@ -374,14 +388,10 @@ export default function UserDashboard() {
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2">
-                <PerformanceChart />
-              </div>
-              <div>
-                <QuickActions />
-              </div>
-            </div>
+            <StrategySelectionCards 
+              onStrategySelect={handleStrategySelect}
+              userPlan={user?.planType}
+            />
           </TabsContent>
 
           <TabsContent value="activity" className="space-y-6">
@@ -392,12 +402,20 @@ export default function UserDashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <ProfileSettings />
               <div className="space-y-6">
-                <QuickActions />
+                <QuickActionsLegacy />
               </div>
             </div>
           </TabsContent>
         </Tabs>
       </main>
+
+      {/* Analysis System Modal */}
+      <AnalysisSystemModal
+        isOpen={modalOpen}
+        onClose={handleCloseModal}
+        selectedStrategy={selectedStrategy}
+        autoStart={true}
+      />
     </div>
   );
 }
