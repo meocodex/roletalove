@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Zap, Target, RefreshCw } from 'lucide-react';
+import { useStrategyFloating } from '@/contexts/StrategyFloatingContext';
+import { Zap, Target, RefreshCw, Play } from 'lucide-react';
 import { UnifiedPatternAnalyzer } from '@/lib/pattern-analyzer';
 import { type RouletteResult } from '@shared/schema';
 import { getNumberColor, getColorClass } from '@/lib/roulette-utils';
@@ -15,6 +16,7 @@ interface SimplifiedStrategiesProps {
 export function SimplifiedStrategies({ results, className }: SimplifiedStrategiesProps) {
   const [currentStrategy, setCurrentStrategy] = useState<number[]>([]);
   const [strategyType, setStrategyType] = useState<'straight-up' | 'neighbors'>('straight-up');
+  const { openPanel } = useStrategyFloating();
   
   const generateStrategy = () => {
     if (strategyType === 'straight-up') {
@@ -57,6 +59,22 @@ export function SimplifiedStrategies({ results, className }: SimplifiedStrategie
 
   const clearStrategy = () => {
     setCurrentStrategy([]);
+  };
+
+  const playStrategy = () => {
+    if (currentStrategy.length === 0) return;
+    
+    const activeStrategy = {
+      id: `auto-${strategyType}-${Date.now()}`,
+      name: `${strategyType === 'straight-up' ? 'Plenos' : 'Vizinhos'} Automático`,
+      numbers: currentStrategy,
+      type: strategyType,
+      attempts: 0,
+      maxAttempts: 5,
+      successRate: 0
+    };
+    
+    openPanel(activeStrategy);
   };
 
   return (
@@ -142,6 +160,16 @@ export function SimplifiedStrategies({ results, className }: SimplifiedStrategie
                 <div>• Cobertura da mesa: ~{Math.round((currentStrategy.length / 37) * 100)}%</div>
               )}
             </div>
+
+            {/* Play Button */}
+            <Button
+              onClick={playStrategy}
+              className="w-full bg-roulette-green hover:bg-green-600 text-white"
+              size="sm"
+            >
+              <Play className="w-4 h-4 mr-2" />
+              Jogar Estratégia
+            </Button>
           </div>
         )}
 

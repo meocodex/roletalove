@@ -4,6 +4,8 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/components/auth/AuthProvider";
+import { StrategyFloatingProvider } from "@/contexts/StrategyFloatingContext";
+import AdaptiveStrategyPanel from "@/components/AdaptiveStrategyPanel";
 import { Header } from "@/components/layout/Header";
 import { PlanSelector } from "@/components/auth/PlanSelector";
 import HomePage from "@/pages/home";
@@ -55,10 +57,13 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
+        <StrategyFloatingProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Router />
+            <AdaptiveStrategyPanel />
+          </TooltipProvider>
+        </StrategyFloatingProvider>
       </AuthProvider>
     </QueryClientProvider>
   );

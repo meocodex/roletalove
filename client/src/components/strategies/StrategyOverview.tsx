@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useStrategyFloating } from '@/contexts/StrategyFloatingContext';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -14,7 +15,8 @@ import {
   ArrowUp,
   Brain,
   TrendingUp,
-  BarChart3
+  BarChart3,
+  Play
 } from "lucide-react";
 import { 
   getAvailableStrategies, 
@@ -76,6 +78,24 @@ interface StrategyCardProps {
 }
 
 function StrategyCard({ strategy, isAvailable }: StrategyCardProps) {
+  const { openPanel } = useStrategyFloating();
+
+  const handlePlayStrategy = () => {
+    if (!isAvailable) return;
+    
+    // Convert strategy to the format expected by floating panel
+    const activeStrategy = {
+      id: strategy.id,
+      name: strategy.name,
+      numbers: strategy.numbers || [1, 2, 3, 4, 5, 6, 7], // Default numbers if not provided
+      type: strategy.type || 'straight_up',
+      attempts: 0,
+      maxAttempts: 5,
+      successRate: 0
+    };
+    
+    openPanel(activeStrategy);
+  };
   return (
     <Card className={`${
       isAvailable 
@@ -111,18 +131,44 @@ function StrategyCard({ strategy, isAvailable }: StrategyCardProps) {
           {strategy.description}
         </p>
         
-        <div className="flex items-center gap-2">
-          <Badge 
-            variant="outline" 
-            className={`text-xs border-gray-600 ${getCategoryColor(strategy.category)}`}
-          >
-            {getCategoryIcon(strategy.category)}
-            <span className="ml-1">{strategy.category.toUpperCase()}</span>
-          </Badge>
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <Badge 
+              variant="outline" 
+              className={`text-xs border-gray-600 ${getCategoryColor(strategy.category)}`}
+            >
+              {getCategoryIcon(strategy.category)}
+              <span className="ml-1">{strategy.category.toUpperCase()}</span>
+            </Badge>
+            
+            <Badge variant="outline" className="text-xs border-gray-600 text-gray-400">
+              Nível {strategy.complexity}
+            </Badge>
+          </div>
           
-          <Badge variant="outline" className="text-xs border-gray-600 text-gray-400">
-            Nível {strategy.complexity}
-          </Badge>
+          {/* Play Button */}
+          {isAvailable && (
+            <Button
+              onClick={handlePlayStrategy}
+              className="w-full bg-roulette-green hover:bg-green-600 text-white"
+              size="sm"
+            >
+              <Play className="w-3 h-3 mr-2" />
+              Jogar Estratégia
+            </Button>
+          )}
+          
+          {!isAvailable && (
+            <Button
+              variant="ghost"
+              disabled
+              className="w-full"
+              size="sm"
+            >
+              <Lock className="w-3 h-3 mr-2" />
+              Upgrade Necessário
+            </Button>
+          )}
         </div>
       </CardContent>
     </Card>
