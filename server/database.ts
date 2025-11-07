@@ -6,14 +6,20 @@ import * as schema from "@shared/schema";
 // Configure WebSocket for Neon
 neonConfig.webSocketConstructor = ws;
 
+const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://dummy:dummy@localhost:5432/dummy';
+
 if (!process.env.DATABASE_URL) {
-  throw new Error(
-    "DATABASE_URL must be set. Did you forget to provision a database?",
-  );
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error(
+      "DATABASE_URL must be set. Did you forget to provision a database?",
+    );
+  }
+  console.warn("⚠️ DATABASE_URL not set. Running in development mode without database.");
+  console.warn("⚠️ Application will use in-memory storage. Data will be lost on restart.");
 }
 
 // Use the pool configuration from the blueprint
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+export const pool = new Pool({ connectionString: DATABASE_URL });
 export const db = drizzle({ client: pool, schema });
 
 console.log("✅ Database connection configured successfully");

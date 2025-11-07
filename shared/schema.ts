@@ -353,10 +353,11 @@ export const PLAN_CONFIG = {
     price: 29.90,
     description: 'Funcionalidades básicas para iniciantes',
     features: [
-      'mesa_roleta',
-      'entrada_manual',
-      'resultados_recentes',
-      'estatisticas_basicas'
+      'Mesa de roleta visual',
+      'Entrada manual de números',
+      'Histórico de resultados recentes (últimos 50)',
+      'Estatísticas básicas (cores, dúzias, colunas)',
+      'Análise de padrões simples'
     ],
     strategies: [
       'basic_patterns',        // Padrões básicos de cores
@@ -364,25 +365,29 @@ export const PLAN_CONFIG = {
       'simple_recommendations' // Recomendações simples
     ],
     maxStrategies: 3,
-    aiAnalysis: false
+    aiAnalysis: false,
+    limits: {
+      sessionsPerMonth: 10,
+      resultsPerSession: 100
+    }
   },
   intermediario: {
     name: 'Plano Intermediário',
     price: 59.90,
     description: 'Análises avançadas e múltiplas estratégias',
     features: [
-      'mesa_roleta',
-      'entrada_manual', 
-      'resultados_recentes',
-      'estatisticas_basicas',
-      'analise_padroes',
-      'estrategias_tradicionais',
-      'ml_analyzer',
-      'graficos_basicos'
+      'Tudo do Plano Básico',
+      'Análise de padrões avançados (dúzias, colunas)',
+      'Estratégias tradicionais (Martingale, Fibonacci)',
+      'Machine Learning Analyzer (predições inteligentes)',
+      'Gráficos básicos de tendências',
+      'Números quentes e frios',
+      'Alertas de padrões detectados',
+      'Histórico estendido (últimos 200 resultados)'
     ],
     strategies: [
       'basic_patterns',
-      'color_analysis', 
+      'color_analysis',
       'simple_recommendations',
       'dozen_patterns',        // Análise de dúzias
       'column_patterns',       // Análise de colunas
@@ -392,34 +397,35 @@ export const PLAN_CONFIG = {
       'pattern_alerts'         // Alertas de padrões
     ],
     maxStrategies: 9,
-    aiAnalysis: false
+    aiAnalysis: false,
+    limits: {
+      sessionsPerMonth: 50,
+      resultsPerSession: 500
+    }
   },
   completo: {
     name: 'Plano Completo',
     price: 99.90,
     description: 'Acesso completo com IA externa e personalização',
     features: [
-      'mesa_roleta',
-      'entrada_manual',
-      'resultados_recentes', 
-      'estatisticas_basicas',
-      'analise_padroes',
-      'estrategias_tradicionais',
-      'ml_analyzer',
-      'graficos_basicos',
-      'ia_externa_chatgpt',
-      'ia_externa_claude',
-      'estrategias_combinadas',
-      'graficos_avancados',
-      'dashboard_customizavel',
-      'exportacao_dados',
-      'historico_sessoes'
+      'Tudo dos Planos Anteriores',
+      'Análise com IA Externa (ChatGPT-4)',
+      'Análise com IA Externa (Claude 3.5)',
+      'Estratégias combinadas avançadas',
+      'Gráficos avançados e interativos',
+      'Dashboard customizável',
+      'Exportação de dados (CSV, JSON)',
+      'Histórico ilimitado de sessões',
+      'Algoritmos personalizados',
+      'Análise múltiplas mesas simultâneas',
+      'Engine de probabilidades avançado',
+      'Suporte prioritário'
     ],
     strategies: [
       // Todas as estratégias dos planos anteriores +
       'basic_patterns',
       'color_analysis',
-      'simple_recommendations', 
+      'simple_recommendations',
       'dozen_patterns',
       'column_patterns',
       'hot_cold_numbers',
@@ -436,7 +442,11 @@ export const PLAN_CONFIG = {
       'probability_engine'     // Engine de probabilidades
     ],
     maxStrategies: -1, // Ilimitado
-    aiAnalysis: true
+    aiAnalysis: true,
+    limits: {
+      sessionsPerMonth: -1,   // Ilimitado
+      resultsPerSession: -1   // Ilimitado
+    }
   }
 } as const;
 
