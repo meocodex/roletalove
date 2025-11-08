@@ -471,25 +471,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/checkout/create-payment', async (req, res) => {
-    try {
-      const { amount, currency = 'brl', metadata = {}, provider = 'stripe' } = req.body;
-      
-      if (!amount) {
-        return res.status(400).json({ error: 'amount is required' });
-      }
-
-      const result = await PaymentService.createPayment(amount, currency, metadata, provider);
-      res.json(result);
-    } catch (error) {
-      console.error('Error creating payment:', error);
-      res.status(500).json({ 
-        error: 'Failed to create payment', 
-        details: error instanceof Error ? error.message : 'Unknown error' 
-      });
-    }
-  });
-
   app.post('/api/checkout/cancel-subscription', async (req, res) => {
     try {
       const { subscriptionId, provider = 'stripe' } = req.body;
