@@ -52,10 +52,10 @@ function HeroSection({ onLoginClick }: { onLoginClick?: () => void }) {
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           {user ? (
-            <Link href="/dashboard">
+            <Link href="/app">
               <Button size="lg" className="bg-roulette-green hover:bg-roulette-green/90 text-white px-8 py-4 text-lg">
                 <Activity className="w-5 h-5 mr-2" />
-                Ir para Dashboard
+                Acessar Sistema
               </Button>
             </Link>
           ) : (

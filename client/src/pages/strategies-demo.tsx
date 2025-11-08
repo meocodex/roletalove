@@ -131,10 +131,10 @@ export default function StrategiesDemoPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <Link href="/dashboard">
+            <Link href="/app">
               <Button variant="ghost" className="hover:bg-gray-800 mb-4">
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Voltar ao Dashboard
+                Voltar ao Sistema
               </Button>
             </Link>
             <h1 className="text-3xl font-bold text-white">

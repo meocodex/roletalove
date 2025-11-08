@@ -13,7 +13,6 @@ import LoginPage from "@/pages/login";
 import RegisterPage from "@/pages/register";
 import { ForgotPasswordPage } from "@/pages/forgot-password";
 import { ResetPasswordPage } from "@/pages/reset-password";
-import UserDashboard from "@/pages/user-dashboard";
 import RouletteDashboard from "@/pages/roulette-dashboard";
 import AdminDashboard from "@/pages/admin-dashboard";
 import StrategiesDemoPage from "@/pages/strategies-demo";
@@ -32,12 +31,6 @@ function Router() {
       <Route path="/register" component={RegisterPage} />
       <Route path="/forgot-password" component={ForgotPasswordPage} />
       <Route path="/reset-password" component={ResetPasswordPage} />
-      <Route path="/dashboard" component={() => (
-        <>
-          <Header />
-          <UserDashboard />
-        </>
-      )} />
       <Route path="/app" component={() => (
         <>
           <Header />

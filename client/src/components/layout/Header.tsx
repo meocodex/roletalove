@@ -38,7 +38,6 @@ export function Header({ transparent = false }: HeaderProps) {
   ];
 
   const userNavigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: <User className="w-4 h-4" /> },
     { name: 'Sistema', href: '/app', icon: <BarChart3 className="w-4 h-4" /> },
   ];
 
@@ -115,12 +114,6 @@ export function Header({ transparent = false }: HeaderProps) {
                     </div>
                   </div>
                   <DropdownMenuSeparator />
-                  <Link href="/dashboard">
-                    <DropdownMenuItem>
-                      <User className="mr-2 h-4 w-4" />
-                      Dashboard
-                    </DropdownMenuItem>
-                  </Link>
                   <Link href="/app">
                     <DropdownMenuItem>
                       <Activity className="mr-2 h-4 w-4" />

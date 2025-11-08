@@ -49,9 +49,9 @@ export default function LoginPage() {
         title: "Login realizado com sucesso!",
         description: `Bem-vindo, ${data.user.name}!`,
       });
-      
-      // Redirecionar para dashboard após login
-      setTimeout(() => navigate('/dashboard'), 1000);
+
+      // Redirecionar para app após login
+      setTimeout(() => navigate('/app'), 1000);
 
     } catch (error: any) {
       toast({
