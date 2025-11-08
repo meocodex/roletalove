@@ -73,15 +73,15 @@ button, [role="button"] {
   --card-foreground: hsl(210, 40%, 98%);
   --border: hsl(217, 33%, 17%);
   --input: hsl(217, 33%, 17%);
-  --primary: hsl(210, 40%, 98%);
-  --primary-foreground: hsl(222, 84%, 5%);
+  --primary: hsl(142, 76%, 36%);
+  --primary-foreground: hsl(210, 40%, 98%);
   --secondary: hsl(217, 33%, 17%);
   --secondary-foreground: hsl(210, 40%, 98%);
   --accent: hsl(217, 33%, 25%);
   --accent-foreground: hsl(210, 40%, 98%);
   --destructive: hsl(0, 62.8%, 30.6%);
   --destructive-foreground: hsl(210, 40%, 98%);
-  --ring: hsl(217, 33%, 17%);
+  --ring: hsl(142, 76%, 36%);
   --radius: 0.5rem;
 
   /* Custom roulette colors */
@@ -102,15 +102,15 @@ button, [role="button"] {
   --card-foreground: hsl(210, 40%, 98%);
   --border: hsl(217, 33%, 17%);
   --input: hsl(217, 33%, 17%);
-  --primary: hsl(210, 40%, 98%);
-  --primary-foreground: hsl(222, 84%, 5%);
+  --primary: hsl(142, 76%, 36%);
+  --primary-foreground: hsl(210, 40%, 98%);
   --secondary: hsl(217, 33%, 17%);
   --secondary-foreground: hsl(210, 40%, 98%);
   --accent: hsl(217, 33%, 25%);
   --accent-foreground: hsl(210, 40%, 98%);
   --destructive: hsl(0, 62.8%, 30.6%);
   --destructive-foreground: hsl(210, 40%, 98%);
-  --ring: hsl(217, 33%, 17%);
+  --ring: hsl(142, 76%, 36%);
 }
 
 @layer base {

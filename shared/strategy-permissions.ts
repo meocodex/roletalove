@@ -167,35 +167,69 @@ export const STRATEGY_DEFINITIONS: Record<StrategyType, StrategyInfo> = {
 };
 
 // Função para verificar se usuário tem acesso à estratégia
-export function hasStrategyAccess(userPlan: PlanType, strategyId: StrategyType): boolean {
+export function hasStrategyAccess(
+  userPlan: PlanType,
+  strategyId: StrategyType,
+  userRole?: 'user' | 'admin' | 'super_admin'
+): boolean {
+  // Admin e Super Admin têm acesso total a todas as estratégias
+  if (userRole === 'admin' || userRole === 'super_admin') {
+    return true;
+  }
+
   const strategy = STRATEGY_DEFINITIONS[strategyId];
   const planConfig = PLAN_CONFIG[userPlan];
-  
+
   return (planConfig.strategies as readonly StrategyType[]).includes(strategyId);
 }
 
 // Função para obter estratégias disponíveis por plano
-export function getAvailableStrategies(userPlan: PlanType): StrategyInfo[] {
+export function getAvailableStrategies(
+  userPlan: PlanType,
+  userRole?: 'user' | 'admin' | 'super_admin'
+): StrategyInfo[] {
+  // Admin e Super Admin têm acesso a todas as estratégias
+  if (userRole === 'admin' || userRole === 'super_admin') {
+    return Object.values(STRATEGY_DEFINITIONS);
+  }
+
   const planConfig = PLAN_CONFIG[userPlan];
-  
+
   return (planConfig.strategies as readonly StrategyType[]).map(strategyId => STRATEGY_DEFINITIONS[strategyId]);
 }
 
 // Função para obter estratégias bloqueadas (para upgrade)
-export function getLockedStrategies(userPlan: PlanType): StrategyInfo[] {
+export function getLockedStrategies(
+  userPlan: PlanType,
+  userRole?: 'user' | 'admin' | 'super_admin'
+): StrategyInfo[] {
+  // Admin e Super Admin não têm estratégias bloqueadas
+  if (userRole === 'admin' || userRole === 'super_admin') {
+    return [];
+  }
+
   const allStrategies = Object.values(STRATEGY_DEFINITIONS);
-  const availableStrategies = getAvailableStrategies(userPlan);
+  const availableStrategies = getAvailableStrategies(userPlan, userRole);
   const availableIds = availableStrategies.map(s => s.id);
-  
+
   return allStrategies.filter(strategy => !availableIds.includes(strategy.id));
 }
 
 // Função para verificar limite de estratégias simultâneas
-export function canActivateStrategy(userPlan: PlanType, currentActiveCount: number): boolean {
+export function canActivateStrategy(
+  userPlan: PlanType,
+  currentActiveCount: number,
+  userRole?: 'user' | 'admin' | 'super_admin'
+): boolean {
+  // Admin e Super Admin têm estratégias ilimitadas
+  if (userRole === 'admin' || userRole === 'super_admin') {
+    return true;
+  }
+
   const planConfig = PLAN_CONFIG[userPlan];
-  
+
   if (planConfig.maxStrategies === -1) return true; // Ilimitado
-  
+
   return currentActiveCount < planConfig.maxStrategies;
 }
 
@@ -208,16 +242,102 @@ export function getRequiredPlanForStrategy(strategyId: StrategyType): PlanType {
 export function suggestPlanUpgrade(currentPlan: PlanType, desiredStrategies: StrategyType[]): PlanType | null {
   for (const strategyId of desiredStrategies) {
     const requiredPlan = getRequiredPlanForStrategy(strategyId);
-    
+
     // Verificar hierarquia de planos
     if (currentPlan === 'basico' && (requiredPlan === 'intermediario' || requiredPlan === 'completo')) {
       return requiredPlan === 'completo' ? 'completo' : 'intermediario';
     }
-    
+
     if (currentPlan === 'intermediario' && requiredPlan === 'completo') {
       return 'completo';
     }
   }
-  
+
   return null; // Não precisa de upgrade
+}
+
+// ==================== SISTEMA DE TRIAL E BLOQUEIO ====================
+
+/**
+ * Verifica se o trial do usuário ainda está ativo
+ */
+export function isTrialActive(subscription: {
+  startDate: Date | string;
+  trialDays: number;
+  isTrialUsed: boolean;
+}): boolean {
+  if (!subscription.isTrialUsed) {
+    return false; // Trial ainda não foi iniciado
+  }
+
+  const startDate = new Date(subscription.startDate);
+  const now = new Date();
+  const daysSinceStart = Math.floor((now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+
+  return daysSinceStart < subscription.trialDays;
+}
+
+/**
+ * Verifica se o usuário tem acesso ao sistema (trial ativo OU assinatura paga)
+ */
+export function hasActiveAccess(subscription: {
+  status: 'active' | 'trialing' | 'past_due' | 'canceled' | 'unpaid';
+  startDate: Date | string;
+  trialDays: number;
+  isTrialUsed: boolean;
+}): boolean {
+  // Status 'active' = pagamento em dia
+  if (subscription.status === 'active') {
+    return true;
+  }
+
+  // Status 'trialing' = em período de trial
+  if (subscription.status === 'trialing') {
+    return isTrialActive(subscription);
+  }
+
+  // Outros status = sem acesso
+  return false;
+}
+
+/**
+ * Calcula quantos dias restam no trial
+ */
+export function getTrialDaysRemaining(subscription: {
+  startDate: Date | string;
+  trialDays: number;
+  isTrialUsed: boolean;
+}): number {
+  if (!subscription.isTrialUsed) {
+    return subscription.trialDays; // Trial completo disponível
+  }
+
+  const startDate = new Date(subscription.startDate);
+  const now = new Date();
+  const daysSinceStart = Math.floor((now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+  const daysRemaining = subscription.trialDays - daysSinceStart;
+
+  return Math.max(0, daysRemaining);
+}
+
+/**
+ * Verifica se deve gerar fatura (trial expirou e ainda não foi gerada)
+ */
+export function shouldGenerateInvoice(subscription: {
+  status: 'active' | 'trialing' | 'past_due' | 'canceled' | 'unpaid';
+  startDate: Date | string;
+  trialDays: number;
+  isTrialUsed: boolean;
+}, hasUnpaidInvoice: boolean): boolean {
+  // Se já tem fatura em aberto, não gera outra
+  if (hasUnpaidInvoice) {
+    return false;
+  }
+
+  // Se o status é trialing e o trial expirou
+  if (subscription.status === 'trialing' && !isTrialActive(subscription)) {
+    return true;
+  }
+
+  return false;
 }
