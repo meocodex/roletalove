@@ -49,9 +49,9 @@ export default function LoginPage() {
         title: "Login realizado com sucesso!",
         description: `Bem-vindo, ${data.user.name}!`,
       });
-      
-      // Redirecionar para dashboard após login
-      setTimeout(() => navigate('/dashboard'), 1000);
+
+      // Redirecionar para app após login
+      setTimeout(() => navigate('/app'), 1000);
 
     } catch (error: any) {
       toast({
@@ -149,6 +149,14 @@ export default function LoginPage() {
                 {loading ? 'Entrando...' : 'Entrar'}
               </Button>
             </form>
+
+            <div className="mt-4 text-center">
+              <Link href="/forgot-password">
+                <span className="text-sm text-gray-400 hover:text-roulette-green cursor-pointer">
+                  Esqueceu sua senha?
+                </span>
+              </Link>
+            </div>
 
             <div className="mt-6 text-center">
               <p className="text-gray-400">

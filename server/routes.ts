@@ -14,10 +14,12 @@ import {
 import { z } from "zod";
 import { AIServices } from "./ai-services";
 import { PaymentService } from "./payment-service";
-import { 
-  registerUser, 
-  loginUser, 
-  refreshUserToken, 
+import {
+  registerUser,
+  loginUser,
+  refreshUserToken,
+  requestPasswordReset,
+  resetPassword, 
   logoutUser, 
   getCurrentUser 
 } from "./auth-routes";
@@ -29,7 +31,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/auth/login', loginUser);
   app.post('/api/auth/refresh', refreshUserToken);
   app.post('/api/auth/logout', logoutUser);
-  
+  app.post('/api/auth/request-password-reset', requestPasswordReset);
+  app.post('/api/auth/reset-password', resetPassword);
+
   // Auth Routes - PROTECTED
   app.get('/api/auth/me', authenticateToken, getCurrentUser);
 
@@ -466,25 +470,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error('Error creating subscription:', error);
       res.status(500).json({ 
         error: 'Failed to create subscription', 
-        details: error instanceof Error ? error.message : 'Unknown error' 
-      });
-    }
-  });
-
-  app.post('/api/checkout/create-payment', async (req, res) => {
-    try {
-      const { amount, currency = 'brl', metadata = {}, provider = 'stripe' } = req.body;
-      
-      if (!amount) {
-        return res.status(400).json({ error: 'amount is required' });
-      }
-
-      const result = await PaymentService.createPayment(amount, currency, metadata, provider);
-      res.json(result);
-    } catch (error) {
-      console.error('Error creating payment:', error);
-      res.status(500).json({ 
-        error: 'Failed to create payment', 
         details: error instanceof Error ? error.message : 'Unknown error' 
       });
     }

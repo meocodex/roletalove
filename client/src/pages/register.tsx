@@ -109,10 +109,10 @@ export default function RegisterPage() {
         title: "Conta criada com sucesso!",
         description: `Bem-vindo ao plano ${PLANS[selectedPlan].name}!`,
       });
-      
+
       // Na implementação real da Fase 3, redirecionaria para checkout de pagamento
-      // Por ora, vai direto para dashboard
-      setTimeout(() => navigate('/dashboard'), 1000);
+      // Por ora, vai direto para app
+      setTimeout(() => navigate('/app'), 1000);
       
     } catch (error: any) {
       toast({

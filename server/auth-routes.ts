@@ -248,3 +248,115 @@ export async function getCurrentUser(req: Request, res: Response) {
     });
   }
 }
+
+// POST /api/auth/request-password-reset
+export async function requestPasswordReset(req: Request, res: Response) {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        error: 'Email required',
+        message: 'Email é obrigatório'
+      });
+    }
+
+    // Verificar se usuário existe
+    const user = await dbService.findUserByEmail(email);
+
+    // Por segurança, sempre retornar sucesso (não revelar se email existe)
+    if (!user) {
+      return res.json({
+        message: 'Se o email existir, você receberá instruções para reset de senha'
+      });
+    }
+
+    // Gerar token único e seguro
+    const crypto = await import('crypto');
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
+
+    // Salvar token no banco (simular por enquanto com MOCK)
+    // TODO: Implementar dbService.createPasswordResetToken
+    console.log(`[PASSWORD RESET] Token gerado para ${email}: ${resetToken}`);
+    console.log(`[PASSWORD RESET] Link: http://localhost:5000/reset-password?token=${resetToken}`);
+
+    // TODO: Enviar email com link de reset
+    // await emailService.sendPasswordResetEmail(email, resetToken);
+
+    res.json({
+      message: 'Se o email existir, você receberá instruções para reset de senha',
+      // Apenas para desenvolvimento - REMOVER EM PRODUÇÃO
+      ...(process.env.NODE_ENV === 'development' && {
+        _dev_token: resetToken,
+        _dev_link: `http://localhost:5000/reset-password?token=${resetToken}`
+      })
+    });
+
+  } catch (error) {
+    console.error('Request password reset error:', error);
+    res.status(500).json({
+      error: 'Failed to process request',
+      message: 'Falha ao processar solicitação'
+    });
+  }
+}
+
+// POST /api/auth/reset-password
+export async function resetPassword(req: Request, res: Response) {
+  try {
+    const { token, newPassword } = req.body;
+
+    if (!token || !newPassword) {
+      return res.status(400).json({
+        error: 'Token and password required',
+        message: 'Token e nova senha são obrigatórios'
+      });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        error: 'Password too short',
+        message: 'Senha deve ter pelo menos 6 caracteres'
+      });
+    }
+
+    // TODO: Verificar token no banco
+    // const resetToken = await dbService.findPasswordResetToken(token);
+
+    // Simulação por enquanto
+    console.log(`[PASSWORD RESET] Tentando resetar senha com token: ${token}`);
+
+    // Verificar se token existe e não expirou
+    // if (!resetToken || resetToken.expiresAt < new Date() || resetToken.usedAt) {
+    //   return res.status(400).json({
+    //     error: 'Invalid or expired token',
+    //     message: 'Token inválido ou expirado'
+    //   });
+    // }
+
+    // TODO: Buscar usuário associado ao token
+    // const user = await dbService.findUserById(resetToken.userId);
+
+    // Por enquanto, retornar sucesso simulado
+    res.json({
+      message: 'Senha resetada com sucesso! Faça login com sua nova senha.',
+      // TODO: Implementar update real
+      _dev_note: 'Reset de senha será implementado com banco de dados real'
+    });
+
+    // TODO: Hash da nova senha e atualizar usuário
+    // const hashedPassword = await hashPassword(newPassword);
+    // await dbService.updateUserPassword(user.id, hashedPassword);
+
+    // TODO: Marcar token como usado
+    // await dbService.markPasswordResetTokenAsUsed(token);
+
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json({
+      error: 'Failed to reset password',
+      message: 'Falha ao resetar senha'
+    });
+  }
+}

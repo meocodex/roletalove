@@ -35,6 +35,16 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Password Reset Tokens
+export const passwordResetTokens = pgTable("password_reset_tokens", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  token: varchar("token", { length: 255 }).unique().notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  usedAt: timestamp("used_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // Controle de Features por Plano
 export const features = pgTable("features", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -269,6 +279,21 @@ export const insertUserSchema = createInsertSchema(users).omit({
   updatedAt: true
 });
 
+// Schema para password reset
+export const insertPasswordResetTokenSchema = createInsertSchema(passwordResetTokens).omit({
+  id: true,
+  createdAt: true
+});
+
+export const requestPasswordResetSchema = z.object({
+  email: z.string().email("Email inválido"),
+});
+
+export const resetPasswordSchema = z.object({
+  token: z.string().min(1, "Token obrigatório"),
+  newPassword: z.string().min(6, "Senha deve ter no mínimo 6 caracteres"),
+});
+
 // Schemas de inserção para pagamentos
 export const insertSubscriptionSchema = createInsertSchema(subscriptions).omit({
   id: true,
@@ -353,10 +378,11 @@ export const PLAN_CONFIG = {
     price: 29.90,
     description: 'Funcionalidades básicas para iniciantes',
     features: [
-      'mesa_roleta',
-      'entrada_manual',
-      'resultados_recentes',
-      'estatisticas_basicas'
+      'Mesa de roleta visual',
+      'Entrada manual de números',
+      'Histórico de resultados recentes (últimos 50)',
+      'Estatísticas básicas (cores, dúzias, colunas)',
+      'Análise de padrões simples'
     ],
     strategies: [
       'basic_patterns',        // Padrões básicos de cores
@@ -364,25 +390,29 @@ export const PLAN_CONFIG = {
       'simple_recommendations' // Recomendações simples
     ],
     maxStrategies: 3,
-    aiAnalysis: false
+    aiAnalysis: false,
+    limits: {
+      sessionsPerMonth: 10,
+      resultsPerSession: 100
+    }
   },
   intermediario: {
     name: 'Plano Intermediário',
     price: 59.90,
     description: 'Análises avançadas e múltiplas estratégias',
     features: [
-      'mesa_roleta',
-      'entrada_manual', 
-      'resultados_recentes',
-      'estatisticas_basicas',
-      'analise_padroes',
-      'estrategias_tradicionais',
-      'ml_analyzer',
-      'graficos_basicos'
+      'Tudo do Plano Básico',
+      'Análise de padrões avançados (dúzias, colunas)',
+      'Estratégias tradicionais (Martingale, Fibonacci)',
+      'Machine Learning Analyzer (predições inteligentes)',
+      'Gráficos básicos de tendências',
+      'Números quentes e frios',
+      'Alertas de padrões detectados',
+      'Histórico estendido (últimos 200 resultados)'
     ],
     strategies: [
       'basic_patterns',
-      'color_analysis', 
+      'color_analysis',
       'simple_recommendations',
       'dozen_patterns',        // Análise de dúzias
       'column_patterns',       // Análise de colunas
@@ -392,34 +422,35 @@ export const PLAN_CONFIG = {
       'pattern_alerts'         // Alertas de padrões
     ],
     maxStrategies: 9,
-    aiAnalysis: false
+    aiAnalysis: false,
+    limits: {
+      sessionsPerMonth: 50,
+      resultsPerSession: 500
+    }
   },
   completo: {
     name: 'Plano Completo',
     price: 99.90,
     description: 'Acesso completo com IA externa e personalização',
     features: [
-      'mesa_roleta',
-      'entrada_manual',
-      'resultados_recentes', 
-      'estatisticas_basicas',
-      'analise_padroes',
-      'estrategias_tradicionais',
-      'ml_analyzer',
-      'graficos_basicos',
-      'ia_externa_chatgpt',
-      'ia_externa_claude',
-      'estrategias_combinadas',
-      'graficos_avancados',
-      'dashboard_customizavel',
-      'exportacao_dados',
-      'historico_sessoes'
+      'Tudo dos Planos Anteriores',
+      'Análise com IA Externa (ChatGPT-4)',
+      'Análise com IA Externa (Claude 3.5)',
+      'Estratégias combinadas avançadas',
+      'Gráficos avançados e interativos',
+      'Dashboard customizável',
+      'Exportação de dados (CSV, JSON)',
+      'Histórico ilimitado de sessões',
+      'Algoritmos personalizados',
+      'Análise múltiplas mesas simultâneas',
+      'Engine de probabilidades avançado',
+      'Suporte prioritário'
     ],
     strategies: [
       // Todas as estratégias dos planos anteriores +
       'basic_patterns',
       'color_analysis',
-      'simple_recommendations', 
+      'simple_recommendations',
       'dozen_patterns',
       'column_patterns',
       'hot_cold_numbers',
@@ -436,7 +467,11 @@ export const PLAN_CONFIG = {
       'probability_engine'     // Engine de probabilidades
     ],
     maxStrategies: -1, // Ilimitado
-    aiAnalysis: true
+    aiAnalysis: true,
+    limits: {
+      sessionsPerMonth: -1,   // Ilimitado
+      resultsPerSession: -1   // Ilimitado
+    }
   }
 } as const;
 
