@@ -14,10 +14,12 @@ import {
 import { z } from "zod";
 import { AIServices } from "./ai-services";
 import { PaymentService } from "./payment-service";
-import { 
-  registerUser, 
-  loginUser, 
-  refreshUserToken, 
+import {
+  registerUser,
+  loginUser,
+  refreshUserToken,
+  requestPasswordReset,
+  resetPassword, 
   logoutUser, 
   getCurrentUser 
 } from "./auth-routes";
@@ -29,7 +31,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/auth/login', loginUser);
   app.post('/api/auth/refresh', refreshUserToken);
   app.post('/api/auth/logout', logoutUser);
-  
+  app.post('/api/auth/request-password-reset', requestPasswordReset);
+  app.post('/api/auth/reset-password', resetPassword);
+
   // Auth Routes - PROTECTED
   app.get('/api/auth/me', authenticateToken, getCurrentUser);
 
