@@ -2,14 +2,15 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
-import { 
-  insertRouletteResultSchema, 
+import {
+  insertRouletteResultSchema,
   insertAlertSchema,
   insertUserSchema,
   insertSubscriptionSchema,
   insertPaymentSchema,
   insertPaymentMethodSchema,
-  insertBillingEventSchema
+  insertBillingEventSchema,
+  PLAN_CONFIG
 } from "@shared/schema";
 import { z } from "zod";
 import { AIServices } from "./ai-services";
@@ -586,9 +587,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Plan information endpoint
   app.get('/api/plans', async (req, res) => {
     try {
-      // Import PLAN_CONFIG here to avoid circular dependency
-      const { PLAN_CONFIG } = await import('@shared/schema');
-      
       const plans = Object.entries(PLAN_CONFIG).map(([key, config]) => ({
         id: key,
         name: config.name,
@@ -596,7 +594,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         features: config.features,
         limits: config.limits
       }));
-      
+
       res.json(plans);
     } catch (error) {
       console.error('Error fetching plans:', error);
