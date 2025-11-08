@@ -9,6 +9,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/hooks/useAuth';
+import { useSubscriptionAccess } from '@/hooks/useSubscriptionAccess';
+import { Badge } from '@/components/ui/badge';
 import { Link, useLocation } from 'wouter';
 import {
   User,
@@ -20,7 +22,8 @@ import {
   Home,
   Crown,
   Activity,
-  LogIn
+  LogIn,
+  Clock
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -30,6 +33,7 @@ interface HeaderProps {
 export function Header({ transparent = false }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, logout } = useAuth();
+  const { trialActive, daysLeft, isAdmin } = useSubscriptionAccess();
   const [location] = useLocation();
 
   const navigation = [
@@ -93,6 +97,23 @@ export function Header({ transparent = false }: HeaderProps) {
 
           {/* User Menu or Auth Buttons */}
           <div className="flex items-center space-x-4">
+            {/* Trial Badge */}
+            {user && !isAdmin && trialActive && daysLeft > 0 && (
+              <Badge
+                variant="outline"
+                className={`hidden md:flex items-center gap-1 ${
+                  daysLeft <= 3
+                    ? 'border-red-500 text-red-400 bg-red-500/10'
+                    : 'border-blue-500 text-blue-400 bg-blue-500/10'
+                }`}
+              >
+                <Clock className="w-3 h-3" />
+                <span className="text-xs font-medium">
+                  {daysLeft} {daysLeft === 1 ? 'dia' : 'dias'} restante{daysLeft !== 1 ? 's' : ''}
+                </span>
+              </Badge>
+            )}
+
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

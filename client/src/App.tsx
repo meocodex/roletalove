@@ -9,6 +9,7 @@ import AdaptiveStrategyPanel from "@/components/AdaptiveStrategyPanel";
 import { Header } from "@/components/layout/Header";
 import { PlanSelector } from "@/components/auth/PlanSelector";
 import { AccessGuard, TrialBanner } from "@/components/auth/AccessGuard";
+import { TrialNotifications } from "@/components/auth/TrialNotifications";
 import HomePage from "@/pages/home";
 import LoginPage from "@/pages/login";
 import RegisterPage from "@/pages/register";
@@ -17,6 +18,7 @@ import { ResetPasswordPage } from "@/pages/reset-password";
 import RouletteDashboard from "@/pages/roulette-dashboard";
 import AdminDashboard from "@/pages/admin-dashboard";
 import StrategiesDemoPage from "@/pages/strategies-demo";
+import InvoicesPage from "@/pages/invoices";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -47,6 +49,12 @@ function Router() {
           <PlanSelector />
         </>
       )} />
+      <Route path="/invoices" component={() => (
+        <>
+          <Header />
+          <InvoicesPage />
+        </>
+      )} />
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/strategies-demo" component={StrategiesDemoPage} />
       <Route component={NotFound} />
@@ -61,6 +69,7 @@ function App() {
         <StrategyFloatingProvider>
           <TooltipProvider>
             <Toaster />
+            <TrialNotifications />
             <Router />
             <AdaptiveStrategyPanel />
           </TooltipProvider>
