@@ -2,10 +2,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CreditCard, Crown, Calendar, AlertTriangle, Settings, ExternalLink } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "wouter";
 import { UpgradeDialog } from "./UpgradeDialog";
+import { CancelSubscriptionDialog } from "./CancelSubscriptionDialog";
+import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 
 interface Subscription {
@@ -18,6 +20,7 @@ interface Subscription {
   currentPeriodEnd: string;
   nextBillingDate?: string;
   trialEnd?: string;
+  stripeSubscriptionId?: string;
   metadata?: any;
 }
 
@@ -64,7 +67,10 @@ const getStatusBadge = (status: string, trialEnd?: string) => {
 
 export function SubscriptionCard() {
   const { user } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
 
   const { data: subscription, isLoading } = useQuery({
     queryKey: ['/api/subscriptions/user', user?.id],
@@ -72,6 +78,47 @@ export function SubscriptionCard() {
     enabled: !!user?.id,
     refetchInterval: 30000 // Atualizar a cada 30 segundos
   });
+
+  // Mutation para cancelar assinatura
+  const cancelMutation = useMutation({
+    mutationFn: async (subscriptionId: string) => {
+      const response = await fetch('/api/checkout/cancel-subscription', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          subscriptionId,
+          provider: 'stripe'
+        })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.details || 'Falha ao cancelar assinatura');
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/subscriptions/user', user?.id] });
+      toast({
+        title: "Assinatura cancelada",
+        description: "Sua assinatura foi cancelada com sucesso. Você continuará tendo acesso até o fim do período.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        variant: "destructive",
+        title: "Erro ao cancelar",
+        description: error.message
+      });
+    }
+  });
+
+  const handleCancelSubscription = async () => {
+    if (subscription?.stripeSubscriptionId) {
+      await cancelMutation.mutateAsync(subscription.stripeSubscriptionId);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -203,13 +250,10 @@ export function SubscriptionCard() {
           </Button>
           
           {subscription.status === 'active' && (
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="bg-red-600/20 border-red-600/50 text-red-400 hover:bg-red-600/30"
-              onClick={() => {
-                // TODO: Implementar cancelamento
-                console.log('Cancelar assinatura:', subscription.id);
-              }}
+              onClick={() => setShowCancelDialog(true)}
             >
               Cancelar
             </Button>
@@ -225,6 +269,17 @@ export function SubscriptionCard() {
           currentPlan={subscription.planType}
           currentPrice={subscription.priceMonthly}
           userId={user.id}
+        />
+      )}
+
+      {/* Cancel Subscription Dialog */}
+      {subscription && (
+        <CancelSubscriptionDialog
+          open={showCancelDialog}
+          onOpenChange={setShowCancelDialog}
+          onConfirm={handleCancelSubscription}
+          planName={getPlanName(subscription.planType)}
+          nextBillingDate={subscription.nextBillingDate}
         />
       )}
     </Card>
