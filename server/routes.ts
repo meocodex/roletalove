@@ -294,15 +294,139 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { id } = req.params;
       const updates = req.body;
       const subscription = await storage.updateSubscription(id, updates);
-      
+
       if (!subscription) {
         return res.status(404).json({ error: 'Subscription not found' });
       }
-      
+
       res.json(subscription);
     } catch (error) {
       console.error('Error updating subscription:', error);
       res.status(500).json({ error: 'Failed to update subscription' });
+    }
+  });
+
+  // Subscription Access Check Route
+  app.get('/api/subscription/check-access', authenticateToken, async (req, res) => {
+    try {
+      const userId = (req as any).user?.id;
+
+      if (!userId) {
+        return res.status(401).json({ error: 'User not authenticated' });
+      }
+
+      // Importar funções de verificação de trial
+      const { hasActiveAccess, getTrialDaysRemaining, isTrialActive } = await import('@shared/strategy-permissions');
+
+      const subscription = await storage.getSubscriptionByUserId(userId);
+
+      if (!subscription) {
+        return res.status(404).json({
+          hasAccess: false,
+          daysLeft: 0,
+          status: 'no_subscription',
+          message: 'Nenhuma assinatura encontrada'
+        });
+      }
+
+      const hasAccess = hasActiveAccess({
+        status: subscription.status as any,
+        startDate: subscription.startDate,
+        trialDays: subscription.trialDays || 7,
+        isTrialUsed: subscription.isTrialUsed || false
+      });
+
+      const daysLeft = getTrialDaysRemaining({
+        startDate: subscription.startDate,
+        trialDays: subscription.trialDays || 7,
+        isTrialUsed: subscription.isTrialUsed || false
+      });
+
+      const trialActive = isTrialActive({
+        startDate: subscription.startDate,
+        trialDays: subscription.trialDays || 7,
+        isTrialUsed: subscription.isTrialUsed || false
+      });
+
+      res.json({
+        hasAccess,
+        daysLeft,
+        trialActive,
+        status: subscription.status,
+        planType: subscription.planType,
+        nextBillingDate: subscription.nextBillingDate
+      });
+    } catch (error) {
+      console.error('Error checking subscription access:', error);
+      res.status(500).json({ error: 'Failed to check subscription access' });
+    }
+  });
+
+  // Generate Invoices for Expired Trials
+  app.post('/api/subscription/generate-invoices', authenticateToken, async (req, res) => {
+    try {
+      const userId = (req as any).user?.id;
+      const user = await storage.getUserById(userId);
+
+      // Apenas admin pode gerar faturas em lote
+      if (!user || (user.userRole !== 'admin' && user.userRole !== 'super_admin')) {
+        return res.status(403).json({ error: 'Acesso negado. Apenas administradores podem gerar faturas.' });
+      }
+
+      const { shouldGenerateInvoice, isTrialActive } = await import('@shared/strategy-permissions');
+
+      // Buscar todas as assinaturas
+      const allSubscriptions = await storage.getSubscriptions();
+      const invoicesGenerated: string[] = [];
+
+      for (const subscription of allSubscriptions) {
+        // Verificar se o trial expirou
+        const trialActive = isTrialActive({
+          startDate: subscription.startDate,
+          trialDays: subscription.trialDays || 7,
+          isTrialUsed: subscription.isTrialUsed || false
+        });
+
+        // Se trial expirado e status ainda é trialing
+        if (!trialActive && subscription.status === 'trialing') {
+          // Verificar se já tem fatura pendente
+          const userPayments = await storage.getPaymentsByUserId(subscription.userId);
+          const hasPendingInvoice = userPayments.some(p => p.status === 'pending');
+
+          if (shouldGenerateInvoice({
+            status: subscription.status as any,
+            startDate: subscription.startDate,
+            trialDays: subscription.trialDays || 7,
+            isTrialUsed: subscription.isTrialUsed || false
+          }, hasPendingInvoice)) {
+            // Gerar fatura
+            const invoice = await storage.createPayment({
+              subscriptionId: subscription.id,
+              userId: subscription.userId,
+              amount: subscription.priceMonthly,
+              currency: subscription.currency,
+              status: 'pending',
+              paymentMethod: 'boleto',
+              description: `Fatura mensal - ${subscription.planType.toUpperCase()}`
+            });
+
+            // Atualizar status da assinatura para unpaid
+            await storage.updateSubscription(subscription.id, {
+              status: 'unpaid'
+            });
+
+            invoicesGenerated.push(invoice.id);
+          }
+        }
+      }
+
+      res.json({
+        message: `${invoicesGenerated.length} fatura(s) gerada(s) com sucesso`,
+        invoices: invoicesGenerated
+      });
+    } catch (error) {
+      console.error('Error generating invoices:', error);
+      res.status(500).json({ error: 'Failed to generate invoices' });
     }
   });
 

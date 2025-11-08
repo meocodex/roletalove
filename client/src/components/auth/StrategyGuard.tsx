@@ -113,19 +113,20 @@ function StrategyUpgradePrompt({ strategyId }: StrategyUpgradePromptProps) {
 export function StrategyGuard({ strategyId, children, fallback, showUpgrade = true }: StrategyGuardProps) {
   const { user } = useAuth();
   const userPlan = user?.planType || 'basico';
-  
-  if (hasStrategyAccess(userPlan, strategyId)) {
+  const userRole = user?.userRole || 'user';
+
+  if (hasStrategyAccess(userPlan, strategyId, userRole)) {
     return <>{children}</>;
   }
-  
+
   if (fallback) {
     return <>{fallback}</>;
   }
-  
+
   if (showUpgrade) {
     return <StrategyUpgradePrompt strategyId={strategyId} />;
   }
-  
+
   return null;
 }
 
@@ -133,10 +134,12 @@ export function StrategyGuard({ strategyId, children, fallback, showUpgrade = tr
 export function useStrategyAccess() {
   const { user } = useAuth();
   const userPlan = user?.planType || 'basico';
-  
+  const userRole = user?.userRole || 'user';
+
   return {
-    hasStrategyAccess: (strategyId: StrategyType) => hasStrategyAccess(userPlan, strategyId),
+    hasStrategyAccess: (strategyId: StrategyType) => hasStrategyAccess(userPlan, strategyId, userRole),
     getRequiredPlan: (strategyId: StrategyType) => getRequiredPlanForStrategy(strategyId),
-    userPlan
+    userPlan,
+    userRole
   };
 }
