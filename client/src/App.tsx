@@ -8,6 +8,7 @@ import { StrategyFloatingProvider } from "@/contexts/StrategyFloatingContext";
 import AdaptiveStrategyPanel from "@/components/AdaptiveStrategyPanel";
 import { Header } from "@/components/layout/Header";
 import { PlanSelector } from "@/components/auth/PlanSelector";
+import { AccessGuard, TrialBanner } from "@/components/auth/AccessGuard";
 import HomePage from "@/pages/home";
 import LoginPage from "@/pages/login";
 import RegisterPage from "@/pages/register";
@@ -34,7 +35,10 @@ function Router() {
       <Route path="/app" component={() => (
         <>
           <Header />
-          <RouletteDashboard />
+          <TrialBanner />
+          <AccessGuard>
+            <RouletteDashboard />
+          </AccessGuard>
         </>
       )} />
       <Route path="/plans" component={() => (
