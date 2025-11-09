@@ -133,6 +133,30 @@ export async function getAllUsers() {
 }
 
 /**
+ * Get user roles from user_roles table
+ */
+export async function getUserRoles(authUserId: string) {
+  const { data, error } = await supabase
+    .from('user_roles')
+    .select('role')
+    .eq('user_id', authUserId);
+
+  if (error) throw error;
+  return data?.map(r => r.role) || [];
+}
+
+/**
+ * Check if user has a specific role
+ */
+export async function hasRole(authUserId: string, role: string) {
+  const { data, error } = await supabase
+    .rpc('has_role', { _user_id: authUserId, _role: role });
+
+  if (error) throw error;
+  return data || false;
+}
+
+/**
  * Update user data
  */
 export async function updateUser(userId: string, updates: {
@@ -140,13 +164,33 @@ export async function updateUser(userId: string, updates: {
   email?: string;
   phone?: string;
   plan_type?: string;
-  user_role?: string;
   is_active?: boolean;
 }) {
   const { data, error } = await supabase
     .from('users')
     .update(updates)
     .eq('id', userId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+/**
+ * Update user role (in user_roles table)
+ */
+export async function updateUserRole(authUserId: string, newRole: 'user' | 'admin' | 'super_admin') {
+  // First, remove all existing roles
+  await supabase
+    .from('user_roles')
+    .delete()
+    .eq('user_id', authUserId);
+
+  // Then insert the new role
+  const { data, error } = await supabase
+    .from('user_roles')
+    .insert({ user_id: authUserId, role: newRole })
     .select()
     .single();
 

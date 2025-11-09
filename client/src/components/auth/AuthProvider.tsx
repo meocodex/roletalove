@@ -3,14 +3,15 @@ import { supabase } from '@/integrations/supabase/client';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
 import { PlanType, UserRole, PLAN_FEATURES, ADMIN_FEATURES } from '@shared/schema';
 
-interface UserProfile {
+export interface UserProfile {
   id: string;
   auth_user_id: string;
   email: string;
   name: string;
   phone: string;
   plan_type: PlanType;
-  user_role: UserRole;
+  user_role: UserRole; // Deprecated: use roles array
+  roles: ('user' | 'admin' | 'super_admin')[]; // New: from user_roles table
   is_active: boolean;
   last_login_at: string | null;
   created_at: string;
@@ -55,18 +56,35 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Buscar perfil do usuário
   const fetchUserProfile = async (authUserId: string): Promise<UserProfile | null> => {
     try {
-      const { data, error } = await supabase
+      // Fetch user data
+      const { data: userData, error: userError } = await supabase
         .from('users')
         .select('*')
         .eq('auth_user_id', authUserId)
         .single();
 
-      if (error) {
-        console.error('Error fetching user profile:', error);
+      if (userError) {
+        console.error('Error fetching user profile:', userError);
         return null;
       }
 
-      return data;
+      // Fetch user roles from user_roles table
+      const { data: rolesData, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', authUserId);
+
+      if (rolesError) {
+        console.error('Error fetching user roles:', rolesError);
+      }
+
+      const roles = rolesData?.map(r => r.role as 'user' | 'admin' | 'super_admin') || ['user'];
+      
+      return {
+        ...userData,
+        roles,
+        user_role: roles[0] || 'user' // For backward compatibility
+      } as UserProfile;
     } catch (error) {
       console.error('Error fetching user profile:', error);
       return null;
@@ -167,11 +185,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   const isAdmin = (): boolean => {
-    return user?.user_role === 'admin' || user?.user_role === 'super_admin';
+    return user?.roles?.includes('admin') || user?.roles?.includes('super_admin') || false;
   };
 
   const isSuperAdmin = (): boolean => {
-    return user?.user_role === 'super_admin';
+    return user?.roles?.includes('super_admin') || false;
   };
 
   const contextValue: AuthContextType = {

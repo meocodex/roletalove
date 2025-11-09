@@ -32,7 +32,7 @@ function AccessDenied({ requiredRole }: { requiredRole?: string }) {
           </p>
           
           <div className="text-sm text-gray-500 bg-gray-900 p-3 rounded">
-            <p><strong>Seu perfil:</strong> {user?.user_role || 'Não identificado'}</p>
+            <p><strong>Seu perfil:</strong> {user?.roles?.[0] || 'Não identificado'}</p>
             {requiredRole && (
               <p><strong>Necessário:</strong> {requiredRole}</p>
             )}

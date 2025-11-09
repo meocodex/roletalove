@@ -51,7 +51,7 @@ export function useSupabaseSubscription() {
   });
 
   // Admin sempre tem acesso total
-  if (user?.user_role === 'admin' || user?.user_role === 'super_admin') {
+  if (user?.roles?.includes('admin') || user?.roles?.includes('super_admin')) {
     return {
       hasAccess: true,
       daysLeft: -1,
