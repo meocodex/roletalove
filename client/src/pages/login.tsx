@@ -16,7 +16,7 @@ export default function LoginPage() {
     password: ''
   });
 
-  const { login } = useAuth();
+  const { signIn } = useAuth();
   const { toast } = useToast();
   const [, navigate] = useLocation();
 
@@ -25,38 +25,24 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-        }),
-      });
+      const { error } = await signIn(formData.email, formData.password);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Erro no login');
+      if (error) {
+        throw error;
       }
 
-      // Login bem-sucedido
-      login(data.user, data.token);
-      
       toast({
         title: "Login realizado com sucesso!",
-        description: `Bem-vindo, ${data.user.name}!`,
+        description: "Bem-vindo de volta!",
       });
 
       // Redirecionar para app após login
-      setTimeout(() => navigate('/app'), 1000);
+      setTimeout(() => navigate('/app'), 500);
 
     } catch (error: any) {
       toast({
         title: "Erro no login",
-        description: error.message,
+        description: error.message || "Email ou senha incorretos",
         variant: "destructive"
       });
     } finally {

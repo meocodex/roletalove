@@ -147,7 +147,7 @@ export default function StrategiesDemoPage() {
 
           <div className="text-right">
             <Badge className="bg-roulette-green text-white">
-              Plano Atual: {user?.planType || 'Básico'}
+              Plano Atual: {user?.plan_type || 'Básico'}
             </Badge>
             <p className="text-sm text-gray-400 mt-1">
               {user?.name || 'Usuário Teste'}

@@ -32,7 +32,7 @@ function AccessDenied({ requiredRole }: { requiredRole?: string }) {
           </p>
           
           <div className="text-sm text-gray-500 bg-gray-900 p-3 rounded">
-            <p><strong>Seu perfil:</strong> {user?.userRole || 'Não identificado'}</p>
+            <p><strong>Seu perfil:</strong> {user?.user_role || 'Não identificado'}</p>
             {requiredRole && (
               <p><strong>Necessário:</strong> {requiredRole}</p>
             )}
@@ -75,7 +75,7 @@ export function AdminGuard({
   }
   
   // Check if user is active
-  if (user.isActive === false) {
+  if (user.is_active === false) {
     return fallback || <AccessDenied requiredRole={requiredRole} />;
   }
   

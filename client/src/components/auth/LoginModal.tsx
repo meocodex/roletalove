@@ -29,7 +29,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
     password: ''
   });
 
-  const { login } = useAuth();
+  const { signIn } = useAuth();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -40,51 +40,19 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
       // Simulação de autenticação - em produção seria uma chamada real para API
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      if (isLogin) {
-        // Login simulation
-        if (formData.email && formData.password) {
-          const userData = {
-            id: 'user-001',
-            email: formData.email,
-            name: formData.name || 'Usuário',
-            planType: 'basico' as const,
-            userRole: 'user' as const
-          };
-          
-          login(userData);
-          
-          toast({
-            title: "Login realizado com sucesso!",
-            description: "Bem-vindo ao sistema de análise de roleta.",
-          });
-          
-          onOpenChange(false);
-        } else {
-          throw new Error('Email e senha são obrigatórios');
-        }
-      } else {
-        // Register simulation
-        if (formData.name && formData.email && formData.password) {
-          const userData = {
-            id: 'user-' + Date.now(),
-            email: formData.email,
-            name: formData.name,
-            planType: 'basico' as const,
-            userRole: 'user' as const
-          };
-          
-          login(userData);
-          
-          toast({
-            title: "Conta criada com sucesso!",
-            description: "Sua conta foi criada e você já está logado.",
-          });
-          
-          onOpenChange(false);
-        } else {
-          throw new Error('Todos os campos são obrigatórios');
-        }
+      // Usar signIn para login (este modal é apenas para demonstração)
+      const { error } = await signIn(formData.email, formData.password);
+      
+      if (error) {
+        throw error;
       }
+      
+      toast({
+        title: isLogin ? "Login realizado com sucesso!" : "Conta criada com sucesso!",
+        description: isLogin ? "Bem-vindo ao sistema de análise de roleta." : "Sua conta foi criada e você já está logado.",
+      });
+      
+      onOpenChange(false);
     } catch (error) {
       toast({
         title: "Erro",

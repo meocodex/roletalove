@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PlanType } from "@shared/schema";
 import { 
   Lock, 
   CheckCircle, 
@@ -179,10 +180,10 @@ export default function StrategyOverview() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('available');
   
-  const userPlan = user?.planType || 'basico';
+  const userPlan = user?.plan_type || 'basico';
   const availableStrategies = getAvailableStrategies(userPlan);
   const lockedStrategies = getLockedStrategies(userPlan);
-  const planConfig = PLAN_CONFIG[userPlan];
+  const planConfig = PLAN_CONFIG[userPlan as PlanType];
 
   return (
     <div className="space-y-6">

@@ -40,7 +40,7 @@ export default function RegisterPage() {
     confirmPassword: ''
   });
 
-  const { login } = useAuth();
+  const { signUp } = useAuth();
   const { toast } = useToast();
   const [, navigate] = useLocation();
 
@@ -81,38 +81,26 @@ export default function RegisterPage() {
         throw new Error('Nome e email são obrigatórios');
       }
 
-      // Chamada para API real
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          phone: formData.phone,
-          email: formData.email,
-          password: formData.password,
-          planType: selectedPlan,
-        }),
-      });
+      // Criar conta com Supabase Auth
+      const { error } = await signUp(
+        formData.email,
+        formData.password,
+        formData.name,
+        formData.phone,
+        selectedPlan
+      );
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Erro no cadastro');
+      if (error) {
+        throw error;
       }
 
-      // Registro bem-sucedido
-      login(data.user, data.token);
-      
       toast({
         title: "Conta criada com sucesso!",
         description: `Bem-vindo ao plano ${PLANS[selectedPlan].name}!`,
       });
 
-      // Na implementação real da Fase 3, redirecionaria para checkout de pagamento
-      // Por ora, vai direto para app
-      setTimeout(() => navigate('/app'), 1000);
+      // Redirecionar para app
+      setTimeout(() => navigate('/app'), 500);
       
     } catch (error: any) {
       toast({

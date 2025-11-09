@@ -1,20 +1,28 @@
 import { createContext, useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import type { User as SupabaseUser } from '@supabase/supabase-js';
 import { PlanType, UserRole, PLAN_FEATURES, ADMIN_FEATURES } from '@shared/schema';
 
-interface User {
+interface UserProfile {
   id: string;
+  auth_user_id: string;
   email: string;
   name: string;
-  planType: PlanType;
-  userRole: UserRole;
-  isActive?: boolean;
-  lastLoginAt?: Date | null;
+  phone: string;
+  plan_type: PlanType;
+  user_role: UserRole;
+  is_active: boolean;
+  last_login_at: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 interface AuthContextType {
-  user: User | null;
-  login: (userData: User, token?: string) => void;
-  logout: () => void;
+  user: UserProfile | null;
+  supabaseUser: SupabaseUser | null;
+  signUp: (email: string, password: string, name: string, phone: string, planType?: PlanType) => Promise<{ error?: Error }>;
+  signIn: (email: string, password: string) => Promise<{ error?: Error }>;
+  signOut: () => Promise<void>;
   hasFeature: (feature: string) => boolean;
   hasAdminFeature: (feature: string) => boolean;
   isAdmin: () => boolean;
@@ -24,8 +32,10 @@ interface AuthContextType {
 
 export const AuthContext = createContext<AuthContextType>({
   user: null,
-  login: () => {},
-  logout: () => {},
+  supabaseUser: null,
+  signUp: async () => ({ error: new Error('Not implemented') }),
+  signIn: async () => ({ error: new Error('Not implemented') }),
+  signOut: async () => {},
   hasFeature: () => false,
   hasAdminFeature: () => false,
   isAdmin: () => false,
@@ -38,104 +48,138 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [supabaseUser, setSupabaseUser] = useState<SupabaseUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Verificar se há token válido e restaurar usuário
-  useEffect(() => {
-    const checkAuth = async () => {
-      const token = localStorage.getItem('auth_token');
-      
-      if (!token) {
-        setIsLoading(false);
-        return;
+  // Buscar perfil do usuário
+  const fetchUserProfile = async (authUserId: string): Promise<UserProfile | null> => {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('auth_user_id', authUserId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching user profile:', error);
+        return null;
       }
 
-      try {
-        const response = await fetch('/api/auth/me', {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setUser(data.user);
-        } else {
-          // Token inválido ou expirado
-          localStorage.removeItem('auth_token');
-          localStorage.removeItem('user');
-        }
-      } catch (error) {
-        console.error('Auth check failed:', error);
-        localStorage.removeItem('auth_token');
-        localStorage.removeItem('user');
-      }
-
-      setIsLoading(false);
-    };
-
-    checkAuth();
-  }, []);
-
-  const login = (userData: User, token?: string) => {
-    setUser(userData);
-    localStorage.setItem('user', JSON.stringify(userData));
-    
-    if (token) {
-      localStorage.setItem('auth_token', token);
+      return data;
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+      return null;
     }
   };
 
-  const logout = async () => {
-    try {
-      const token = localStorage.getItem('auth_token');
+  // Verificar sessão inicial e configurar listener
+  useEffect(() => {
+    // Verificar sessão existente
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSupabaseUser(session?.user ?? null);
       
-      if (token) {
-        // Notificar o servidor sobre logout (opcional)
-        await fetch('/api/auth/logout', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
+      if (session?.user) {
+        fetchUserProfile(session.user.id).then(profile => {
+          setUser(profile);
+          setIsLoading(false);
         });
+      } else {
+        setIsLoading(false);
       }
+    });
+
+    // Listener para mudanças de autenticação
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSupabaseUser(session?.user ?? null);
+      
+      if (session?.user) {
+        fetchUserProfile(session.user.id).then(profile => {
+          setUser(profile);
+        });
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const signUp = async (
+    email: string,
+    password: string,
+    name: string,
+    phone: string,
+    planType: PlanType = 'basico'
+  ) => {
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name,
+            phone,
+            planType
+          }
+        }
+      });
+
+      if (error) throw error;
+      
+      return { error: undefined };
     } catch (error) {
-      console.error('Logout request failed:', error);
-    } finally {
-      // Limpar dados locais independente do resultado da requisição
-      setUser(null);
-      localStorage.removeItem('user');
-      localStorage.removeItem('auth_token');
+      return { error: error as Error };
     }
+  };
+
+  const signIn = async (email: string, password: string) => {
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) throw error;
+      
+      return { error: undefined };
+    } catch (error) {
+      return { error: error as Error };
+    }
+  };
+
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+    setSupabaseUser(null);
   };
 
   const hasFeature = (feature: string): boolean => {
     if (!user) return false;
-    const features = PLAN_FEATURES[user.planType];
+    const features = PLAN_FEATURES[user.plan_type];
     return features ? (features as readonly string[]).includes(feature) : false;
   };
 
   const hasAdminFeature = (feature: string): boolean => {
     if (!user) return false;
-    const features = ADMIN_FEATURES[user.userRole as keyof typeof ADMIN_FEATURES];
+    const features = ADMIN_FEATURES[user.user_role as keyof typeof ADMIN_FEATURES];
     return features ? (features as readonly string[]).includes(feature) : false;
   };
 
   const isAdmin = (): boolean => {
-    return user?.userRole === 'admin' || user?.userRole === 'super_admin';
+    return user?.user_role === 'admin' || user?.user_role === 'super_admin';
   };
 
   const isSuperAdmin = (): boolean => {
-    return user?.userRole === 'super_admin';
+    return user?.user_role === 'super_admin';
   };
 
   const contextValue: AuthContextType = {
     user,
-    login,
-    logout,
+    supabaseUser,
+    signUp,
+    signIn,
+    signOut,
     hasFeature,
     hasAdminFeature,
     isAdmin,

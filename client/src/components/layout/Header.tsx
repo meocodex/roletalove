@@ -32,7 +32,7 @@ interface HeaderProps {
 
 export function Header({ transparent = false }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { user, logout } = useAuth();
+  const { user, signOut } = useAuth();
   const { trialActive, daysLeft, isAdmin } = useSubscriptionAccess();
   const [location] = useLocation();
 
@@ -45,8 +45,8 @@ export function Header({ transparent = false }: HeaderProps) {
     { name: 'Sistema', href: '/app', icon: <BarChart3 className="w-4 h-4" /> },
   ];
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await signOut();
     setMobileMenuOpen(false);
   };
 

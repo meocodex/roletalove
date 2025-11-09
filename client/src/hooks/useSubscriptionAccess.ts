@@ -57,13 +57,13 @@ export function useSubscriptionAccess() {
   });
 
   // Admin sempre tem acesso total
-  if (user?.userRole === 'admin' || user?.userRole === 'super_admin') {
+  if (user?.user_role === 'admin' || user?.user_role === 'super_admin') {
     return {
       hasAccess: true,
       daysLeft: -1, // Ilimitado
       trialActive: false,
       status: 'active' as const,
-      planType: user.planType,
+      planType: user.plan_type,
       isAdmin: true,
       isLoading: false,
       error: null,

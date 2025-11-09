@@ -35,7 +35,7 @@ function UpgradePrompt({ featureName, requiredPlan }: UpgradePromptProps) {
         </p>
         
         <p className="text-sm text-gray-500 mb-6">
-          Seu plano atual: <span className="text-white">{user?.planType}</span>
+          Seu plano atual: <span className="text-white">{user?.plan_type}</span>
         </p>
         
         <Button 

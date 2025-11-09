@@ -171,7 +171,7 @@ export default function RouletteDashboard() {
         isConnected={isConnected}
         isMobile={isMobile}
         userName={user?.name}
-        userPlan={user?.planType}
+        userPlan={user?.plan_type}
         dashboardMode={dashboardMode}
         onToggleDashboardMode={toggleDashboardMode}
         getNumberColor={getNumberColor}

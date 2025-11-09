@@ -95,7 +95,7 @@ function StrategyUpgradePrompt({ strategyId }: StrategyUpgradePromptProps) {
         </div>
         
         <p className="text-sm text-gray-500 mb-6">
-          Seu plano atual: <span className="text-white font-medium">{getPlanName(user?.planType || 'basico')}</span>
+          Seu plano atual: <span className="text-white font-medium">{getPlanName(user?.plan_type || 'basico')}</span>
         </p>
         
         <Button 
@@ -112,8 +112,8 @@ function StrategyUpgradePrompt({ strategyId }: StrategyUpgradePromptProps) {
 
 export function StrategyGuard({ strategyId, children, fallback, showUpgrade = true }: StrategyGuardProps) {
   const { user } = useAuth();
-  const userPlan = user?.planType || 'basico';
-  const userRole = user?.userRole || 'user';
+  const userPlan = user?.plan_type || 'basico';
+  const userRole = user?.user_role || 'user';
 
   if (hasStrategyAccess(userPlan, strategyId, userRole)) {
     return <>{children}</>;
@@ -133,8 +133,8 @@ export function StrategyGuard({ strategyId, children, fallback, showUpgrade = tr
 // Hook para verificar acesso a múltiplas estratégias
 export function useStrategyAccess() {
   const { user } = useAuth();
-  const userPlan = user?.planType || 'basico';
-  const userRole = user?.userRole || 'user';
+  const userPlan = user?.plan_type || 'basico';
+  const userRole = user?.user_role || 'user';
 
   return {
     hasStrategyAccess: (strategyId: StrategyType) => hasStrategyAccess(userPlan, strategyId, userRole),
