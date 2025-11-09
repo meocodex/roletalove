@@ -1,11 +1,15 @@
 import { type RouletteResult } from '@shared/schema';
 
 export interface PatternResult {
+  id?: string;
   type: string;
   sequence: any[];
   targetOutcome: any;
+  outcomes?: any;
   probability: number;
   confidence: number;
+  totalOccurrences?: number;
+  successCount?: number;
   description: string;
   suggestion: string;
 }

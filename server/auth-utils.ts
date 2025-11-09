@@ -34,7 +34,7 @@ export async function comparePassword(password: string, hashedPassword: string):
 export function generateToken(user: AuthUser): string {
   return jwt.sign(user, JWT_SECRET, {
     expiresIn: JWT_EXPIRES_IN,
-  });
+  } as jwt.SignOptions);
 }
 
 // Verify JWT token
@@ -131,7 +131,8 @@ export function requirePlan(plans: string[]) {
 // Utilitário para extrair token do header
 export function extractTokenFromHeader(req: Request): string | null {
   const authHeader = req.headers['authorization'];
-  return authHeader && authHeader.split(' ')[1];
+  const token = authHeader?.split(' ')[1];
+  return token ?? null;
 }
 
 // Refresh token (implementação básica)

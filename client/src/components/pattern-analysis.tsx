@@ -77,9 +77,9 @@ export function PatternAnalysis({ patterns, className }: PatternAnalysisProps) {
               </p>
             </div>
           ) : (
-            topPatterns.map((pattern) => (
+            topPatterns.map((pattern, index) => (
               <div
-                key={pattern.id}
+                key={pattern.id || `pattern-${index}`}
                 className={`border rounded p-3 ${getSeverityColor(pattern.probability)}`}
               >
                 <div className="flex items-center justify-between mb-2">
@@ -93,7 +93,7 @@ export function PatternAnalysis({ patterns, className }: PatternAnalysisProps) {
                 
                 <div className="text-xs text-gray-300 mb-2">
                   {pattern.type === 'color_sequence' && (
-                    <>Sequência: {JSON.stringify(pattern.sequence)} → {String(pattern.outcomes)}</>
+                    <>Sequência: {JSON.stringify(pattern.sequence)} → {pattern.outcomes ? String(pattern.outcomes) : 'N/A'}</>
                   )}
                   {pattern.type === 'dozen_hot' && (
                     <>Dúzia: {String(pattern.sequence)}</>
@@ -110,7 +110,7 @@ export function PatternAnalysis({ patterns, className }: PatternAnalysisProps) {
                 </div>
                 
                 <div className="mt-2 text-xs text-gray-500">
-                  Ocorrências: {pattern.totalOccurrences} | Acertos: {pattern.successCount}
+                  Ocorrências: {pattern.totalOccurrences ?? 0} | Acertos: {pattern.successCount ?? 0}
                 </div>
               </div>
             ))

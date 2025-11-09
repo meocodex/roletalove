@@ -114,12 +114,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const hasFeature = (feature: string): boolean => {
     if (!user) return false;
-    return PLAN_FEATURES[user.planType]?.includes(feature as any) || false;
+    const features = PLAN_FEATURES[user.planType];
+    return features ? (features as readonly string[]).includes(feature) : false;
   };
 
   const hasAdminFeature = (feature: string): boolean => {
     if (!user) return false;
-    return ADMIN_FEATURES[user.userRole as keyof typeof ADMIN_FEATURES]?.includes(feature as any) || false;
+    const features = ADMIN_FEATURES[user.userRole as keyof typeof ADMIN_FEATURES];
+    return features ? (features as readonly string[]).includes(feature) : false;
   };
 
   const isAdmin = (): boolean => {

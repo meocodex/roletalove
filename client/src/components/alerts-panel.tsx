@@ -124,16 +124,16 @@ export function AlertsPanel({ className }: AlertsPanelProps) {
                   </div>
                   
                   {/* Additional data display */}
-                  {alert.data && typeof alert.data === 'object' && (
+                  {alert.data && typeof alert.data === 'object' ? (
                     <div className="text-gray-400 text-xs mt-1">
-                      {alert.type === 'strategy_hit' && (alert.data as any)?.number && (
-                        <span>Número: {(alert.data as any).number}</span>
+                      {alert.type === 'strategy_hit' && ((alert.data as { number?: number }).number) && (
+                        <span>Número: {(alert.data as { number?: number }).number}</span>
                       )}
-                      {alert.type === 'pattern_detected' && (alert.data as any)?.probability && (
-                        <span>Probabilidade: {Math.round((alert.data as any).probability * 100)}%</span>
+                      {alert.type === 'pattern_detected' && ((alert.data as { probability?: number }).probability) && (
+                        <span>Probabilidade: {Math.round(((alert.data as { probability?: number }).probability || 0) * 100)}%</span>
                       )}
                     </div>
-                  )}
+                  ) : null}
                 </div>
               </div>
             ))

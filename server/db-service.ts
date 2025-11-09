@@ -86,6 +86,7 @@ class DatabaseService {
         id: users.id,
         email: users.email,
         name: users.name,
+        phone: users.phone,
         planType: users.planType,
         userRole: users.userRole,
         isActive: users.isActive,
