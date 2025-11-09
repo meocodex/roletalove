@@ -27,15 +27,23 @@
     <!-- PWA Service Worker Registration -->
     <script>
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
-            .then((registration) => {
-              console.log('SW registrado com sucesso:', registration.scope);
-            })
-            .catch((registrationError) => {
-              console.log('SW registration falhou:', registrationError);
-            });
-        });
+        const isLocal = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+        if (!isLocal) {
+          window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js?v=2')
+              .then((registration) => {
+                console.log('SW registrado:', registration.scope);
+              })
+              .catch((err) => {
+                console.warn('SW registration falhou:', err);
+              });
+          });
+        } else {
+          navigator.serviceWorker.getRegistrations().then((registrations) => {
+            registrations.forEach((registration) => registration.unregister());
+            console.log('SW desregistrado em desenvolvimento');
+          });
+        }
       }
     </script>
     

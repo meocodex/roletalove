@@ -1,4 +1,6 @@
 import express, { type Request, Response, NextFunction } from "express";
+import fs from "fs";
+import path from "path";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { testConnection, initializeDatabase } from "./database";
@@ -56,9 +58,16 @@ app.use((req, res, next) => {
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
-  if (app.get("env") === "development") {
+  // Verificar se existe build antes de decidir modo
+  const distPath = path.resolve(import.meta.dirname, "..", "dist", "public");
+  const hasBuild = fs.existsSync(distPath);
+  const isDev = process.env.NODE_ENV !== "production" || !hasBuild;
+
+  if (isDev) {
+    log("🔧 Running in development mode with Vite");
     await setupVite(app, server);
   } else {
+    log("📦 Running in production mode with static files");
     serveStatic(app);
   }
 

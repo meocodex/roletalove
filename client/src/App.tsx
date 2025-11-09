@@ -63,6 +63,7 @@ function Router() {
 }
 
 function App() {
+  console.log("[boot] App component mounted");
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>

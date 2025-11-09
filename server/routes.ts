@@ -27,6 +27,11 @@ import {
 import { authenticateToken } from "./auth-utils";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Health Check - PUBLIC
+  app.get('/api/health', (_req, res) => {
+    res.json({ status: 'ok', timestamp: new Date().toISOString(), env: process.env.NODE_ENV || 'development' });
+  });
+
   // Auth Routes - PUBLIC
   app.post('/api/auth/register', registerUser);
   app.post('/api/auth/login', loginUser);
