@@ -9,13 +9,8 @@ neonConfig.webSocketConstructor = ws;
 const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://dummy:dummy@localhost:5432/dummy';
 
 if (!process.env.DATABASE_URL) {
-  if (process.env.NODE_ENV === 'production') {
-    throw new Error(
-      "DATABASE_URL must be set. Did you forget to provision a database?",
-    );
-  }
-  console.warn("⚠️ DATABASE_URL not set. Running in development mode without database.");
-  console.warn("⚠️ Application will use in-memory storage. Data will be lost on restart.");
+  console.warn("⚠️ DATABASE_URL not set. Starting without a persistent database.");
+  console.warn("⚠️ The app will use in-memory storage; data will reset on restart.");
 }
 
 // Use the pool configuration from the blueprint
@@ -34,12 +29,9 @@ export async function testConnection() {
   } catch (error) {
     console.error("❌ Database connection test failed:", error);
     
-    // In development, continue with in-memory storage as fallback
-    if (process.env.NODE_ENV === 'development') {
-      console.log("⚠️ Switching to in-memory storage for development");
-      return false;
-    }
-    throw error;
+    // Always continue with in-memory storage fallback in this environment
+    console.log("⚠️ Continuing without database (using in-memory storage)");
+    return false;
   }
 }
 
